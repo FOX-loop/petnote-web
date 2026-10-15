@@ -9,9 +9,9 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="寵物筆記">
+<meta name="apple-mobile-web-app-title" content="貓貓筆記">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>寵物筆記</title>
+<title>貓貓筆記</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* 版面：單欄手機 App。上方寵物切換、中間內容、下方四個分頁。招牌元素是驅蟲「集章」格，像寵物健康手冊蓋章。 */
@@ -326,6 +326,14 @@ var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHour
 var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
+var APP_VERSION='1.1.0';
+function isNative(){try{var c=window.Capacitor;return !!(c&&c.isNativePlatform&&c.isNativePlatform())}catch(e){return false}}
+function apkUrl(){
+  var m=/^([a-z0-9-]+)\.github\.io$/i.exec(location.hostname);if(!m)return '';
+  var repo=(location.pathname.split('/').filter(Boolean)[0]||'');
+  if(!repo||/\.html?$/i.test(repo))return '';
+  return 'https://github.com/'+m[1]+'/'+repo+'/releases/latest/download/PetNote.apk';
+}
 
 /* ================= 類型與圖示 ================= */
 var TYPES=[
@@ -562,7 +570,7 @@ function planMonth(pet,item,cm){
 function render(){renderTop();renderNav();renderMain();renderFab()}
 function renderTop(){
   var t=new Date();
-  var row='<div class="toprow"><span class="brand">寵物筆記</span><span class="today">'+(t.getMonth()+1)+'月'+t.getDate()+'日 週'+WD[t.getDay()]+'</span></div>';
+  var row='<div class="toprow"><span class="brand">貓貓筆記</span><span class="today">'+(t.getMonth()+1)+'月'+t.getDate()+'日 週'+WD[t.getDay()]+'</span></div>';
   if(!S.pets.length){$('#top').innerHTML=row;return}
   $('#top').innerHTML=row+'<div class="chips">'+S.pets.map(function(p){
     return '<button class="pchip '+(p.id===S.sel?'on':'')+'" data-act="selpet" data-id="'+p.id+'">'+avatar(p,30)+'<span>'+esc(p.name)+'</span></button>';
@@ -809,7 +817,12 @@ function viewMore(){
   }).join('')+'<button class="lrow" data-act="libedit"><span class="av" style="--s:40px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增疫苗</b><small style="display:block">建立後，新增施打紀錄時直接點選</small></span></button></div></div>';
   h+='<div class="sechead">手機通知</div><div class="card"><p class="about" id="notifTxt" style="margin:0">檢查中…</p><div id="notifBtns"></div></div>';
   h+='<div class="sechead">資料備份</div><div class="card"><div class="actions"><button class="btn" data-act="export">匯出備份</button><button class="btn" data-act="import">匯入備份</button></div><input id="importFile" type="file" accept=".json,application/json" hidden><p class="about">資料只存在這支手機（或這個瀏覽器）裡。換手機、重新安裝或清除瀏覽器資料前，請先匯出備份檔並存到雲端硬碟。匯入時會與現有資料合併。使用網頁版時，建議每個月匯出一次。</p></div>';
-  h+='<div class="sechead">關於</div><div class="about">寵物筆記 1.0<br>記錄每隻寵物的年齡、紀念日、身體狀況、每月驅蟲與預防針。</div>';
+  if(!isNative()){
+    var au=apkUrl();
+    h+='<div class="sechead">在其他手機使用</div><div class="card"><p class="about" style="margin:0"><b>iPhone</b>：用 Safari 打開這個網址，點下方「分享」→「加入主畫面」，就會像 App 一樣有圖示。<br><b>Android</b>：用 Chrome 打開，點右上角選單 →「加到主畫面」。'+(au?'也可以安裝 App 版，會在早上跳出提醒通知。':'')+'</p>'+
+      (au?'<a class="btn block" style="margin-top:12px;text-decoration:none" href="'+esc(au)+'" target="_blank" rel="noopener">下載 Android App（APK）</a>':'')+'</div>';
+  }
+  h+='<div class="sechead">關於</div><div class="about">貓貓筆記 '+APP_VERSION+(isNative()?'（Android App）':'（網頁版）')+'<br>記錄每隻寵物的年齡、紀念日、身體狀況、每月驅蟲與預防針。</div>';
   return h;
 }
 
@@ -1109,7 +1122,7 @@ function openWormBackfill(){
 /* ================= 備份 ================= */
 async function exportData(){
   var data={app:'petnote',version:3,exported:new Date().toISOString(),vaccLib:S.lib,pets:S.pets,logs:S.logs,worms:S.worms,vaccines:S.vaccs};
-  var text=JSON.stringify(data),name='寵物筆記備份-'+ymd(new Date())+'.json';
+  var text=JSON.stringify(data),name='貓貓筆記備份-'+ymd(new Date())+'.json';
   var cap=window.Capacitor,P=cap&&cap.Plugins;
   try{
     if(cap&&cap.isNativePlatform&&cap.isNativePlatform()&&P&&P.Filesystem&&P.Share){
@@ -1137,7 +1150,7 @@ async function importData(file){
     for(i=0;i<(d.vaccines||[]).length;i++){var v=d.vaccines[i];if(v&&v.id&&v.petId){await saveVacc(v);nv++}}
     if(!curPet()&&S.pets.length)S.sel=S.pets[0].id;
     render();toast('已匯入 '+np+' 隻寵物、'+nl+' 筆狀況、'+nw+' 筆驅蟲、'+nv+' 筆預防針');
-  }catch(e){toast('這不是寵物筆記的備份檔')}
+  }catch(e){toast('這不是貓貓筆記的備份檔')}
 }
 
 /* ================= 範例資料 ================= */
@@ -1213,7 +1226,7 @@ var Notif=(function(){
   }
   async function test(){
     var P=plug();if(!P)return false;
-    try{await P.schedule({notifications:[{id:9999,title:'寵物筆記',body:'這是測試通知，看到這則代表提醒功能正常。',schedule:{at:new Date(Date.now()+5000),allowWhileIdle:true}}]});return true}catch(e){return false}
+    try{await P.schedule({notifications:[{id:9999,title:'貓貓筆記',body:'這是測試通知，看到這則代表提醒功能正常。',schedule:{at:new Date(Date.now()+5000),allowWhileIdle:true}}]});return true}catch(e){return false}
   }
   return {status:status,ask:ask,ensure:ensure,test:test,sync:queue};
 })();
@@ -1223,7 +1236,7 @@ async function updateNotifCard(){
   var msg={
     web:'網頁版不會跳出手機通知，快到期的預防針與本月驅蟲會顯示在首頁最上方。Android 手機安裝 App 版，才會在早上 9:00 跳通知。',
     granted:'通知已開啟。預防針與驅蟲會依你設定的提醒時間，在早上 9:00 通知你。',
-    denied:'通知被關閉了。請到手機「設定 → 應用程式 → 寵物筆記 → 通知」開啟。',
+    denied:'通知被關閉了。請到手機「設定 → 應用程式 → 貓貓筆記 → 通知」開啟。',
     error:'暫時無法確認通知狀態。'
   };
   t.textContent=msg[st]||'尚未允許通知，開啟後才能收到提醒。';
@@ -1288,6 +1301,7 @@ function applyTheme(){
   var s=lsGet('petnote.sel');S.sel=(S.pets.filter(function(p){return p.id===s})[0]||S.pets[0]||{}).id||null;
   render();Notif.sync();
   if(!DB.ok)toast('目前無法永久儲存資料');
+  else{var lv=lsGet('petnote.ver');if(lv&&lv!==APP_VERSION)toast('已更新到 '+APP_VERSION+' 版，資料都還在');lsSet('petnote.ver',APP_VERSION)}
   try{
     var cap=window.Capacitor,native=cap&&cap.isNativePlatform&&cap.isNativePlatform();
     if(!native&&'serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(function(){});
