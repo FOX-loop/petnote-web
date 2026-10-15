@@ -1,0 +1,1301 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F6E7E">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="寵物筆記">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>寵物筆記</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* 版面：單欄手機 App。上方寵物切換、中間內容、下方四個分頁。招牌元素是驅蟲「集章」格，像寵物健康手冊蓋章。 */
+:root{
+  --bg:#EEF3F1; --surface:#FFFFFF; --surface2:#E3EBE8; --ink:#14262B; --ink2:#52666B; --line:#D2DDDA;
+  --primary:#0F6E7E; --on-primary:#FFFFFF; --primary-soft:#D5EBEE;
+  --accent:#D9691F; --accent-soft:#FBE5D2;
+  --ok:#277D50; --ok-soft:#D6EFE1; --bad:#B93B35; --bad-soft:#F8DCD9;
+  --shadow:0 1px 2px rgba(20,38,43,.06),0 6px 18px rgba(20,38,43,.06);
+  --scrim:rgba(10,20,22,.5);
+  --ts:55%; --tl:34%; --bs:62%; --bl:91%;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px); --navpad:0px;
+  --font:system-ui,-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1618; --surface:#162226; --surface2:#1F2F34; --ink:#E4EEEC; --ink2:#9BB0B3; --line:#2B3E43;
+    --primary:#5CC1D0; --on-primary:#06262B; --primary-soft:#173B41;
+    --accent:#F29A5B; --accent-soft:#41291A;
+    --ok:#5CCB93; --ok-soft:#173528; --bad:#F27D75; --bad-soft:#401E1C;
+    --shadow:0 1px 2px rgba(0,0,0,.45); --scrim:rgba(0,0,0,.62);
+    --ts:68%; --tl:74%; --bs:32%; --bl:21%;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1618; --surface:#162226; --surface2:#1F2F34; --ink:#E4EEEC; --ink2:#9BB0B3; --line:#2B3E43;
+  --primary:#5CC1D0; --on-primary:#06262B; --primary-soft:#173B41;
+  --accent:#F29A5B; --accent-soft:#41291A;
+  --ok:#5CCB93; --ok-soft:#173528; --bad:#F27D75; --bad-soft:#401E1C;
+  --shadow:0 1px 2px rgba(0,0,0,.45); --scrim:rgba(0,0,0,.62);
+  --ts:68%; --tl:74%; --bs:32%; --bl:21%;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{height:100%;box-sizing:border-box;background:var(--bg)}
+body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--font);overflow:hidden;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.ic{display:block;flex:none}
+b{font-weight:700}
+small{font-size:12.5px;color:var(--ink2)}
+
+#app{height:100%;display:flex;flex-direction:column;min-height:0}
+#top{flex:none;padding-top:10px;padding-bottom:6px}
+.toprow{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.brand{font-weight:800;font-size:17px;letter-spacing:.04em;color:var(--primary)}
+.today{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.chips::-webkit-scrollbar{display:none}
+.pchip{flex:none;display:flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 8px;border-radius:22px;background:var(--surface);border:1.5px solid var(--line);font-weight:600;max-width:60vw}
+.pchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pchip.on{border-color:var(--primary);background:var(--primary-soft);color:var(--primary)}
+.pchip.add{padding:0;width:44px;justify-content:center;color:var(--primary);border-style:dashed}
+
+.mainwrap{position:relative;flex:1;min-height:0}
+main{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding-top:6px;padding-bottom:96px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow);min-width:0}
+.card h2{margin:0;font-size:16px;font-weight:700}
+.cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.linkbtn{color:var(--primary);font-weight:600;font-size:14px;min-height:36px;padding:0 4px;display:flex;align-items:center;gap:2px}
+
+.av{width:var(--s,48px);height:var(--s,48px);border-radius:30%;object-fit:cover;flex:none;display:grid;place-items:center;font-weight:700;font-size:calc(var(--s,48px)*.42);color:hsl(var(--h,200) var(--ts) var(--tl));background:hsl(var(--h,200) var(--bs) var(--bl))}
+.pchip .av{border-radius:50%}
+
+.pet{border-radius:24px;padding:18px}
+.pet-top{display:flex;gap:14px;align-items:center}
+.pet-top .grow{flex:1;min-width:0}
+.pet h1{margin:0;font-size:25px;line-height:1.2;font-weight:800;overflow-wrap:anywhere}
+.pet .meta{color:var(--ink2);font-size:14px;margin-top:2px}
+.iconbtn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--ink2);background:var(--surface2);flex:none}
+.facts{display:grid;grid-template-columns:1fr 1fr;margin:16px 0 0;border-top:1px dashed var(--line)}
+.facts div{padding:10px 0 0}
+.facts div+div{padding-left:14px;border-left:1px dashed var(--line)}
+.facts dt{font-size:12.5px;color:var(--ink2)}
+.facts dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+.age{margin-top:14px;padding:14px;border-radius:14px;background:var(--primary-soft)}
+.age-nums{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:baseline}
+.age-nums span{font-size:15px;color:var(--primary)}
+.age-nums b{font-size:36px;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-right:3px}
+.age .sub{margin-top:6px;font-size:13.5px;color:var(--ink2)}
+.age .party{margin-top:8px;display:inline-block;padding:3px 10px;border-radius:99px;background:var(--accent);color:var(--surface);font-weight:700;font-size:13.5px}
+
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{min-height:46px;padding:0 18px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--surface2);color:var(--ink)}
+.btn.primary{background:var(--primary);color:var(--on-primary)}
+.btn.danger{background:var(--bad-soft);color:var(--bad)}
+.btn.block{width:100%}
+
+.annbig{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.annbig b{font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--accent);letter-spacing:-.02em}
+.annbig span{color:var(--ink2);font-size:14px}
+.bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden;margin:12px 0 6px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.todaybanner{margin-bottom:12px;padding:10px 12px;border-radius:12px;background:var(--accent);color:var(--surface);font-weight:700}
+.evlist{list-style:none;margin:10px 0 0;padding:0}
+.evlist li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.evlist .when{margin-left:auto;font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.evlist .nm{font-weight:600}
+.evlist small{display:block}
+.pill{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:99px;font-size:12.5px;font-weight:700;white-space:nowrap;background:var(--surface2);color:var(--ink2)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--accent-soft);color:var(--accent)}
+.pill.cnt{background:var(--primary-soft);color:var(--primary)}
+
+.wrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.cardhead+.wrow{border-top:0;padding-top:0}
+.wrow .nm{flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere}
+.mini{min-height:36px;padding:0 14px;border-radius:12px;background:var(--primary);color:var(--on-primary);font-weight:700;font-size:14px}
+
+.tag{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:99px;font-size:13px;font-weight:700;white-space:nowrap;color:hsl(var(--h,200) var(--ts) var(--tl));background:hsl(var(--h,200) var(--bs) var(--bl))}
+.recent{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);width:100%;text-align:left}
+.recent:first-of-type{border-top:0;padding-top:0}
+.recent .tx{flex:1;min-width:0}
+.recent .tx p{margin:2px 0 0;color:var(--ink2);font-size:14px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.recent time{font-size:12.5px;color:var(--ink2);white-space:nowrap}
+
+.pagehead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 12px}
+.pagehead h2{margin:0;font-size:22px;font-weight:800}
+.filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 14px 0;padding-right:max(16px,env(safe-area-inset-right,0px))}
+.filters::-webkit-scrollbar{display:none}
+.fchip{flex:none;height:36px;padding:0 14px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);font-weight:600;font-size:14px;white-space:nowrap}
+.fchip.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.dayh{margin:18px 0 8px;font-size:14px;font-weight:700;color:var(--ink2);display:flex;gap:8px;align-items:baseline}
+.dayh:first-child{margin-top:0}
+.dayh small{font-weight:600}
+.entry{position:relative;display:flex;gap:12px;padding-bottom:12px;width:100%;text-align:left}
+.entry .rail{flex:none;width:14px;position:relative;display:flex;justify-content:center}
+.entry .rail::before{content:"";position:absolute;top:18px;bottom:-12px;width:2px;background:var(--line)}
+.entry:last-child .rail::before{display:none}
+.entry .dot{position:relative;margin-top:8px;width:12px;height:12px;border-radius:50%;background:hsl(var(--h,200) var(--ts) var(--tl));box-shadow:0 0 0 3px var(--bg)}
+.ebody{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.ehead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ehead time{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.note{margin:8px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.thumbs button{aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--surface2);min-width:0}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.fab{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:16px;height:54px;padding:0 20px 0 16px;border-radius:27px;background:var(--primary);color:var(--on-primary);font-weight:800;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.empty{text-align:center;padding:36px 12px;color:var(--ink2)}
+.empty h3{margin:0 0 6px;color:var(--ink);font-size:18px}
+.empty p{margin:0 0 16px}
+.empty .btn{margin:4px}
+
+.yearnav{display:flex;align-items:center;gap:4px}
+.yearnav b{min-width:64px;text-align:center;font-size:17px;font-variant-numeric:tabular-nums}
+.yearnav button{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--surface2)}
+.remindline{display:flex;align-items:center;gap:10px;margin-bottom:14px;color:var(--ink2);font-size:14px}
+.remindline span{flex:1;min-width:0}
+.stampcard h2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stamps{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.stamp{aspect-ratio:1;min-width:0;border-radius:50%;border:1.5px solid var(--line);color:var(--ink2);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;font-size:13px;font-weight:600;background:var(--bg);font-variant-numeric:tabular-nums}
+.stamp small{font-size:10.5px;color:inherit;opacity:.9}
+.stamp.future{opacity:.55}
+.stamp.now{border-color:var(--primary);color:var(--primary);border-width:2px}
+.stamp.plan{border:2px dashed var(--accent);color:var(--accent)}
+.stamp.done{border:0;color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent),inset 0 0 0 5px var(--accent-soft),inset 0 0 0 6px var(--accent);transform:rotate(var(--rot,0deg));font-weight:800}
+.stamp.done{font-size:12.5px}
+.stamp.done small{font-weight:700;font-size:10px}
+
+.list{display:flex;flex-direction:column}
+.lrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);width:100%;text-align:left}
+.lrow:first-child{border-top:0}
+.lrow .grow{flex:1;min-width:0}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{min-height:42px;padding:0 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:600}
+.seg button.on{border-color:var(--primary);background:var(--primary-soft);color:var(--primary)}
+.sechead{margin:22px 2px 8px;font-size:13px;font-weight:700;color:var(--ink2)}
+.sechead:first-child{margin-top:4px}
+.about{font-size:13px;color:var(--ink2);line-height:1.7;padding:4px 2px}
+
+nav.tabs{flex:none;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:var(--navpad)}
+nav.tabs button{min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11.5px;font-weight:600;color:var(--ink2)}
+nav.tabs .ico{width:46px;height:30px;border-radius:15px;display:grid;place-items:center}
+nav.tabs button.on{color:var(--primary)}
+nav.tabs button.on .ico{background:var(--primary-soft)}
+
+.alerts{display:flex;flex-direction:column;gap:8px}
+.alert{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:var(--accent-soft);color:var(--ink);font-weight:600;width:100%;text-align:left;line-height:1.35}
+.alert span{flex:1;min-width:0;overflow-wrap:anywhere}
+.alert svg{color:var(--accent)}
+.alert.bad{background:var(--bad-soft)}
+.alert.bad svg{color:var(--bad)}
+.vnext{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.vnext span{color:var(--ink2);font-size:14px}
+.vnext b{font-size:28px;line-height:1.2;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.hist{margin-top:12px;border-top:1px dashed var(--line)}
+.hrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line);width:100%;text-align:left}
+.hist .hrow:first-child,.yrh+.hrow{border-top:0}
+.hrow .d{font-variant-numeric:tabular-nums;font-weight:700;flex:none}
+.hrow .grow{flex:1;min-width:0;overflow-wrap:anywhere}
+.hrow svg{color:var(--ink2)}
+.yrh{margin:12px 0 2px;font-size:13px;font-weight:700;color:var(--ink2)}
+.yrh:first-of-type{margin-top:0}
+.itemcard{border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.itemcard .top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.itemcard .top b{min-width:0;overflow-wrap:anywhere}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two>div{min-width:0}
+.layer{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:transparent;transition:background .2s}
+.layer.open{background:var(--scrim)}
+.layer.center{align-items:center;padding:24px}
+.sheet{width:100%;max-width:560px;max-height:calc(100% - var(--sat) - 12px);display:flex;flex-direction:column;background:var(--surface);border-radius:24px 24px 0 0;transform:translateY(100%);transition:transform .24s cubic-bezier(.2,.8,.2,1);padding-bottom:var(--sab)}
+.layer.open .sheet{transform:none}
+.sheet-h{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:14px;padding-bottom:8px}
+.sheet-h h3{margin:0;font-size:18px;font-weight:800;overflow-wrap:anywhere}
+.sheet-b{flex:1;min-height:0;overflow-y:auto;padding-top:6px;padding-bottom:18px;overscroll-behavior:contain}
+.sheet-f{flex:none;display:flex;gap:10px;padding-top:10px;padding-bottom:14px;border-top:1px solid var(--line)}
+.sheet-f .btn{flex:1}
+.sheet-f .btn.danger{flex:none}
+.dlg{width:100%;max-width:360px;background:var(--surface);border-radius:20px;padding:20px;transform:scale(.94);opacity:0;transition:transform .18s,opacity .18s}
+.layer.open .dlg{transform:none;opacity:1}
+.dlg p{margin:0 0 16px;font-size:16px;overflow-wrap:anywhere}
+.dlg .row{display:flex;gap:10px}
+.dlg .row .btn{flex:1}
+.viewer{background:#000}
+.layer.viewer.open{background:#000}
+.vimg{position:absolute;inset:0;display:grid;place-items:center}
+.vimg img{max-width:100%;max-height:100%;object-fit:contain}
+.vbar{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;padding-top:calc(var(--sat) + 10px);color:#fff;font-variant-numeric:tabular-nums}
+.vbar button,.vnav button{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;display:grid;place-items:center}
+.vnav{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;padding-bottom:calc(var(--sab) + 18px)}
+
+.field{margin-bottom:14px;min-width:0}
+.field>label,.lbl{display:block;font-size:13.5px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+input[type=text],input[type=date],input[type=datetime-local],select,textarea{width:100%;min-width:0;min-height:46px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);appearance:none;-webkit-appearance:none}
+textarea{min-height:104px;resize:vertical;line-height:1.5}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--ink2) 50%),linear-gradient(135deg,var(--ink2) 50%,transparent 50%);background-position:calc(100% - 18px) 20px,calc(100% - 13px) 20px;background-size:5px 5px;background-repeat:no-repeat;padding-right:32px}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);outline:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:12.5px;color:var(--ink2);margin-top:6px}
+.av-pick{display:flex;flex-direction:column;align-items:center;margin-bottom:14px}
+.av-btn{position:relative}
+.av-cam{position:absolute;right:-4px;bottom:-4px;width:30px;height:30px;border-radius:50%;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;border:3px solid var(--surface)}
+.swrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.swrow>span:first-child{min-width:0}
+.swrow b{display:block}
+.sw{position:relative;flex:none;width:52px;height:32px}
+.sw input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;z-index:1;cursor:pointer}
+.sw i{position:absolute;inset:0;border-radius:16px;background:var(--line);transition:background .15s}
+.sw i::after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw input:checked+i{background:var(--primary)}
+.sw input:checked+i::after{transform:translateX(20px)}
+.sw input:focus-visible+i{outline:2px solid var(--primary);outline-offset:2px}
+.typegrid{display:flex;flex-wrap:wrap;gap:8px}
+.typegrid button{min-height:40px;padding:0 14px;border-radius:20px;border:1.5px solid var(--line);background:var(--surface);font-weight:600;font-size:14px}
+.typegrid button.on{border-color:hsl(var(--h) var(--ts) var(--tl));color:hsl(var(--h) var(--ts) var(--tl));background:hsl(var(--h) var(--bs) var(--bl))}
+.vchips{display:flex;flex-wrap:wrap;gap:8px}
+.vchips button{min-height:42px;padding:0 14px;border-radius:21px;border:1.5px solid var(--line);background:var(--surface);font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.vchips button.on{border-color:var(--primary);background:var(--primary-soft);color:var(--primary)}
+.vchips button.new{border-style:dashed;color:var(--primary)}
+.vchips .chk{width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;display:grid;place-items:center;flex:none;font-size:11px;line-height:1;font-weight:800}
+.vchips button.on .chk{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.pill.mute{background:var(--surface2);color:var(--ink2)}
+.pickrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pickrow .ph{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--surface2);min-width:0}
+.pickrow .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.pickrow .ph button.rm{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;display:grid;place-items:center}
+.pickrow .addph{aspect-ratio:1;border-radius:12px;border:1.5px dashed var(--ink2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink2);font-size:13px;font-weight:600;min-width:0}
+.itemrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.itemrow .nm{flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere}
+.itemrow select{width:112px;flex:none}
+.itemrow input{flex:1}
+
+.toast{position:fixed;left:50%;bottom:calc(var(--sab) + 84px);transform:translate(-50%,12px);max-width:86%;padding:11px 18px;border-radius:14px;background:var(--ink);color:var(--bg);font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:80;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<style>
+/* Android 外殼：套用 Capacitor 注入的安全區域（狀態列、手勢列） */
+:root{--sat:var(--safe-area-inset-top,env(safe-area-inset-top,0px));--sab:var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px));--navpad:var(--sab)}
+html{padding-top:var(--sat)}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header id="top" class="gut"></header>
+  <div class="mainwrap">
+    <main id="main" class="gut"></main>
+    <div id="fabslot"></div>
+  </div>
+  <nav class="tabs" id="nav" aria-label="主選單"></nav>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+/* ================= 基本工具 ================= */
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var uid=function(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)};
+var pad=function(n){return String(n).padStart(2,'0')};
+var ymd=function(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+var ym=function(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)};
+var parseD=function(s){var a=s.split('-').map(Number);return new Date(a[0],a[1]-1,a[2])};
+var today=function(){var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())};
+var dayDiff=function(a,b){return Math.round((a-b)/864e5)};
+var addDays=function(d,n){return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n)};
+var addMonths=function(d,n){var t=new Date(d.getFullYear(),d.getMonth()+n,1);var last=new Date(t.getFullYear(),t.getMonth()+1,0).getDate();t.setDate(Math.min(d.getDate(),last));return t};
+var monthAdd=function(m,n){var a=m.split('-').map(Number);return ym(new Date(a[0],a[1]-1+n,1))};
+var monthsBetween=function(a,b){var x=a.split('-').map(Number),y=b.split('-').map(Number);return (y[0]-x[0])*12+(y[1]-x[1])};
+var WD=['日','一','二','三','四','五','六'];
+var fmtD=function(s){return s?s.replace(/-/g,'/'):''};
+var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHours())+':'+pad(d.getMinutes())};
+var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
+var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
+var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
+
+/* ================= 類型與圖示 ================= */
+var TYPES=[
+  {id:'vomit',name:'嘔吐',h:18},{id:'stool',name:'軟便／腹瀉',h:38},{id:'appetite',name:'食慾不振',h:62},
+  {id:'energy',name:'精神不佳',h:100},{id:'cough',name:'咳嗽／打噴嚏',h:165},{id:'skin',name:'皮膚／毛髮',h:195},
+  {id:'injury',name:'受傷／外傷',h:350},{id:'vet',name:'就醫／看診',h:262},{id:'other',name:'其他',h:215}
+];
+var typeOf=function(id){return TYPES.filter(function(t){return t.id===id})[0]||TYPES[TYPES.length-1]};
+var logLabel=function(l){return (l.type==='other'&&l.custom)?l.custom:typeOf(l.type).name};
+var IC={
+  home:'<path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  list:'<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.3"/><circle cx="4.5" cy="12" r="1.3"/><circle cx="4.5" cy="18" r="1.3"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M9 15.5l2 2 4-4"/>',
+  gear:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9M4 12h16"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+  cam:'<path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  cl:'<path d="m15 5-7 7 7 7"/>',cr:'<path d="m9 5 7 7-7 7"/>',
+  img:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/>',
+  syringe:'<path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/>',
+  bell:'<path d="M6 17h12l-1.5-2v-4a4.5 4.5 0 0 0-9 0v4z"/><path d="M10 20a2 2 0 0 0 4 0"/>'
+};
+var ico=function(n,s){s=s||22;return '<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'};
+
+/* ================= 日期計算 ================= */
+function ageParts(b,now){
+  if(b>now) return null;
+  var total=(now.getFullYear()-b.getFullYear())*12+now.getMonth()-b.getMonth();
+  if(addMonths(b,total)>now) total--;
+  var base=addMonths(b,total);
+  return {y:Math.floor(total/12),m:total%12,d:dayDiff(now,base)};
+}
+function nextAnn(d,now){
+  var y=Math.max(now.getFullYear(),d.getFullYear()+1);
+  for(var i=0;i<3;i++,y++){
+    var last=new Date(y,d.getMonth()+1,0).getDate();
+    var dt=new Date(y,d.getMonth(),Math.min(d.getDate(),last));
+    if(dt>=now) return {date:dt,years:y-d.getFullYear()};
+  }
+  return null;
+}
+function annEvents(home,now){
+  var ev=[],n=nextAnn(home,now);
+  if(n){
+    ev.push({label:'來家 '+n.years+' 週年',date:n.date});
+    var d2=new Date(n.date.getFullYear()+1,home.getMonth(),home.getDate());
+    ev.push({label:'來家 '+(n.years+1)+' 週年',date:d2});
+  }
+  [100,200,300,500,1000,1500,2000,2500,3000,4000,5000].forEach(function(k){
+    var d=addDays(home,k-1); if(d>=now) ev.push({label:'來家第 '+k+' 天',date:d});
+  });
+  ev.sort(function(a,b){return a.date-b.date});
+  return ev.slice(0,3);
+}
+function relDays(date,now){
+  var n=dayDiff(date,now);
+  return n===0?'就是今天':(n+' 天後');
+}
+
+/* ================= 資料層 (IndexedDB) ================= */
+var DB={db:null,ok:false,
+  open:function(){return new Promise(function(res){
+    try{
+      var r=indexedDB.open('petnote',3);
+      r.onupgradeneeded=function(){var d=r.result;['pets','logs','worms','vaccines','meta'].forEach(function(n){if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'})})};
+      r.onsuccess=function(){DB.db=r.result;DB.ok=true;res(true)};
+      r.onerror=function(){res(false)};r.onblocked=function(){res(false)};
+    }catch(e){res(false)}
+  })},
+  all:function(n){return new Promise(function(res){
+    if(!DB.ok) return res([]);
+    try{var q=DB.db.transaction(n).objectStore(n).getAll();q.onsuccess=function(){res(q.result||[])};q.onerror=function(){res([])}}catch(e){res([])}
+  })},
+  put:function(n,o){return new Promise(function(res){
+    if(!DB.ok) return res(false);
+    try{var t=DB.db.transaction(n,'readwrite');t.objectStore(n).put(o);t.oncomplete=function(){res(true)};t.onerror=function(){res(false)};t.onabort=function(){res(false)}}catch(e){res(false)}
+  })},
+  del:function(n,id){return new Promise(function(res){
+    if(!DB.ok) return res(false);
+    try{var t=DB.db.transaction(n,'readwrite');t.objectStore(n).delete(id);t.oncomplete=function(){res(true)};t.onerror=function(){res(false)}}catch(e){res(false)}
+  })}
+};
+var warnedStore=false;
+function saved(ok){ if(!ok&&!warnedStore){warnedStore=true;toast('目前無法永久儲存資料，關閉後可能消失')} }
+
+var S={pets:[],logs:[],worms:[],vaccs:[],lib:[],sel:null,tab:'home',filter:'all',year:new Date().getFullYear()};
+
+function newPet(){
+  return {id:uid(),name:'',species:'貓',breed:'',gender:'未知',birthday:'',homeDate:'',photo:'',
+    showAge:true,showAnniv:true,wormRemind:true,wormDay:1,
+    wormItems:[{name:'體外驅蟲',every:1},{name:'體內驅蟲',every:3},{name:'心絲蟲預防',every:1}],vaccItems:[],created:Date.now()};
+}
+/* ---- 疫苗清單（所有寵物共用，在「設定」管理） ---- */
+var DEFAULT_LIB=[
+  {name:'貓三合一疫苗',every:12,remind:14},{name:'貓五合一疫苗',every:12,remind:14},{name:'貓白血病疫苗',every:12,remind:14},
+  {name:'狗八合一疫苗',every:12,remind:14},{name:'狗十合一疫苗',every:12,remind:14},{name:'狂犬病疫苗',every:12,remind:14}
+];
+var SPECIES_DEFAULT={'貓':['貓三合一疫苗','狂犬病疫苗'],'狗':['狗八合一疫苗','狂犬病疫苗'],'其他':['狂犬病疫苗']};
+var libDirty=false;
+function libGet(n){return S.lib.filter(function(x){return x.name===n})[0]||null}
+function libAdd(n,every,remind){if(!n||libGet(n))return;S.lib.push({name:n,every:every||12,remind:(remind==null?14:remind)});libDirty=true}
+function speciesDefault(sp){return (SPECIES_DEFAULT[sp]||SPECIES_DEFAULT['其他']).filter(function(n){return !!libGet(n)})}
+function vItems(p){return (p.vaccItems||[]).map(libGet).filter(Boolean)}
+function uniq(a){return a.filter(function(x,i){return a.indexOf(x)===i})}
+function ensurePet(p){
+  if(!Array.isArray(p.vaccItems)){p.vaccItems=speciesDefault(p.species);p._mig=true}
+  else if(p.vaccItems.some(function(it){return typeof it!=='string'})){
+    p.vaccItems=uniq(p.vaccItems.map(function(it){if(typeof it==='string')return it;libAdd(it.name,it.every,it.remind);return it.name}).filter(Boolean));p._mig=true;
+  }
+  if(!Array.isArray(p.wormItems))p.wormItems=[];
+  return p;
+}
+async function saveLib(){libDirty=false;saved(await DB.put('meta',{id:'vaccLib',items:S.lib}));Notif.sync()}
+function upsert(arr,o){var i=arr.findIndex(function(x){return x.id===o.id});if(i<0)arr.push(o);else arr[i]=o}
+async function savePet(p){delete p._mig;upsert(S.pets,p);S.pets.sort(function(a,b){return a.created-b.created});saved(await DB.put('pets',p));Notif.sync()}
+async function saveLog(l){upsert(S.logs,l);saved(await DB.put('logs',l))}
+async function saveWorm(w){upsert(S.worms,w);saved(await DB.put('worms',w));Notif.sync()}
+async function saveVacc(v){upsert(S.vaccs,v);saved(await DB.put('vaccines',v));Notif.sync()}
+async function removePet(id){
+  var ls=S.logs.filter(function(l){return l.petId===id}),ws=S.worms.filter(function(w){return w.petId===id}),vs=S.vaccs.filter(function(v){return v.petId===id});
+  S.pets=S.pets.filter(function(p){return p.id!==id});
+  S.logs=S.logs.filter(function(l){return l.petId!==id});S.worms=S.worms.filter(function(w){return w.petId!==id});S.vaccs=S.vaccs.filter(function(v){return v.petId!==id});
+  await DB.del('pets',id);
+  for(var i=0;i<ls.length;i++) await DB.del('logs',ls[i].id);
+  for(var j=0;j<ws.length;j++) await DB.del('worms',ws[j].id);
+  for(var k=0;k<vs.length;k++) await DB.del('vaccines',vs[k].id);
+  Notif.sync();
+}
+async function removeLog(id){S.logs=S.logs.filter(function(l){return l.id!==id});await DB.del('logs',id)}
+async function removeWorm(id){S.worms=S.worms.filter(function(w){return w.id!==id});await DB.del('worms',id);Notif.sync()}
+async function removeVacc(id){S.vaccs=S.vaccs.filter(function(v){return v.id!==id});await DB.del('vaccines',id);Notif.sync()}
+var curPet=function(){return S.pets.filter(function(p){return p.id===S.sel})[0]||null};
+var wid=function(pid,m,item){return pid+'|'+m+'|'+item};
+
+/* ================= 圖片 ================= */
+function readImage(file,max,q){
+  return new Promise(function(res,rej){
+    var img=new Image(),url=URL.createObjectURL(file);
+    img.onload=function(){
+      var w=img.naturalWidth,h=img.naturalHeight,k=Math.min(1,max/Math.max(w,h));
+      w=Math.max(1,Math.round(w*k));h=Math.max(1,Math.round(h*k));
+      var c=document.createElement('canvas');c.width=w;c.height=h;
+      var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',q));
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);rej(new Error('img'))};
+    img.src=url;
+  });
+}
+function hueOf(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
+function avatar(p,size){
+  if(p.photo) return '<img class="av" style="--s:'+size+'px" src="'+p.photo+'" alt="">';
+  var ch=(p.name||'?').trim().charAt(0)||'?';
+  return '<span class="av" style="--s:'+size+'px;--h:'+hueOf(p.name||'?')+'">'+esc(ch)+'</span>';
+}
+
+/* ================= 層（底部面板、對話框）與返回鍵 ================= */
+var Layers=[];
+function pushLayer(el,onClose){
+  document.body.appendChild(el);
+  var hist=true;try{history.pushState({layer:Layers.length+1},'')}catch(e){hist=false}
+  var L={el:el,hist:hist,onClose:onClose};Layers.push(L);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('open')})});
+  return L;
+}
+function removeTop(){
+  var L=Layers.pop();if(!L)return;
+  L.el.classList.remove('open');setTimeout(function(){L.el.remove()},240);
+  if(L.onClose)L.onClose();
+}
+function closeTop(){
+  var n=Layers.length;if(!n)return;var L=Layers[n-1];
+  if(L.hist){history.back();setTimeout(function(){if(Layers.length===n&&Layers[n-1]===L)removeTop()},400)}
+  else removeTop();
+}
+window.addEventListener('popstate',function(){if(Layers.length)removeTop()});
+
+function openSheet(o){
+  var el=document.createElement('div');el.className='layer';
+  el.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(o.title)+'">'+
+    '<div class="sheet-h gut"><h3>'+esc(o.title)+'</h3><button class="iconbtn" data-close aria-label="關閉">'+ico('x')+'</button></div>'+
+    '<div class="sheet-b gut">'+o.body+'</div>'+(o.footer?'<div class="sheet-f gut">'+o.footer+'</div>':'')+'</div>';
+  el.addEventListener('mousedown',function(e){if(e.target===el)closeTop()});
+  el.addEventListener('click',function(e){if(e.target.closest('[data-close]'))closeTop()});
+  pushLayer(el);
+  if(o.onMount)o.onMount(el);
+  return el;
+}
+function confirmDlg(msg,okLabel,danger){
+  return new Promise(function(res){
+    var el=document.createElement('div');el.className='layer center';
+    el.innerHTML='<div class="dlg" role="alertdialog" aria-modal="true"><p>'+esc(msg)+'</p><div class="row"><button class="btn" data-no>取消</button><button class="btn '+(danger?'danger':'primary')+'" data-yes>'+esc(okLabel||'確定')+'</button></div></div>';
+    var done=false;
+    function fin(v){if(done)return;done=true;res(v)}
+    el.addEventListener('click',function(e){
+      if(e.target.closest('[data-yes]')){fin(true);closeTop()}
+      else if(e.target.closest('[data-no]')||e.target===el){closeTop()}
+    });
+    pushLayer(el,function(){fin(false)});
+  });
+}
+var toastT=null;
+function toast(msg){
+  var t=$('#toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show')},2300);
+}
+function bindSeg(root,cb){
+  root.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-v]');if(!b||!root.contains(b))return;
+    $$('button',root).forEach(function(x){x.classList.toggle('on',x===b)});
+    if(cb)cb(b.dataset.v);
+  });
+}
+var segVal=function(root){var b=$('button.on',root);return b?b.dataset.v:''};
+
+/* ================= 驅蟲狀態 ================= */
+function itemStatus(pet,item,cm){
+  var done=S.worms.filter(function(w){return w.id===wid(pet.id,cm,item.name)})[0];
+  if(done) return {state:'done',rec:done};
+  var prev=S.worms.filter(function(w){return w.petId===pet.id&&w.item===item.name&&w.month<cm}).sort(function(a,b){return a.month<b.month?1:-1})[0];
+  if(!prev) return {state:'due'};
+  if(monthsBetween(prev.month,cm)>=item.every) return {state:'due',last:prev};
+  return {state:'wait',next:monthAdd(prev.month,item.every),last:prev};
+}
+function planMonth(pet,item,cm){
+  var last=S.worms.filter(function(w){return w.petId===pet.id&&w.item===item.name}).sort(function(a,b){return a.month<b.month?1:-1})[0];
+  if(!last) return cm;
+  var nx=monthAdd(last.month,item.every);
+  return nx<cm?cm:nx;
+}
+
+/* ================= 畫面：共用 ================= */
+function render(){renderTop();renderNav();renderMain();renderFab()}
+function renderTop(){
+  var t=new Date();
+  var row='<div class="toprow"><span class="brand">寵物筆記</span><span class="today">'+(t.getMonth()+1)+'月'+t.getDate()+'日 週'+WD[t.getDay()]+'</span></div>';
+  if(!S.pets.length){$('#top').innerHTML=row;return}
+  $('#top').innerHTML=row+'<div class="chips">'+S.pets.map(function(p){
+    return '<button class="pchip '+(p.id===S.sel?'on':'')+'" data-act="selpet" data-id="'+p.id+'">'+avatar(p,30)+'<span>'+esc(p.name)+'</span></button>';
+  }).join('')+'<button class="pchip add" data-act="addpet" aria-label="新增寵物">'+ico('plus')+'</button></div>';
+}
+function renderNav(){
+  var tabs=[['home','首頁','home'],['timeline','時間線','list'],['deworm','驅蟲','cal'],['vaccine','預防針','syringe'],['more','設定','gear']];
+  $('#nav').innerHTML=tabs.map(function(t){
+    return '<button class="'+(S.tab===t[0]?'on':'')+'" data-act="tab" data-tab="'+t[0]+'" '+(S.tab===t[0]?'aria-current="page"':'')+'><span class="ico">'+ico(t[2])+'</span>'+t[1]+'</button>';
+  }).join('');
+}
+function renderFab(){
+  $('#fabslot').innerHTML=(S.tab==='timeline'&&curPet())?'<button class="fab" data-act="addlog">'+ico('plus')+'記錄狀況</button>':'';
+}
+function renderMain(){
+  var m=$('#main'),st=m.scrollTop;
+  var html;
+  if(S.tab==='more') html=viewMore();
+  else if(!curPet()) html=viewEmpty();
+  else if(S.tab==='home') html=viewHome();
+  else if(S.tab==='timeline') html=viewTimeline();
+  else if(S.tab==='vaccine') html=viewVaccine();
+  else html=viewDeworm();
+  m.innerHTML=html;m.scrollTop=st;
+  if(S.tab==='more')updateNotifCard();
+}
+function viewEmpty(){
+  return '<div class="empty"><h3>先新增第一隻寵物</h3><p>記下生日、來家日期，之後的狀況和驅蟲都會跟著這隻寵物。</p>'+
+    '<button class="btn primary" data-act="addpet">'+ico('plus')+'新增寵物</button><br><button class="btn" data-act="sample">先看看範例資料</button></div>';
+}
+
+/* ================= 畫面：首頁 ================= */
+function viewHome(){
+  var p=curPet(),now=today(),out=[];
+  var ah=alertsHtml(now);if(ah)out.push(ah);
+  var bd=p.birthday?parseD(p.birthday):null,hd=p.homeDate?parseD(p.homeDate):null;
+  var meta=[p.species,p.breed,p.gender&&p.gender!=='未知'?p.gender:''].filter(Boolean).map(esc).join('・');
+  var h='<section class="card pet"><div class="pet-top">'+avatar(p,72)+'<div class="grow"><h1>'+esc(p.name)+'</h1><div class="meta">'+meta+'</div></div><button class="iconbtn" data-act="editpet" aria-label="編輯寵物">'+ico('edit')+'</button></div>';
+  h+='<dl class="facts"><div><dt>生日</dt><dd>'+(p.birthday?fmtD(p.birthday):'未填寫')+'</dd></div><div><dt>來家日期</dt><dd>'+(p.homeDate?fmtD(p.homeDate):'未填寫')+'</dd></div></dl>';
+  if(p.showAge&&bd){
+    var a=ageParts(bd,now);
+    if(a){
+      var nums='';
+      if(a.y) nums+='<span><b>'+a.y+'</b>歲</span>';
+      if(a.y||a.m) nums+='<span><b>'+a.m+'</b>個月</span>';
+      nums+='<span><b>'+a.d+'</b>天</span>';
+      var nb=nextAnn(bd,now),sub='出生第 '+(dayDiff(now,bd)+1).toLocaleString('en-US')+' 天';
+      var party='';
+      if(nb){ if(dayDiff(nb.date,now)===0) party='<div class="party">今天滿 '+nb.years+' 歲，生日快樂！</div>'; else sub+='　距離 '+nb.years+' 歲生日還有 '+dayDiff(nb.date,now)+' 天'; }
+      h+='<div class="age"><div class="age-nums">'+nums+'</div><div class="sub">'+sub+'</div>'+party+'</div>';
+    }else h+='<div class="age"><div class="sub">生日設在未來，請確認日期。</div></div>';
+  }
+  h+='</section>';
+  out.push(h);
+  out.push('<div class="actions"><button class="btn primary" data-act="addlog">'+ico('plus',20)+'記錄狀況</button><button class="btn" data-act="tab" data-tab="deworm">'+ico('cal',20)+'驅蟲紀錄</button></div>');
+
+  if(p.showAnniv&&hd){
+    var days=dayDiff(now,hd)+1,ap=ageParts(hd,now),ev=annEvents(hd,now),parts=[];
+    if(days<1){ out.push('<section class="card"><div class="cardhead"><h2>來家紀念日</h2></div><div class="annbig"><span>來家日期在未來，請確認日期。</span></div></section>'); }
+    else{
+      if(ap.y)parts.push(ap.y+' 年');if(ap.y||ap.m)parts.push(ap.m+' 個月');parts.push(ap.d+' 天');
+      var banner='',prog='';
+      var todayEv=ev.filter(function(e){return dayDiff(e.date,now)===0})[0];
+      if(todayEv) banner='<div class="todaybanner">今天是'+esc(todayEv.label)+'紀念日！</div>';
+      var na=nextAnn(hd,now);
+      if(na){var prevA=new Date(na.date.getFullYear()-1,hd.getMonth(),hd.getDate());var tot=dayDiff(na.date,prevA)||365;var pct=Math.min(100,Math.max(0,Math.round(dayDiff(now,prevA)/tot*100)));
+        prog='<div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><small>距離 '+na.years+' 週年還有 '+dayDiff(na.date,now)+' 天</small>';}
+      out.push('<section class="card"><div class="cardhead"><h2>來家紀念日</h2></div>'+banner+
+        '<div class="annbig"><b>第 '+days.toLocaleString('en-US')+' 天</b><span>已相伴 '+parts.join(' ')+'</span></div>'+prog+
+        '<ul class="evlist">'+ev.map(function(e){return '<li><div><span class="nm">'+esc(e.label)+'</span><small>'+fmtD(ymd(e.date))+'</small></div><span class="when">'+relDays(e.date,now)+'</span></li>'}).join('')+'</ul></section>');
+    }
+  }
+
+  out.push(wormSummary(p,now));
+  out.push(vaccSummary(p,now));
+
+  var rec=S.logs.filter(function(l){return l.petId===p.id}).sort(function(a,b){return b.ts-a.ts}).slice(0,3);
+  var rh='<section class="card"><div class="cardhead"><h2>最近狀況</h2>'+(rec.length?'<button class="linkbtn" data-act="tab" data-tab="timeline">全部'+ico('cr',16)+'</button>':'')+'</div>';
+  if(!rec.length) rh+='<small>還沒有紀錄。嘔吐、軟便、食慾不好都可以記下來，附上照片更清楚。</small>';
+  else rh+=rec.map(function(l){var d=new Date(l.ts);
+    return '<button class="recent" data-act="editlog" data-id="'+l.id+'"><span class="tag" style="--h:'+typeOf(l.type).h+'">'+esc(logLabel(l))+'</span><span class="tx"><time>'+(d.getMonth()+1)+'/'+d.getDate()+' '+hhmm(l.ts)+(l.photos&&l.photos.length?'　'+l.photos.length+' 張照片':'')+'</time>'+(l.note?'<p>'+esc(l.note)+'</p>':'')+'</span></button>'}).join('');
+  rh+='</section>';
+  out.push(rh);
+  return '<div class="stack">'+out.join('')+'</div>';
+}
+function wormSummary(p,now){
+  var cm=ym(now),h='<section class="card"><div class="cardhead"><h2>'+(now.getMonth()+1)+' 月驅蟲</h2><button class="linkbtn" data-act="tab" data-tab="deworm">全部紀錄'+ico('cr',16)+'</button></div>';
+  if(!p.wormItems.length) return h+'<small>還沒有驅蟲項目，到「驅蟲」分頁設定。</small></section>';
+  h+=p.wormItems.map(function(it){
+    var s=itemStatus(p,it,cm),right='',sub=it.every===1?'每月':'每 '+it.every+' 個月';
+    if(s.state==='done') right='<span class="pill ok">已完成 '+(s.rec.date?s.rec.date.slice(5).replace('-','/'):'')+'</span>';
+    else if(s.state==='wait') right='<span class="pill">'+(+s.next.slice(5))+' 月再驅蟲</span>';
+    else{
+      var late=p.wormRemind&&now.getDate()>=p.wormDay;
+      right=(late?'<span class="pill warn">待辦</span>':(p.wormRemind?'<span class="pill">預計 '+p.wormDay+' 號</span>':''))+'<button class="mini" data-act="wormdone" data-item="'+esc(it.name)+'" data-month="'+cm+'">打卡</button>';
+    }
+    return '<div class="wrow"><div class="nm">'+esc(it.name)+'<small style="display:block">'+sub+'</small></div>'+right+'</div>';
+  }).join('');
+  return h+'</section>';
+}
+
+/* ================= 畫面：時間線 ================= */
+function viewTimeline(){
+  var p=curPet(),all=S.logs.filter(function(l){return l.petId===p.id}).sort(function(a,b){return b.ts-a.ts});
+  var head='<div class="pagehead"><h2>'+esc(p.name)+' 的時間線</h2><span class="pill cnt">'+all.length+' 筆</span></div>';
+  if(!all.length) return head+'<div class="empty"><h3>還沒有狀況紀錄</h3><p>遇到嘔吐、軟便、受傷等狀況，點右下角記下時間、說明和照片。</p></div>';
+  var counts={};all.forEach(function(l){counts[l.type]=(counts[l.type]||0)+1});
+  var f=S.filter;if(f!=='all'&&!counts[f])f=S.filter='all';
+  var chips='<div class="filters"><button class="fchip '+(f==='all'?'on':'')+'" data-act="filter" data-f="all">全部 '+all.length+'</button>'+
+    TYPES.filter(function(t){return counts[t.id]}).map(function(t){return '<button class="fchip '+(f===t.id?'on':'')+'" data-act="filter" data-f="'+t.id+'">'+t.name+' '+counts[t.id]+'</button>'}).join('')+'</div>';
+  var list=all.filter(function(l){return f==='all'||l.type===f});
+  var out='',lastKey='',now=today(),open=false;
+  list.forEach(function(l){
+    var d=new Date(l.ts),key=ymd(d);
+    if(key!==lastKey){
+      if(open)out+='</div>';
+      var dd=new Date(d.getFullYear(),d.getMonth(),d.getDate()),diff=dayDiff(now,dd);
+      var lbl=(d.getFullYear()!==now.getFullYear()?d.getFullYear()+'年':'')+(d.getMonth()+1)+'月'+d.getDate()+'日';
+      var rel=diff===0?'今天':diff===1?'昨天':'週'+WD[d.getDay()];
+      out+='<h3 class="dayh">'+lbl+'<small>'+rel+'</small></h3><div>';open=true;lastKey=key;
+    }
+    var ph=(l.photos||[]).map(function(src,i){return '<button data-act="photo" data-id="'+l.id+'" data-idx="'+i+'" aria-label="放大照片"><img loading="lazy" decoding="async" src="'+src+'" alt=""></button>'}).join('');
+    out+='<div class="entry" role="button" tabindex="0" data-act="editlog" data-id="'+l.id+'"><div class="rail"><i class="dot" style="--h:'+typeOf(l.type).h+'"></i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+typeOf(l.type).h+'">'+esc(logLabel(l))+'</span><time>'+hhmm(l.ts)+'</time></div>'+
+      (l.note?'<p class="note">'+esc(l.note)+'</p>':'')+(ph?'<div class="thumbs">'+ph+'</div>':'')+'</div></div>';
+  });
+  if(open)out+='</div>';
+  return head+chips+out;
+}
+
+/* ================= 畫面：驅蟲 ================= */
+function viewDeworm(){
+  var p=curPet(),now=today(),cm=ym(now),Y=S.year;
+  var h='<div class="pagehead"><h2>驅蟲紀錄</h2><div class="yearnav"><button data-act="year" data-d="-1" aria-label="前一年">'+ico('cl',18)+'</button><b>'+Y+'</b><button data-act="year" data-d="1" aria-label="後一年">'+ico('cr',18)+'</button></div></div>';
+  h+='<div class="remindline"><span>'+(p.wormRemind?'每月 '+p.wormDay+' 號開始提醒（首頁顯示待辦）':'提醒已關閉')+'</span><button class="btn" style="min-height:40px" data-act="wormset">設定</button></div>';
+  if(!p.wormItems.length) return h+'<div class="empty"><h3>還沒有驅蟲項目</h3><p>新增體外、體內驅蟲或心絲蟲預防，之後每月蓋章打卡。</p><button class="btn primary" data-act="wormset">設定驅蟲項目</button></div>';
+  h+='<div class="stack">';
+  p.wormItems.forEach(function(it){
+    var s=itemStatus(p,it,cm),pm=planMonth(p,it,cm),chip='';
+    if(Y===now.getFullYear()){
+      if(s.state==='done')chip='<span class="pill ok">本月已完成</span>';
+      else if(s.state==='due')chip='<span class="pill warn">本月待辦</span>';
+      else chip='<span class="pill">'+(+s.next.slice(5))+' 月再驅蟲</span>';
+    }
+    var st='';
+    for(var m=1;m<=12;m++){
+      var mk=Y+'-'+pad(m),rec=S.worms.filter(function(w){return w.id===wid(p.id,mk,it.name)})[0],cls='stamp',inner='<span>'+m+'月</span>';
+      if(rec){cls+=' done';var rot=((hueOf(rec.id)%9)-4);inner='<span>'+m+'月</span><small>'+(rec.date?(+rec.date.slice(8)):'')+'日</small>';st+='<button class="'+cls+'" style="--rot:'+rot+'deg" data-act="wormdone" data-item="'+esc(it.name)+'" data-month="'+mk+'" aria-label="'+m+'月已驅蟲，點擊編輯">'+inner+'</button>';continue}
+      if(mk===cm)cls+=' now';else if(mk===pm)cls+=' plan';else if(mk>cm)cls+=' future';
+      st+='<button class="'+cls+'" data-act="wormdone" data-item="'+esc(it.name)+'" data-month="'+mk+'" aria-label="'+m+'月，點擊打卡">'+inner+'</button>';
+    }
+    h+='<section class="card stampcard"><div class="cardhead"><h2>'+esc(it.name)+'<small>'+(it.every===1?'每月':'每 '+it.every+' 個月')+'</small></h2>'+chip+'</div><div class="stamps">'+st+'</div></section>';
+  });
+  var wr=S.worms.filter(function(w){return w.petId===p.id}).sort(function(a,b){return a.date<b.date?1:(a.date>b.date?-1:0)});
+  h+='<section class="card"><div class="cardhead"><h2>歷史紀錄</h2><button class="linkbtn" data-act="wormadd">'+ico('plus',16)+'補登過去紀錄</button></div>';
+  if(!wr.length)h+='<small>還沒有紀錄。點上方圓圈打卡，或用「補登」輸入以前驅蟲的日期。</small>';
+  else{var ly='';wr.forEach(function(w){var y=w.date.slice(0,4);if(y!==ly){h+='<div class="yrh">'+y+' 年</div>';ly=y}h+='<button class="hrow" data-act="wormdone" data-item="'+esc(w.item)+'" data-month="'+w.month+'"><span class="d">'+w.date.slice(5).replace('-','/')+'</span><span class="grow"><b>'+esc(w.item)+'</b>'+(w.note?'<small style="display:block">'+esc(w.note)+'</small>':'')+'</span>'+ico('cr',16)+'</button>'})}
+  h+='</section>';
+  h+='<small style="padding:0 4px">實線圈為本月，橘色虛線圈為下一次預計月份，蓋章代表已完成。實際頻率請依獸醫建議。</small></div>';
+  return h;
+}
+
+/* ================= 預防針 ================= */
+var EVERY_OPTS=[3,6,12,24,36],REMIND_OPTS=[-1,0,1,3,7,14,30];
+function everyLabel(n){return n===12?'每年':(n%12===0?'每 '+(n/12)+' 年':(n===1?'每月':'每 '+n+' 個月'))}
+function remindLabel(r){return r<0?'不提醒':(r===0?'到期當天提醒':'提前 '+r+' 天提醒')}
+function optList(list,val,fn){
+  var l=list.indexOf(val)<0?list.concat([val]).sort(function(a,b){return a-b}):list;
+  return l.map(function(n){return '<option value="'+n+'" '+(n===val?'selected':'')+'>'+fn(n)+'</option>'}).join('');
+}
+function vaccStatus(p,it,now){
+  var recs=S.vaccs.filter(function(v){return v.petId===p.id&&v.item===it.name}).sort(function(a,b){return a.date<b.date?1:(a.date>b.date?-1:0)});
+  if(!recs.length)return {state:'none',recs:recs};
+  var last=recs[0],due=addMonths(parseD(last.date),it.every),days=dayDiff(due,now);
+  var state=days<0?'overdue':((it.remind>=0&&days<=it.remind)?'soon':'ok');
+  return {state:state,last:last,due:due,days:days,recs:recs};
+}
+function vaccChip(st,it){
+  if(st.state==='none')return '<span class="pill">尚無紀錄</span>';
+  var txt=st.days<0?'已逾期 '+(-st.days)+' 天':(st.days===0?'今天到期':'還有 '+st.days+' 天');
+  var warn=it.remind>=0&&(st.state==='overdue'||st.state==='soon');
+  return '<span class="pill '+(warn?'warn':'')+'">'+txt+'</span>';
+}
+function alertsAll(now){
+  var out=[];
+  S.pets.forEach(function(p){
+    vItems(p).forEach(function(it){
+      if(it.remind<0)return;
+      var st=vaccStatus(p,it,now);if(st.state!=='soon'&&st.state!=='overdue')return;
+      out.push({tone:st.state==='overdue'?'bad':'warn',pid:p.id,tab:'vaccine',text:p.name+'・'+it.name+' '+(st.days<0?'已逾期 '+(-st.days)+' 天':(st.days===0?'今天到期':st.days+' 天後到期'))});
+    });
+    if(p.wormRemind&&now.getDate()>=p.wormDay){
+      var cm=ym(now),names=(p.wormItems||[]).filter(function(it){return itemStatus(p,it,cm).state==='due'}).map(function(it){return it.name});
+      if(names.length)out.push({tone:'warn',pid:p.id,tab:'deworm',text:p.name+'・本月驅蟲待辦：'+names.join('、')});
+    }
+  });
+  return out;
+}
+function alertsHtml(now){
+  var al=alertsAll(now);if(!al.length)return '';
+  al.sort(function(a,b){return (a.tone==='bad'?0:1)-(b.tone==='bad'?0:1)});
+  return '<div class="alerts">'+al.slice(0,4).map(function(a){return '<button class="alert '+a.tone+'" data-act="alertgo" data-pid="'+a.pid+'" data-tab="'+a.tab+'">'+ico('bell',20)+'<span>'+esc(a.text)+'</span>'+ico('cr',16)+'</button>'}).join('')+'</div>';
+}
+function vaccSummary(p,now){
+  var h='<section class="card"><div class="cardhead"><h2>預防針</h2><button class="linkbtn" data-act="tab" data-tab="vaccine">全部紀錄'+ico('cr',16)+'</button></div>';
+  var vi=vItems(p);
+  if(!vi.length)return h+'<small>還沒有追蹤的預防針，到「預防針」分頁選擇。</small></section>';
+  h+=vi.map(function(it){
+    var st=vaccStatus(p,it,now),sub,right;
+    if(st.state==='none'){sub='尚無紀錄';right='<button class="mini" data-act="vaccadd" data-item="'+esc(it.name)+'">補登</button>'}
+    else{sub='下次 '+fmtD(ymd(st.due));right=vaccChip(st,it)}
+    return '<div class="wrow"><div class="nm">'+esc(it.name)+'<small style="display:block">'+sub+'</small></div>'+right+'</div>';
+  }).join('');
+  return h+'</section>';
+}
+function viewVaccine(){
+  var p=curPet(),now=today(),tracked=vItems(p);
+  var h='<div class="pagehead"><h2>預防針</h2><button class="btn" style="min-height:40px" data-act="vaccset">追蹤項目</button></div>';
+  var orphan=uniq(S.vaccs.filter(function(v){return v.petId===p.id&&(p.vaccItems||[]).indexOf(v.item)<0}).map(function(v){return v.item}))
+    .map(function(n){var l=libGet(n);return {name:n,every:l?l.every:12,remind:-1,orphan:true}});
+  if(!tracked.length&&!orphan.length)return h+'<div class="empty"><h3>還沒有追蹤的預防針</h3><p>從疫苗清單選擇這隻寵物要打的針，之後會依最近一次施打日期自動算出下次日期。</p><button class="btn primary" data-act="vaccset">選擇追蹤項目</button></div>';
+  h+='<button class="btn primary block" data-act="vaccadd" style="margin-bottom:14px">'+ico('plus',20)+'新增施打紀錄</button><div class="stack">';
+  tracked.concat(orphan).forEach(function(it){
+    var st=vaccStatus(p,it,now),next,rows='';
+    if(it.orphan)next='<small>這隻寵物目前沒有追蹤這個項目，所以不會計算下次日期或提醒。點右上「追蹤項目」可以重新加入。</small>';
+    else if(st.state==='none')next='<small>還沒有施打紀錄。補登上一次施打日期後，會自動算出下次日期。</small>';
+    else next='<div class="vnext"><span>下次施打</span><b>'+fmtD(ymd(st.due))+'</b></div><small>上次 '+fmtD(st.last.date)+'　'+everyLabel(it.every)+'　'+remindLabel(it.remind)+'</small>';
+    if(st.recs.length)rows='<div class="hist">'+st.recs.map(function(r,i){return '<button class="hrow" data-act="vaccedit" data-id="'+r.id+'"><span class="d">'+fmtD(r.date)+'</span><span class="grow">'+(r.note?esc(r.note):'<small>無備註</small>')+'</span>'+(i===0&&!it.orphan?'<span class="pill cnt">最近一次</span>':'')+ico('cr',16)+'</button>'}).join('')+'</div>';
+    var chip=it.orphan?'<span class="pill mute">未追蹤</span>':vaccChip(st,it);
+    h+='<section class="card"><div class="cardhead"><h2>'+esc(it.name)+'</h2>'+chip+'</div>'+next+rows+(it.orphan?'':'<button class="btn block" style="margin-top:14px" data-act="vaccadd" data-item="'+esc(it.name)+'">'+ico('plus',20)+'記錄這劑</button>')+'</section>';
+  });
+  return h+'<small style="padding:0 4px">下次日期＝最近一次施打日期＋間隔。疫苗名稱、間隔與提醒在「設定 → 疫苗清單」修改。實際施打時間請依獸醫師建議。</small></div>';
+}
+
+/* ================= 畫面：設定 ================= */
+function viewMore(){
+  var h='<div class="pagehead"><h2>設定</h2></div><div class="sechead">寵物</div><div class="card"><div class="list">';
+  h+=S.pets.map(function(p){return '<button class="lrow" data-act="editpet" data-id="'+p.id+'">'+avatar(p,44)+'<span class="grow"><b>'+esc(p.name)+'</b><small style="display:block">'+[p.species,p.breed].filter(Boolean).map(esc).join('・')+'　年齡'+(p.showAge?'顯示':'隱藏')+'・紀念日'+(p.showAnniv?'顯示':'隱藏')+'</small></span>'+ico('cr',18)+'</button>'}).join('');
+  h+='<button class="lrow" data-act="addpet"><span class="av" style="--s:44px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增寵物</b></span></button></div></div>';
+  var th=lsGet('petnote.theme')||'system';
+  h+='<div class="sechead">外觀</div><div class="card"><div class="seg" id="themeSeg">'+[['system','跟隨手機'],['light','淺色'],['dark','深色']].map(function(t){return '<button data-v="'+t[0]+'" class="'+(th===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</div></div>';
+  h+='<div class="sechead">疫苗清單</div><div class="card"><div class="list">'+S.lib.map(function(l){
+    var users=S.pets.filter(function(p){return (p.vaccItems||[]).indexOf(l.name)>=0}).map(function(p){return p.name});
+    return '<button class="lrow" data-act="libedit" data-name="'+esc(l.name)+'"><span class="grow"><b>'+esc(l.name)+'</b><small style="display:block">'+everyLabel(l.every)+'・'+remindLabel(l.remind)+(users.length?'　'+users.map(esc).join('、'):'')+'</small></span>'+ico('cr',18)+'</button>';
+  }).join('')+'<button class="lrow" data-act="libedit"><span class="av" style="--s:40px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增疫苗</b><small style="display:block">建立後，新增施打紀錄時直接點選</small></span></button></div></div>';
+  h+='<div class="sechead">手機通知</div><div class="card"><p class="about" id="notifTxt" style="margin:0">檢查中…</p><div id="notifBtns"></div></div>';
+  h+='<div class="sechead">資料備份</div><div class="card"><div class="actions"><button class="btn" data-act="export">匯出備份</button><button class="btn" data-act="import">匯入備份</button></div><input id="importFile" type="file" accept=".json,application/json" hidden><p class="about">資料只存在這支手機（或這個瀏覽器）裡。換手機、重新安裝或清除瀏覽器資料前，請先匯出備份檔並存到雲端硬碟。匯入時會與現有資料合併。使用網頁版時，建議每個月匯出一次。</p></div>';
+  h+='<div class="sechead">關於</div><div class="about">寵物筆記 1.0<br>記錄每隻寵物的年齡、紀念日、身體狀況、每月驅蟲與預防針。</div>';
+  return h;
+}
+
+/* ================= 表單：寵物 ================= */
+function openPetSheet(id){
+  var isNew=!id,src=id&&S.pets.filter(function(x){return x.id===id})[0];
+  var p=isNew?newPet():JSON.parse(JSON.stringify(src));
+  var segs=function(arr,val){return arr.map(function(v){return '<button type="button" data-v="'+v+'" class="'+(val===v?'on':'')+'">'+v+'</button>'}).join('')};
+  var body='<div class="av-pick"><button type="button" class="av-btn" id="pf-av" aria-label="選擇頭像">'+avatar(p,88)+'<span class="av-cam">'+ico('cam',16)+'</span></button><input id="pf-file" type="file" accept="image/*" hidden><div class="hint">點頭像可選擇照片</div></div>'+
+    '<div class="field"><label for="pf-name">名字</label><input id="pf-name" type="text" maxlength="20" autocomplete="off" placeholder="例如：麻糬" value="'+esc(p.name)+'"></div>'+
+    '<div class="field"><label>種類</label><div class="seg" id="pf-species">'+segs(['貓','狗','其他'],p.species)+'</div></div>'+
+    '<div class="field"><label for="pf-breed">品種（選填）</label><input id="pf-breed" type="text" maxlength="20" autocomplete="off" placeholder="例如：米克斯" value="'+esc(p.breed)+'"></div>'+
+    '<div class="field"><label>性別</label><div class="seg" id="pf-gender">'+segs(['男生','女生','未知'],p.gender||'未知')+'</div></div>'+
+    '<div class="row2"><div class="field"><label for="pf-bd">生日</label><input id="pf-bd" type="date" value="'+esc(p.birthday)+'"></div><div class="field"><label for="pf-hd">來家日期</label><input id="pf-hd" type="date" value="'+esc(p.homeDate)+'"></div></div>'+
+    '<div class="swrow"><span><b>顯示年齡</b><small>依生日自動算出歲、月、天</small></span><span class="sw"><input type="checkbox" id="pf-age" '+(p.showAge?'checked':'')+' aria-label="顯示年齡"><i></i></span></div>'+
+    '<div class="swrow"><span><b>來家紀念日</b><small>依來家日期顯示天數與週年倒數</small></span><span class="sw"><input type="checkbox" id="pf-ann" '+(p.showAnniv?'checked':'')+' aria-label="顯示來家紀念日"><i></i></span></div>';
+  var footer=(isNew?'':'<button class="btn danger" id="pf-del">刪除</button>')+'<button class="btn primary" id="pf-save">'+(isNew?'新增寵物':'儲存')+'</button>';
+  openSheet({title:isNew?'新增寵物':'編輯寵物',body:body,footer:footer,onMount:function(el){
+    var file=$('#pf-file',el);
+    $('#pf-av',el).onclick=function(){file.click()};
+    file.onchange=async function(){
+      var f=file.files&&file.files[0];if(!f)return;
+      try{p.photo=await readImage(f,480,.85);$('#pf-av',el).innerHTML=avatar(p,88)+'<span class="av-cam">'+ico('cam',16)+'</span>'}catch(e){toast('無法讀取這張圖片，請換一張')}
+      file.value='';
+    };
+    bindSeg($('#pf-species',el));bindSeg($('#pf-gender',el));
+    $('#pf-name',el).oninput=function(){if(!p.photo)$('#pf-av',el).innerHTML=avatar({name:this.value},88)+'<span class="av-cam">'+ico('cam',16)+'</span>'};
+    $('#pf-save',el).onclick=async function(){
+      var name=$('#pf-name',el).value.trim(),bd=$('#pf-bd',el).value,hd=$('#pf-hd',el).value,t=ymd(today());
+      if(!name){toast('請輸入寵物名字');$('#pf-name',el).focus();return}
+      if(bd&&bd>t){toast('生日不能晚於今天');return}
+      if(hd&&hd>t){toast('來家日期不能晚於今天');return}
+      if(bd&&hd&&hd<bd){toast('來家日期不能早於生日');return}
+      p.name=name;p.species=segVal($('#pf-species',el))||'貓';p.breed=$('#pf-breed',el).value.trim();p.gender=segVal($('#pf-gender',el))||'未知';
+      p.birthday=bd;p.homeDate=hd;p.showAge=$('#pf-age',el).checked;p.showAnniv=$('#pf-ann',el).checked;
+      if(isNew)p.vaccItems=speciesDefault(p.species);
+      await savePet(p);S.sel=p.id;lsSet('petnote.sel',p.id);closeTop();render();toast(isNew?'已新增 '+name:'已儲存');
+    };
+    var del=$('#pf-del',el);
+    if(del)del.onclick=async function(){
+      var ok=await confirmDlg('刪除「'+p.name+'」以及牠所有的狀況與驅蟲紀錄？刪除後無法復原。','刪除',true);
+      if(!ok)return;
+      await removePet(p.id);S.sel=S.pets.length?S.pets[0].id:null;lsSet('petnote.sel',S.sel||'');
+      closeTop();render();toast('已刪除');
+    };
+  }});
+}
+
+/* ================= 表單：狀況紀錄 ================= */
+function openLogSheet(id){
+  var p=curPet();if(!p)return;
+  var ex=id&&S.logs.filter(function(l){return l.id===id})[0];
+  var l=ex?JSON.parse(JSON.stringify(ex)):{id:uid(),petId:p.id,type:'vomit',custom:'',ts:Date.now(),note:'',photos:[]};
+  var tg=TYPES.map(function(t){return '<button type="button" data-v="'+t.id+'" class="'+(l.type===t.id?'on':'')+'" style="--h:'+t.h+'">'+t.name+'</button>'}).join('');
+  var body='<div class="field"><span class="lbl">狀況類型</span><div class="typegrid" id="lf-type">'+tg+'</div></div>'+
+    '<div class="field" id="lf-customwrap" '+(l.type==='other'?'':'hidden')+'><label for="lf-custom">自訂名稱（選填）</label><input id="lf-custom" type="text" maxlength="12" placeholder="例如：打噴嚏、跛腳" value="'+esc(l.custom)+'"></div>'+
+    '<div class="field"><label for="lf-time">發生時間</label><input id="lf-time" type="datetime-local" value="'+toLocalInput(l.ts)+'"></div>'+
+    '<div class="field"><label for="lf-note">說明</label><textarea id="lf-note" placeholder="次數、顏色、當時在做什麼、吃了什麼…">'+esc(l.note)+'</textarea></div>'+
+    '<div class="field"><span class="lbl">照片（最多 6 張）</span><div class="pickrow" id="lf-photos"></div><input id="lf-file" type="file" accept="image/*" multiple hidden></div>';
+  var footer=(ex?'<button class="btn danger" id="lf-del">刪除</button>':'')+'<button class="btn primary" id="lf-save">'+(ex?'儲存':'新增紀錄')+'</button>';
+  openSheet({title:(ex?'編輯':'記錄')+'狀況・'+p.name,body:body,footer:footer,onMount:function(el){
+    var file=$('#lf-file',el),grid=$('#lf-photos',el);
+    function paint(){
+      grid.innerHTML=l.photos.map(function(s,i){return '<div class="ph"><img src="'+s+'" alt=""><button type="button" class="rm" data-rm="'+i+'" aria-label="移除照片">'+ico('x',16)+'</button></div>'}).join('')+
+        (l.photos.length<6?'<button type="button" class="addph" data-add>'+ico('cam',22)+'加照片</button>':'');
+    }
+    paint();
+    grid.addEventListener('click',function(e){
+      var rm=e.target.closest('[data-rm]');
+      if(rm){l.photos.splice(+rm.dataset.rm,1);paint();return}
+      if(e.target.closest('[data-add]'))file.click();
+    });
+    file.onchange=async function(){
+      var fs=Array.prototype.slice.call(file.files||[]),bad=0,before=l.photos.length;
+      for(var i=0;i<fs.length&&l.photos.length<6;i++){try{l.photos.push(await readImage(fs[i],1280,.8))}catch(e){bad++}}
+      if(bad)toast('有 '+bad+' 張圖片無法讀取');
+      else if(fs.length>l.photos.length-before)toast('照片最多 6 張，多的已略過');
+      file.value='';paint();
+    };
+    bindSeg($('#lf-type',el),function(v){$('#lf-customwrap',el).hidden=v!=='other'});
+    $('#lf-save',el).onclick=async function(){
+      var v=$('#lf-time',el).value,ts=v?new Date(v).getTime():Date.now();
+      if(isNaN(ts)){toast('請選擇發生時間');return}
+      l.type=segVal($('#lf-type',el))||'other';l.custom=l.type==='other'?$('#lf-custom',el).value.trim():'';
+      l.ts=ts;l.note=$('#lf-note',el).value.trim();
+      await saveLog(l);closeTop();S.filter='all';render();toast(ex?'已儲存':'已新增紀錄');
+    };
+    var del=$('#lf-del',el);
+    if(del)del.onclick=async function(){
+      var ok=await confirmDlg('刪除這筆狀況紀錄？','刪除',true);if(!ok)return;
+      await removeLog(l.id);closeTop();render();toast('已刪除');
+    };
+  }});
+}
+function openViewer(logId,idx){
+  var l=S.logs.filter(function(x){return x.id===logId})[0];if(!l||!l.photos||!l.photos.length)return;
+  var i=idx,n=l.photos.length,el=document.createElement('div');el.className='layer viewer';
+  function paint(){
+    el.innerHTML='<div class="vimg"><img src="'+l.photos[i]+'" alt="第 '+(i+1)+' 張照片"></div><div class="vbar gut"><span style="padding-left:6px">'+(i+1)+' / '+n+'</span><button data-close aria-label="關閉">'+ico('x')+'</button></div>'+
+      (n>1?'<div class="vnav gut"><button data-go="-1" aria-label="上一張">'+ico('cl')+'</button><button data-go="1" aria-label="下一張">'+ico('cr')+'</button></div>':'');
+  }
+  paint();
+  el.addEventListener('click',function(e){
+    if(e.target.closest('[data-close]')){closeTop();return}
+    var g=e.target.closest('[data-go]');if(g){i=(i+ +g.dataset.go+n)%n;paint();return}
+    if(e.target.closest('.vimg')&&!e.target.closest('img')) closeTop();
+  });
+  pushLayer(el);
+}
+
+/* ================= 表單：驅蟲 ================= */
+function openWormSheet(itemName,month){
+  var p=curPet();if(!p)return;
+  var id=wid(p.id,month,itemName),ex=S.worms.filter(function(w){return w.id===id})[0];
+  var parts=month.split('-').map(Number),now=today(),first=month+'-01',last=month+'-'+pad(new Date(parts[0],parts[1],0).getDate());
+  var def=ex?ex.date:(month===ym(now)?ymd(now):(month<ym(now)?month+'-'+pad(Math.min(p.wormDay||1,28)):first));
+  var body='<div class="field"><label for="wf-date">驅蟲日期</label><input id="wf-date" type="date" min="'+first+'" max="'+last+'" value="'+def+'"></div>'+
+    '<div class="field"><label for="wf-note">藥品／備註（選填）</label><input id="wf-note" type="text" maxlength="40" placeholder="例如：福來恩、大寶貝" value="'+esc(ex?ex.note:'')+'"></div>';
+  var footer=(ex?'<button class="btn danger" id="wf-del">取消打卡</button>':'')+'<button class="btn primary" id="wf-save">'+(ex?'儲存':'完成打卡')+'</button>';
+  openSheet({title:itemName+'・'+parts[0]+'年'+parts[1]+'月',body:body,footer:footer,onMount:function(el){
+    $('#wf-save',el).onclick=async function(){
+      var d=$('#wf-date',el).value;
+      if(!d||d<first||d>last){toast('日期要在 '+parts[1]+' 月內');return}
+      await saveWorm({id:id,petId:p.id,month:month,item:itemName,date:d,note:$('#wf-note',el).value.trim()});
+      closeTop();render();toast('已蓋章');
+    };
+    var del=$('#wf-del',el);
+    if(del)del.onclick=async function(){await removeWorm(id);closeTop();render();toast('已取消打卡')};
+  }});
+}
+function openWormSettings(){
+  var p=curPet();if(!p)return;
+  var items=JSON.parse(JSON.stringify(p.wormItems)),remind=p.wormRemind,day=p.wormDay;
+  var every=function(v){return [1,2,3,6,12].map(function(n){return '<option value="'+n+'" '+(v===n?'selected':'')+'>'+(n===1?'每月':'每 '+n+' 個月')+'</option>'}).join('')};
+  var dayOpts=''; for(var d=1;d<=28;d++)dayOpts+='<option value="'+d+'" '+(day===d?'selected':'')+'>'+d+' 號</option>';
+  var body='<div class="swrow" style="border-top:0"><span><b>每月提醒</b><small>到提醒日後，首頁會顯示待辦</small></span><span class="sw"><input type="checkbox" id="ws-on" '+(remind?'checked':'')+' aria-label="每月提醒"><i></i></span></div>'+
+    '<div class="field" style="margin-top:6px"><label for="ws-day">提醒日</label><select id="ws-day">'+dayOpts+'</select></div>'+
+    '<span class="lbl">驅蟲項目</span><div id="ws-items"></div>'+
+    '<div class="itemrow" style="margin-top:10px"><input id="ws-new" type="text" maxlength="14" placeholder="新增項目名稱"><select id="ws-newev" aria-label="頻率">'+every(1)+'</select><button class="iconbtn" id="ws-add" aria-label="新增項目" style="background:var(--primary);color:var(--on-primary)">'+ico('plus')+'</button></div>'+
+    '<div class="hint">項目與頻率請依獸醫師建議設定。移除項目不會刪除已蓋的章。</div>';
+  openSheet({title:'驅蟲設定',body:body,footer:'<button class="btn primary" id="ws-save">儲存設定</button>',onMount:function(el){
+    var box=$('#ws-items',el);
+    function paint(){
+      box.innerHTML=items.map(function(it,i){return '<div class="itemrow"><span class="nm">'+esc(it.name)+'</span><select data-ev="'+i+'" aria-label="'+esc(it.name)+' 頻率">'+every(it.every)+'</select><button class="iconbtn" data-rm="'+i+'" aria-label="移除 '+esc(it.name)+'">'+ico('x',18)+'</button></div>'}).join('')||'<small>目前沒有項目</small>';
+    }
+    paint();
+    box.addEventListener('change',function(e){var s=e.target.closest('select[data-ev]');if(s)items[+s.dataset.ev].every=+s.value});
+    box.addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(b){items.splice(+b.dataset.rm,1);paint()}});
+    $('#ws-add',el).onclick=function(){
+      var inp=$('#ws-new',el),nm=inp.value.trim();
+      if(!nm){toast('請輸入項目名稱');return}
+      if(nm.indexOf('|')>=0){toast('名稱不能包含 | 符號');return}
+      if(items.some(function(x){return x.name===nm})){toast('已經有這個項目');return}
+      items.push({name:nm,every:+$('#ws-newev',el).value});inp.value='';paint();
+    };
+    $('#ws-save',el).onclick=async function(){
+      p.wormItems=items;p.wormRemind=$('#ws-on',el).checked;p.wormDay=+$('#ws-day',el).value;
+      await savePet(p);closeTop();render();toast('已儲存設定');Notif.ensure();
+    };
+  }});
+}
+
+/* ================= 表單：預防針／補登驅蟲 ================= */
+function vchipHtml(names,sel,multi){
+  return names.map(function(n){
+    var on=sel.indexOf(n)>=0;
+    return '<button type="button" class="'+(on?'on':'')+'" data-v="'+esc(n)+'" aria-pressed="'+on+'">'+(multi?'<span class="chk">'+(on?'✓':'')+'</span>':'')+esc(n)+'</button>';
+  }).join('')+'<button type="button" class="new" data-new>'+ico('plus',16)+'新增疫苗</button>';
+}
+function openVaccSheet(itemName,id){
+  var p=curPet();if(!p)return;
+  var ex=id&&S.vaccs.filter(function(v){return v.id===id})[0];
+  var multi=!ex;
+  var sel=ex?[ex.item]:(itemName?[itemName]:[]);
+  function names(){
+    var t=(p.vaccItems||[]).slice();
+    var all=t.concat(S.lib.map(function(l){return l.name}).filter(function(n){return t.indexOf(n)<0}));
+    sel.forEach(function(n){if(all.indexOf(n)<0)all.push(n)});
+    return all;
+  }
+  var body='<div class="field"><span class="lbl">'+(multi?'打了哪些針（可複選）':'疫苗')+'</span><div class="vchips" id="vf-items"></div>'+(multi?'<div class="hint">同一天打好幾劑，可以一次勾選。這隻寵物沒追蹤的疫苗，記錄後會自動加入追蹤。</div>':'')+'</div>'+
+    '<div class="field"><label for="vf-date">施打日期</label><input id="vf-date" type="date" max="'+ymd(today())+'" value="'+(ex?ex.date:ymd(today()))+'"><div class="hint">補登以前打過的針，選當時的日期就可以。下次日期會依最近一次自動計算。</div></div>'+
+    '<div class="field"><label for="vf-note">診所／疫苗品牌（選填）</label><input id="vf-note" type="text" maxlength="40" placeholder="例如：○○動物醫院" value="'+esc(ex?ex.note:'')+'"></div>';
+  var footer=(ex?'<button class="btn danger" id="vf-del">刪除</button>':'')+'<button class="btn primary" id="vf-save">'+(ex?'儲存':'新增紀錄')+'</button>';
+  openSheet({title:(ex?'編輯':'新增')+'施打紀錄・'+p.name,body:body,footer:footer,onMount:function(el){
+    var box=$('#vf-items',el);
+    function paint(){box.innerHTML=vchipHtml(names(),sel,multi)}
+    paint();
+    box.addEventListener('click',function(e){
+      if(e.target.closest('[data-new]')){openLibItem(null,function(n){if(multi){if(sel.indexOf(n)<0)sel.push(n)}else sel=[n];paint()});return}
+      var b=e.target.closest('button[data-v]');if(!b)return;
+      var n=b.dataset.v,i=sel.indexOf(n);
+      if(multi){if(i>=0)sel.splice(i,1);else sel.push(n)}else sel=[n];
+      paint();
+    });
+    $('#vf-save',el).onclick=async function(){
+      var d=$('#vf-date',el).value,note=$('#vf-note',el).value.trim();
+      if(!sel.length){toast('請點選打了哪一種疫苗');return}
+      if(!d){toast('請選擇施打日期');return}
+      if(d>ymd(today())){toast('施打日期不能晚於今天');return}
+      if(ex)await saveVacc({id:ex.id,petId:p.id,item:sel[0],date:d,note:note});
+      else for(var i=0;i<sel.length;i++)await saveVacc({id:uid(),petId:p.id,item:sel[i],date:d,note:note});
+      var add=sel.filter(function(n){return libGet(n)&&(p.vaccItems||[]).indexOf(n)<0});
+      if(add.length){p.vaccItems=S.lib.map(function(l){return l.name}).filter(function(n){return p.vaccItems.indexOf(n)>=0||add.indexOf(n)>=0});await savePet(p)}
+      closeTop();render();toast(ex?'已儲存':(sel.length>1?'已新增 '+sel.length+' 筆紀錄':'已新增，下次日期已更新'));Notif.ensure();
+    };
+    var del=$('#vf-del',el);
+    if(del)del.onclick=async function(){
+      var ok=await confirmDlg('刪除這筆施打紀錄？','刪除',true);if(!ok)return;
+      await removeVacc(ex.id);closeTop();render();toast('已刪除');
+    };
+  }});
+}
+function openVaccSettings(){
+  var p=curPet();if(!p)return;
+  var on=(p.vaccItems||[]).slice();
+  var body='<p class="about" style="margin:0 0 8px">勾選「'+esc(p.name)+'」要追蹤的疫苗。追蹤中的疫苗會計算下次日期並提醒。</p><div class="list" id="vt-list"></div>'+
+    '<button class="btn block" id="vt-new" style="margin-top:12px">'+ico('plus',18)+'清單裡沒有？新增疫苗</button>'+
+    '<div class="hint">疫苗名稱、間隔與提醒，在「設定 → 疫苗清單」修改，所有寵物共用。取消追蹤不會刪除已記錄的施打日期。</div>';
+  openSheet({title:'追蹤項目・'+p.name,body:body,footer:'<button class="btn primary" id="vt-save">儲存</button>',onMount:function(el){
+    var list=$('#vt-list',el);
+    function paint(){
+      list.innerHTML=S.lib.map(function(l,i){
+        return '<div class="swrow"'+(i===0?' style="border-top:0"':'')+'><span><b>'+esc(l.name)+'</b><small>'+everyLabel(l.every)+'・'+remindLabel(l.remind)+'</small></span><span class="sw"><input type="checkbox" data-n="'+esc(l.name)+'" '+(on.indexOf(l.name)>=0?'checked':'')+' aria-label="追蹤 '+esc(l.name)+'"><i></i></span></div>';
+      }).join('')||'<small>疫苗清單是空的，先新增一種疫苗。</small>';
+    }
+    paint();
+    list.addEventListener('change',function(e){var c=e.target.closest('input[data-n]');if(!c)return;var n=c.dataset.n,i=on.indexOf(n);if(c.checked&&i<0)on.push(n);if(!c.checked&&i>=0)on.splice(i,1)});
+    $('#vt-new',el).onclick=function(){openLibItem(null,function(n){if(on.indexOf(n)<0)on.push(n);paint()})};
+    $('#vt-save',el).onclick=async function(){
+      p.vaccItems=S.lib.map(function(l){return l.name}).filter(function(n){return on.indexOf(n)>=0});
+      await savePet(p);closeTop();render();toast('已儲存');Notif.ensure();
+    };
+  }});
+}
+function openLibItem(name,onSaved){
+  var ex=name?libGet(name):null;
+  var it=ex?{name:ex.name,every:ex.every,remind:ex.remind}:{name:'',every:12,remind:14};
+  var used=ex?S.vaccs.filter(function(v){return v.item===ex.name}).length:0;
+  var body='<div class="field"><label for="lb-name">疫苗名稱</label><input id="lb-name" type="text" maxlength="20" autocomplete="off" placeholder="例如：貓五合一疫苗、FIP 預防" value="'+esc(it.name)+'">'+(ex&&used?'<div class="hint">改名後，已記錄的 '+used+' 筆施打紀錄會一起改名。改成清單裡已有的名稱，會把兩個項目合併。</div>':'')+'</div>'+
+    '<div class="two"><div class="field"><label for="lb-every">多久施打一次</label><select id="lb-every">'+optList(EVERY_OPTS,it.every,everyLabel)+'</select></div>'+
+    '<div class="field"><label for="lb-remind">提醒</label><select id="lb-remind">'+optList(REMIND_OPTS,it.remind,remindLabel)+'</select></div></div>'+
+    '<div class="hint">間隔請依獸醫師建議設定。選「不提醒」就不會跳出提醒。這些設定所有寵物共用。</div>';
+  var footer=(ex?'<button class="btn danger" id="lb-del">刪除</button>':'')+'<button class="btn primary" id="lb-save">'+(ex?'儲存':'加入清單')+'</button>';
+  openSheet({title:ex?'編輯疫苗':'新增疫苗',body:body,footer:footer,onMount:function(el){
+    $('#lb-save',el).onclick=async function(){
+      var nm=$('#lb-name',el).value.trim().replace(/\s+/g,' '),ev=+$('#lb-every',el).value,rm=+$('#lb-remind',el).value;
+      if(!nm){toast('請輸入疫苗名稱');$('#lb-name',el).focus();return}
+      var other=libGet(nm);
+      if(!ex){
+        if(other){toast('清單裡已經有「'+nm+'」');return}
+        S.lib.push({name:nm,every:ev,remind:rm});await saveLib();
+      }else if(nm===ex.name){
+        ex.every=ev;ex.remind=rm;await saveLib();
+      }else{
+        if(other&&other!==ex){
+          var ok=await confirmDlg('清單裡已經有「'+nm+'」。要把「'+ex.name+'」的紀錄合併過去嗎？','合併');if(!ok)return;
+          other.every=ev;other.remind=rm;S.lib=S.lib.filter(function(l){return l!==ex});
+        }else{ex.name=nm;ex.every=ev;ex.remind=rm}
+        var old=name,recs=S.vaccs.filter(function(v){return v.item===old});
+        for(var i=0;i<recs.length;i++){recs[i].item=nm;await saveVacc(recs[i])}
+        for(var j=0;j<S.pets.length;j++){var p=S.pets[j];if((p.vaccItems||[]).indexOf(old)>=0){p.vaccItems=uniq(p.vaccItems.map(function(n){return n===old?nm:n}));await savePet(p)}}
+        await saveLib();
+      }
+      closeTop();render();toast(ex?'已儲存':'已加入清單');
+      if(onSaved)onSaved(nm);
+    };
+    var del=$('#lb-del',el);
+    if(del)del.onclick=async function(){
+      var ok=await confirmDlg('從清單刪除「'+ex.name+'」？所有寵物都會停止追蹤這個疫苗。'+(used?'已記錄的 '+used+' 筆施打日期會保留，仍可在預防針頁回看。':''),'刪除',true);
+      if(!ok)return;
+      S.lib=S.lib.filter(function(l){return l!==ex});
+      for(var j=0;j<S.pets.length;j++){var p=S.pets[j];if((p.vaccItems||[]).indexOf(ex.name)>=0){p.vaccItems=p.vaccItems.filter(function(n){return n!==ex.name});await savePet(p)}}
+      await saveLib();closeTop();render();toast('已刪除');
+    };
+  }});
+}
+function openWormBackfill(){
+  var p=curPet();if(!p)return;
+  if(!p.wormItems.length){toast('請先設定驅蟲項目');openWormSettings();return}
+  var opts=p.wormItems.map(function(i){return '<option value="'+esc(i.name)+'">'+esc(i.name)+'</option>'}).join('');
+  var body='<div class="field"><label for="bf-item">驅蟲項目</label><select id="bf-item">'+opts+'</select></div>'+
+    '<div class="field"><label for="bf-date">驅蟲日期</label><input id="bf-date" type="date" max="'+ymd(today())+'" value="'+ymd(today())+'"><div class="hint">補登以前驅蟲的日期。每個項目每月記錄一筆，同一個月再補登會更新那一筆。</div></div>'+
+    '<div class="field"><label for="bf-note">藥品／備註（選填）</label><input id="bf-note" type="text" maxlength="40" placeholder="例如：福來恩"></div>';
+  openSheet({title:'補登驅蟲紀錄',body:body,footer:'<button class="btn primary" id="bf-save">補登</button>',onMount:function(el){
+    $('#bf-save',el).onclick=async function(){
+      var d=$('#bf-date',el).value;
+      if(!d){toast('請選擇驅蟲日期');return}
+      if(d>ymd(today())){toast('驅蟲日期不能晚於今天');return}
+      var mo=d.slice(0,7),item=$('#bf-item',el).value,id=wid(p.id,mo,item),existed=S.worms.some(function(w){return w.id===id});
+      await saveWorm({id:id,petId:p.id,month:mo,item:item,date:d,note:$('#bf-note',el).value.trim()});
+      S.year=+d.slice(0,4);closeTop();render();toast(existed?'已更新該月紀錄':'已補登');
+    };
+  }});
+}
+
+/* ================= 備份 ================= */
+async function exportData(){
+  var data={app:'petnote',version:3,exported:new Date().toISOString(),vaccLib:S.lib,pets:S.pets,logs:S.logs,worms:S.worms,vaccines:S.vaccs};
+  var text=JSON.stringify(data),name='寵物筆記備份-'+ymd(new Date())+'.json';
+  var cap=window.Capacitor,P=cap&&cap.Plugins;
+  try{
+    if(cap&&cap.isNativePlatform&&cap.isNativePlatform()&&P&&P.Filesystem&&P.Share){
+      var r=await P.Filesystem.writeFile({path:name,data:text,directory:'CACHE',encoding:'utf8'});
+      await P.Share.share({title:name,url:r.uri,dialogTitle:'儲存或分享備份檔'});return;
+    }
+  }catch(e){ if(e&&/cancel/i.test(String(e.message||e)))return; }
+  try{
+    var file=new File([text],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}
+  }catch(e){ if(e&&e.name==='AbortError')return; }
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove();
+  toast('已產生備份檔');
+}
+async function importData(file){
+  try{
+    var d=JSON.parse(await file.text());
+    if(!d||d.app!=='petnote'||!Array.isArray(d.pets))throw new Error('format');
+    var np=0,nl=0,nw=0,nv=0,i;
+    (d.vaccLib||[]).forEach(function(l){if(l&&l.name){var g=libGet(l.name);if(!g)libAdd(l.name,+l.every||12,l.remind==null?14:+l.remind)}});
+    for(i=0;i<d.pets.length;i++){if(d.pets[i]&&d.pets[i].id&&d.pets[i].name){await savePet(ensurePet(d.pets[i]));np++}}
+    if(libDirty)await saveLib();
+    for(i=0;i<(d.logs||[]).length;i++){var l=d.logs[i];if(l&&l.id&&l.petId){await saveLog(l);nl++}}
+    for(i=0;i<(d.worms||[]).length;i++){var w=d.worms[i];if(w&&w.id&&w.petId){await saveWorm(w);nw++}}
+    for(i=0;i<(d.vaccines||[]).length;i++){var v=d.vaccines[i];if(v&&v.id&&v.petId){await saveVacc(v);nv++}}
+    if(!curPet()&&S.pets.length)S.sel=S.pets[0].id;
+    render();toast('已匯入 '+np+' 隻寵物、'+nl+' 筆狀況、'+nw+' 筆驅蟲、'+nv+' 筆預防針');
+  }catch(e){toast('這不是寵物筆記的備份檔')}
+}
+
+/* ================= 範例資料 ================= */
+async function loadSample(){
+  var t=today(),p=newPet();
+  Object.assign(p,{name:'麻糬（範例）',species:'貓',breed:'米克斯',gender:'男生',birthday:ymd(addDays(addMonths(t,-27),-12)),homeDate:ymd(addMonths(t,-16)),wormDay:5});
+  p.vaccItems=speciesDefault('貓');
+  await savePet(p);S.sel=p.id;lsSet('petnote.sel',p.id);
+  var now=Date.now(),H=36e5;
+  var logs=[
+    {type:'vomit',ts:now-5*H,note:'早餐後吐了一次黃色泡沫，之後精神和食慾正常。'},
+    {type:'stool',ts:now-30*H,note:'便便偏軟，沒有血絲。晚上補了益生菌，明天繼續觀察。'},
+    {type:'vet',ts:now-9*24*H,note:'例行健檢，體重 4.6 kg，醫生說一切正常。'},
+    {type:'appetite',ts:now-20*24*H,note:'換新飼料第三天，只吃了一半。'}
+  ];
+  for(var i=0;i<logs.length;i++)await saveLog({id:uid(),petId:p.id,type:logs[i].type,custom:'',ts:logs[i].ts,note:logs[i].note,photos:[]});
+  for(var k=1;k<=3;k++){var mo=ym(addMonths(t,-k));await saveWorm({id:wid(p.id,mo,'體外驅蟲'),petId:p.id,month:mo,item:'體外驅蟲',date:mo+'-05',note:'福來恩'})}
+  var m3=ym(addMonths(t,-3));await saveWorm({id:wid(p.id,m3,'體內驅蟲'),petId:p.id,month:m3,item:'體內驅蟲',date:m3+'-05',note:''});
+  var v1=addDays(addMonths(t,-12),10),v0=addMonths(v1,-12);
+  await saveVacc({id:uid(),petId:p.id,item:'貓三合一疫苗',date:ymd(v0),note:'○○動物醫院'});
+  await saveVacc({id:uid(),petId:p.id,item:'貓三合一疫苗',date:ymd(v1),note:'○○動物醫院'});
+  await saveVacc({id:uid(),petId:p.id,item:'狂犬病疫苗',date:ymd(addMonths(t,-5)),note:''});
+  render();toast('已載入範例，可在「設定」刪除');
+}
+
+/* ================= 手機通知（僅 Android App） ================= */
+var Notif=(function(){
+  var timer=null;
+  function plug(){try{var c=window.Capacitor;if(c&&c.isNativePlatform&&c.isNativePlatform()&&c.Plugins&&c.Plugins.LocalNotifications)return c.Plugins.LocalNotifications}catch(e){}return null}
+  async function status(){var P=plug();if(!P)return 'web';try{var r=await P.checkPermissions();return r.display||'prompt'}catch(e){return 'error'}}
+  async function ask(){var P=plug();if(!P)return 'web';try{var r=await P.requestPermissions();return r.display||'denied'}catch(e){return 'error'}}
+  function anyReminder(){return S.pets.some(function(p){return p.wormRemind||vItems(p).some(function(i){return i.remind>=0})})}
+  function build(){
+    var out=[],now=new Date(),td=today();
+    var at=function(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate(),9,0,0)};
+    S.pets.forEach(function(p){
+      vItems(p).forEach(function(it){
+        if(it.remind<0)return;
+        var st=vaccStatus(p,it,td);if(!st.due)return;
+        var t1=at(addDays(st.due,-it.remind));
+        if(t1>now)out.push({t:t1,title:p.name+'的預防針提醒',body:it.name+(it.remind===0?'今天到期':'將在 '+it.remind+' 天後（'+fmtD(ymd(st.due))+'）到期')});
+        if(it.remind>0){var t2=at(st.due);if(t2>now)out.push({t:t2,title:p.name+'的預防針提醒',body:it.name+'今天到期'})}
+      });
+      if(p.wormRemind){
+        for(var k=0;k<3;k++){
+          var md=new Date(now.getFullYear(),now.getMonth()+k,p.wormDay),cm=ym(md),t=at(md);
+          if(t<=now)continue;
+          var names=(p.wormItems||[]).filter(function(it){return itemStatus(p,it,cm).state==='due'}).map(function(it){return it.name});
+          if(names.length)out.push({t:t,title:p.name+'的驅蟲提醒',body:'今天該驅蟲了：'+names.join('、')});
+        }
+      }
+    });
+    out.sort(function(a,b){return a.t-b.t});
+    return out.slice(0,60).map(function(o,i){return {id:i+1,title:o.title,body:o.body,schedule:{at:o.t,allowWhileIdle:true}}});
+  }
+  async function run(){
+    var P=plug();if(!P)return;
+    try{
+      if(await status()!=='granted')return;
+      var pend=await P.getPending();
+      if(pend&&pend.notifications&&pend.notifications.length)await P.cancel({notifications:pend.notifications.map(function(n){return {id:n.id}})});
+      var list=build();
+      if(list.length)await P.schedule({notifications:list});
+    }catch(e){}
+  }
+  function queue(){clearTimeout(timer);timer=setTimeout(run,800)}
+  async function ensure(){
+    if(!plug()||!anyReminder()||lsGet('petnote.notifAsked'))return;
+    lsSet('petnote.notifAsked','1');
+    var st=await status();
+    if(st==='prompt'||st==='prompt-with-rationale')await ask();
+    queue();
+  }
+  async function test(){
+    var P=plug();if(!P)return false;
+    try{await P.schedule({notifications:[{id:9999,title:'寵物筆記',body:'這是測試通知，看到這則代表提醒功能正常。',schedule:{at:new Date(Date.now()+5000),allowWhileIdle:true}}]});return true}catch(e){return false}
+  }
+  return {status:status,ask:ask,ensure:ensure,test:test,sync:queue};
+})();
+async function updateNotifCard(){
+  var st=await Notif.status(),t=$('#notifTxt'),b=$('#notifBtns');
+  if(!t||!b)return;
+  var msg={
+    web:'網頁版不會跳出手機通知，快到期的預防針與本月驅蟲會顯示在首頁最上方。Android 手機安裝 App 版，才會在早上 9:00 跳通知。',
+    granted:'通知已開啟。預防針與驅蟲會依你設定的提醒時間，在早上 9:00 通知你。',
+    denied:'通知被關閉了。請到手機「設定 → 應用程式 → 寵物筆記 → 通知」開啟。',
+    error:'暫時無法確認通知狀態。'
+  };
+  t.textContent=msg[st]||'尚未允許通知，開啟後才能收到提醒。';
+  b.innerHTML=st==='granted'?'<button class="btn block" data-act="notiftest" style="margin-top:12px">傳送測試通知</button>':((st==='prompt'||st==='prompt-with-rationale')?'<button class="btn primary block" data-act="notifask" style="margin-top:12px">開啟通知</button>':'');
+}
+
+/* ================= 事件 ================= */
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]');if(!t)return;
+  var a=t.dataset.act;
+  if(a==='tab'){S.tab=t.dataset.tab;$('#main').scrollTop=0;render()}
+  else if(a==='selpet'){S.sel=t.dataset.id;lsSet('petnote.sel',S.sel);S.filter='all';render()}
+  else if(a==='addpet')openPetSheet();
+  else if(a==='editpet')openPetSheet(t.dataset.id||S.sel);
+  else if(a==='addlog')openLogSheet();
+  else if(a==='editlog')openLogSheet(t.dataset.id);
+  else if(a==='filter'){S.filter=t.dataset.f;renderMain()}
+  else if(a==='photo')openViewer(t.dataset.id,+t.dataset.idx);
+  else if(a==='year'){S.year+=+t.dataset.d;renderMain()}
+  else if(a==='wormdone')openWormSheet(t.dataset.item,t.dataset.month);
+  else if(a==='wormset')openWormSettings();
+  else if(a==='sample')loadSample();
+  else if(a==='export')exportData();
+  else if(a==='import'){var f=$('#importFile');if(f)f.click()}
+  else if(a==='vaccadd')openVaccSheet(t.dataset.item);
+  else if(a==='vaccedit')openVaccSheet(null,t.dataset.id);
+  else if(a==='vaccset')openVaccSettings();
+  else if(a==='libedit')openLibItem(t.dataset.name||null);
+  else if(a==='wormadd')openWormBackfill();
+  else if(a==='alertgo'){S.sel=t.dataset.pid;lsSet('petnote.sel',S.sel);S.tab=t.dataset.tab;$('#main').scrollTop=0;render()}
+  else if(a==='notifask'){Notif.ask().then(function(){Notif.sync();updateNotifCard()})}
+  else if(a==='notiftest'){Notif.test().then(function(ok){toast(ok?'5 秒後會收到測試通知':'無法傳送測試通知')})}
+});
+document.addEventListener('keydown',function(e){
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.entry[data-act]')){e.preventDefault();openLogSheet(e.target.dataset.id)}
+  if(e.key==='Escape'&&Layers.length)closeTop();
+});
+document.addEventListener('change',function(e){
+  if(e.target.id==='importFile'){var f=e.target.files&&e.target.files[0];if(f)importData(f);e.target.value=''}
+});
+document.addEventListener('click',function(e){
+  var b=e.target.closest('#themeSeg button[data-v]');if(!b)return;
+  var v=b.dataset.v;lsSet('petnote.theme',v);applyTheme();$$('#themeSeg button').forEach(function(x){x.classList.toggle('on',x===b)});
+});
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&!Layers.length)render()});
+function applyTheme(){
+  var v=lsGet('petnote.theme'),r=document.documentElement;
+  if(v==='light'||v==='dark')r.setAttribute('data-theme',v);else if(v==='system')r.removeAttribute('data-theme');
+}
+
+/* ================= 啟動 ================= */
+(async function init(){
+  applyTheme();
+  await DB.open();
+  S.pets=(await DB.all('pets')).sort(function(a,b){return a.created-b.created});
+  S.logs=await DB.all('logs');S.worms=await DB.all('worms');S.vaccs=await DB.all('vaccines');
+  var meta=(await DB.all('meta')).filter(function(m){return m.id==='vaccLib'})[0];
+  if(meta&&Array.isArray(meta.items))S.lib=meta.items;else{S.lib=JSON.parse(JSON.stringify(DEFAULT_LIB));libDirty=true}
+  S.pets.forEach(ensurePet);
+  if(libDirty)await saveLib();
+  for(var mi=0;mi<S.pets.length;mi++){if(S.pets[mi]._mig)await savePet(S.pets[mi])}
+  var s=lsGet('petnote.sel');S.sel=(S.pets.filter(function(p){return p.id===s})[0]||S.pets[0]||{}).id||null;
+  render();Notif.sync();
+  if(!DB.ok)toast('目前無法永久儲存資料');
+  try{
+    var cap=window.Capacitor,native=cap&&cap.isNativePlatform&&cap.isNativePlatform();
+    if(!native&&'serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(function(){});
+    if(!native&&navigator.storage&&navigator.storage.persist)navigator.storage.persisted().then(function(p){if(!p)return navigator.storage.persist()}).catch(function(){});
+  }catch(e){}
+})();
+})();
+</script>
+
+</body>
+</html>
