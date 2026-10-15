@@ -48,6 +48,10 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
+.vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;opacity:0}
+.busy{position:fixed;inset:0;z-index:95;display:grid;place-items:center;background:var(--scrim);padding:24px}
+.busy .dlg{transform:none;opacity:1;text-align:center}
+.busy .dlg p{margin:0}
 html{height:100%;box-sizing:border-box;background:var(--bg)}
 body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--font);overflow:hidden;-webkit-text-size-adjust:100%}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -338,7 +342,7 @@ var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHour
 var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
-var APP_VERSION='1.4.0';
+var APP_VERSION='1.4.1';
 function isNative(){try{var c=window.Capacitor;return !!(c&&c.isNativePlatform&&c.isNativePlatform())}catch(e){return false}}
 function apkUrl(){
   var m=/^([a-z0-9-]+)\.github\.io$/i.exec(location.hostname);if(!m)return '';
@@ -647,7 +651,7 @@ function openSheet(o){
 function confirmDlg(msg,okLabel,danger){
   return new Promise(function(res){
     var el=document.createElement('div');el.className='layer center';
-    el.innerHTML='<div class="dlg" role="alertdialog" aria-modal="true"><p>'+esc(msg)+'</p><div class="row"><button class="btn" data-no>取消</button><button class="btn '+(danger?'danger':'primary')+'" data-yes>'+esc(okLabel||'確定')+'</button></div></div>';
+    el.innerHTML='<div class="dlg" role="alertdialog" aria-modal="true"><p style="white-space:pre-line">'+esc(msg)+'</p><div class="row"><button class="btn" data-no>取消</button><button class="btn '+(danger?'danger':'primary')+'" data-yes>'+esc(okLabel||'確定')+'</button></div></div>';
     var done=false;
     function fin(v){if(done)return;done=true;res(v)}
     el.addEventListener('click',function(e){
@@ -657,6 +661,15 @@ function confirmDlg(msg,okLabel,danger){
     pushLayer(el,function(){fin(false)});
   });
 }
+function infoDlg(msg){
+  return new Promise(function(res){
+    var el=document.createElement('div');el.className='layer center';
+    el.innerHTML='<div class="dlg" role="alertdialog" aria-modal="true"><p style="white-space:pre-line">'+esc(msg)+'</p><div class="row"><button class="btn primary" data-yes>好</button></div></div>';
+    el.addEventListener('click',function(e){if(e.target.closest('[data-yes]')||e.target===el)closeTop()});
+    pushLayer(el,function(){res()});
+  });
+}
+var Busy={el:null,show:function(msg){if(!this.el){this.el=document.createElement('div');this.el.className='busy';this.el.innerHTML='<div class="dlg" role="status" aria-live="polite"><p></p></div>';document.body.appendChild(this.el)}this.el.querySelector('p').textContent=msg},hide:function(){if(this.el){this.el.remove();this.el=null}}};
 var toastT=null;
 function toast(msg){
   var t=$('#toast');t.textContent=msg;t.classList.add('show');
@@ -967,7 +980,7 @@ function viewMore(){
     return '<button class="lrow" data-act="libedit" data-name="'+esc(l.name)+'"><span class="grow"><b>'+esc(l.name)+'</b><small style="display:block">'+(g?'群組：'+esc(g.name):'獨立・'+everyLabel(l.every)+'・'+remindLabel(l.remind)+(users.length?'　'+users.map(esc).join('、'):''))+'</small></span>'+ico('cr',18)+'</button>';
   }).join('')+'<button class="lrow" data-act="libedit"><span class="av" style="--s:40px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增疫苗</b><small style="display:block">建立後，新增施打紀錄時直接點選</small></span></button></div></div>';
   h+='<div class="sechead">手機通知</div><div class="card"><p class="about" id="notifTxt" style="margin:0">檢查中…</p><div id="notifBtns"></div></div>';
-  h+='<div class="sechead">資料備份</div><div class="card"><div class="actions"><button class="btn" data-act="export">匯出備份</button><button class="btn" data-act="import">匯入備份</button></div><input id="importFile" type="file" accept=".json,application/json" hidden><p class="about" id="storeTxt" style="margin-bottom:0"></p><p class="about">資料只存在這支手機（或這個瀏覽器）裡。換手機、重新安裝或清除瀏覽器資料前，請先匯出備份檔並存到雲端硬碟。匯入時會與現有資料合併。使用網頁版時，建議每個月匯出一次。</p></div>';
+  h+='<div class="sechead">資料備份</div><div class="card"><div class="actions"><button class="btn" data-act="export">匯出備份</button><label class="btn" for="importFile" role="button" tabindex="0" style="cursor:pointer">匯入備份</label></div><input id="importFile" class="vh" type="file" tabindex="-1" aria-hidden="true"><p class="about" id="storeTxt" style="margin-bottom:0"></p><p class="about">資料只存在這支手機（或這個瀏覽器）裡。換手機、重新安裝或清除瀏覽器資料前，請先匯出備份檔並存到雲端硬碟。匯入時會與現有資料合併。使用網頁版時，建議每個月匯出一次。</p></div>';
   if(!isNative()){
     var au=apkUrl();
     h+='<div class="sechead">在其他手機使用</div><div class="card"><p class="about" style="margin:0"><b>iPhone</b>：用 Safari 打開這個網址，點下方「分享」→「加入主畫面」，就會像 App 一樣有圖示。<br><b>Android</b>：用 Chrome 打開，點右上角選單 →「加到主畫面」。'+(au?'也可以安裝 App 版，會在早上跳出提醒通知。':'')+'</p>'+
@@ -982,7 +995,7 @@ function openPetSheet(id){
   var isNew=!id,src=id&&S.pets.filter(function(x){return x.id===id})[0];
   var p=isNew?newPet():JSON.parse(JSON.stringify(src));
   var segs=function(arr,val){return arr.map(function(v){return '<button type="button" data-v="'+v+'" class="'+(val===v?'on':'')+'">'+v+'</button>'}).join('')};
-  var body='<div class="av-pick"><button type="button" class="av-btn" id="pf-av" aria-label="選擇頭像">'+avatar(p,88)+'<span class="av-cam">'+ico('cam',16)+'</span></button><input id="pf-file" type="file" accept="image/*" hidden><div class="hint">點頭像可選擇照片</div></div>'+
+  var body='<div class="av-pick"><button type="button" class="av-btn" id="pf-av" aria-label="選擇頭像">'+avatar(p,88)+'<span class="av-cam">'+ico('cam',16)+'</span></button><input id="pf-file" class="vh" type="file" accept="image/*" tabindex="-1" aria-hidden="true"><div class="hint">點頭像可選擇照片</div></div>'+
     '<div class="field"><label for="pf-name">名字</label><input id="pf-name" type="text" maxlength="20" autocomplete="off" placeholder="例如：麻糬" value="'+esc(p.name)+'"></div>'+
     '<div class="field"><label>種類</label><div class="seg" id="pf-species">'+segs(['貓','狗','其他'],p.species)+'</div></div>'+
     '<div class="field"><label for="pf-breed">品種（選填）</label><input id="pf-breed" type="text" maxlength="20" autocomplete="off" placeholder="例如：米克斯" value="'+esc(p.breed)+'"></div>'+
@@ -1032,7 +1045,7 @@ function openLogSheet(id){
     '<div class="field" id="lf-customwrap" '+(l.type==='other'?'':'hidden')+'><label for="lf-custom">自訂名稱（選填）</label><input id="lf-custom" type="text" maxlength="12" placeholder="例如：打噴嚏、跛腳" value="'+esc(l.custom)+'"></div>'+
     '<div class="field"><label for="lf-time">發生時間</label><input id="lf-time" type="datetime-local" value="'+toLocalInput(l.ts)+'"></div>'+
     '<div class="field"><label for="lf-note">說明</label><textarea id="lf-note" placeholder="次數、顏色、當時在做什麼、吃了什麼…">'+esc(l.note)+'</textarea></div>'+
-    '<div class="field"><span class="lbl">照片（最多 6 張）</span><div class="pickrow" id="lf-photos"></div><input id="lf-file" type="file" accept="image/*" multiple hidden></div>';
+    '<div class="field"><span class="lbl">照片（最多 6 張）</span><div class="pickrow" id="lf-photos"></div><input id="lf-file" class="vh" type="file" accept="image/*" multiple tabindex="-1" aria-hidden="true"></div>';
   var footer=(ex?'<button class="btn danger" id="lf-del">刪除</button>':'')+'<button class="btn primary" id="lf-save">'+(ex?'儲存':'新增紀錄')+'</button>';
   openSheet({title:(ex?'編輯':'記錄')+'狀況・'+p.name,body:body,footer:footer,onMount:function(el){
     var file=$('#lf-file',el),grid=$('#lf-photos',el),origIds=(ex&&ex.photos||[]).slice(),busy=false;
@@ -1436,10 +1449,20 @@ async function exportData(){
   finally{exportData.busy=false}
 }
 async function importData(file){
+  var d;
+  Busy.show('正在讀取「'+file.name+'」…');
+  try{d=JSON.parse(await file.text())}
+  catch(e){Busy.hide();await infoDlg('這個檔案無法讀取。\n請選擇從「設定 → 匯出備份」產生的檔案，檔名像「貓貓筆記備份-2026-10-15.json」。\n\n如果是從 LINE 或雲端下載的，請確認已經下載完整。');return}
+  Busy.hide();
+  if(!d||d.app!=='petnote'||!Array.isArray(d.pets)){await infoDlg('這不是貓貓筆記的備份檔。\n請選擇從「設定 → 匯出備份」產生的檔案。');return}
+  var photoCount=Object.keys(d.photos||{}).length;(d.logs||[]).forEach(function(l){(l.photos||[]).forEach(function(p){if(typeof p==='string'&&p.indexOf('data:')===0)photoCount++})});
+  var when=d.exported?new Date(d.exported):null;
+  var summary='備份檔內容'+(when&&!isNaN(when)?'（'+when.getFullYear()+'/'+(when.getMonth()+1)+'/'+when.getDate()+' 匯出）':'')+'：\n'+
+    d.pets.length+' 隻寵物'+(d.pets.length?'：'+d.pets.map(function(p){return p&&p.name}).filter(Boolean).slice(0,6).join('、'):'')+'\n'+
+    (d.logs||[]).length+' 筆狀況、'+photoCount+' 張照片\n'+(d.worms||[]).length+' 筆驅蟲、'+(d.vaccines||[]).length+' 筆預防針\n\n匯入後會和目前的資料合併，同一筆紀錄以備份檔為準。';
+  if(!await confirmDlg(summary,'匯入'))return;
   try{
-    toast('正在讀取備份檔…');
-    var d=JSON.parse(await file.text());
-    if(!d||d.app!=='petnote'||!Array.isArray(d.pets))throw new Error('format');
+    Busy.show('正在匯入…');
     var np=0,nl=0,nw=0,nv=0,nph=0,bad=0,i,j,photos=d.photos||{};
     (d.vaccGroups||[]).forEach(function(g){if(g&&g.id&&g.name&&!groupGet(g.id)){S.groups.push({id:g.id,name:g.name,every:+g.every||12,remind:g.remind==null?14:+g.remind});libDirty=true}});
     (d.vaccLib||[]).forEach(function(l){if(l&&l.name){var g=libGet(l.name);if(!g)libAdd(l.name,+l.every||12,l.remind==null?14:+l.remind,l.group&&groupGet(l.group)?l.group:'')}});
@@ -1453,16 +1476,19 @@ async function importData(file){
         var p=l.photos[j];
         if(Photos.isId(p)){if(photos[p]){if(await Photos.put(p,photos[p])){nph++;ids.push(p)}else{bad++;ids.push(photos[p])}photos[p]=null}else ids.push(p)}
         else if(typeof p==='string'&&p.indexOf('data:')===0){var nid=await Photos.add(p);if(nid){ids.push(nid);nph++}else{bad++;ids.push(p)}}
+        Busy.show('正在匯入照片 '+(nph+bad)+' / '+photoCount+' 張…');
       }
       l.photos=ids;await saveLog(l);nl++;
-      if(nph&&nph%10===0)toast('正在匯入照片 '+nph+' 張…');
+      if(!photoCount&&nl%20===0)Busy.show('正在匯入狀況紀錄 '+nl+' / '+logs.length+' 筆…');
     }
+    Busy.show('正在匯入驅蟲與預防針…');
     for(i=0;i<(d.worms||[]).length;i++){var w=d.worms[i];if(w&&w.id&&w.petId){await saveWorm(w);nw++}}
     for(i=0;i<(d.vaccines||[]).length;i++){var v=d.vaccines[i];if(v&&v.id&&v.petId){await saveVacc(v);nv++}}
     await normalizeAllPets();
     if(!curPet()&&S.pets.length)S.sel=S.pets[0].id;
-    render();toast('已匯入 '+np+' 隻寵物、'+nl+' 筆狀況（'+nph+' 張照片）、'+nw+' 筆驅蟲、'+nv+' 筆預防針'+(bad?'。手機空間不足，'+bad+' 張照片之後會再整理':''));
-  }catch(e){toast(e&&e.message==='format'?'這不是貓貓筆記的備份檔':'匯入失敗，檔案可能損壞或太大')}
+    Busy.hide();render();
+    await infoDlg('匯入完成！\n'+np+' 隻寵物、'+nl+' 筆狀況（'+nph+' 張照片）\n'+nw+' 筆驅蟲、'+nv+' 筆預防針'+(bad?'\n\n手機空間不足，有 '+bad+' 張照片先保留原檔，清出空間後重新開啟會自動整理。':''));
+  }catch(e){Busy.hide();render();await infoDlg('匯入到一半發生問題，已匯入的部分都保留著。\n可能是手機空間不足，清出空間後再匯入一次即可（重複匯入不會產生重複資料）。')}
 }
 
 /* ================= 範例資料 ================= */
@@ -1582,7 +1608,6 @@ document.addEventListener('click',function(e){
   else if(a==='wormset')openWormSettings();
   else if(a==='sample')loadSample();
   else if(a==='export')exportData();
-  else if(a==='import'){var f=$('#importFile');if(f)f.click()}
   else if(a==='vaccadd')openVaccSheet(t.dataset.item);
   else if(a==='vaccedit')openVaccSheet(null,t.dataset.id);
   else if(a==='vaccset')openVaccSettings();
@@ -1594,6 +1619,7 @@ document.addEventListener('click',function(e){
   else if(a==='notiftest'){Notif.test().then(function(ok){toast(ok?'5 秒後會收到測試通知':'無法傳送測試通知')})}
 });
 document.addEventListener('keydown',function(e){
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('label[for=importFile]')){e.preventDefault();var fi=$('#importFile');if(fi)fi.click();return}
   if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.entry[data-act]')){e.preventDefault();openLogSheet(e.target.dataset.id)}
   if(e.key==='Escape'&&Layers.length)closeTop();
 });
