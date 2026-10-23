@@ -157,6 +157,12 @@ main{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;paddi
 .wstats small{display:block;font-size:11.5px}
 .wstats b{font-size:15px;font-variant-numeric:tabular-nums}
 .wkg{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pager{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;margin:12px 0 4px}
+.pager button{min-width:40px;height:40px;padding:0 8px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.pager button.on{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.pager button:disabled{opacity:.35;cursor:default}
+.pager .gap{min-width:16px;text-align:center;color:var(--ink2)}
+.pageinfo{text-align:center;font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
 .search{position:relative;margin:0 0 12px}
 .search .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink2);pointer-events:none}
 .search input{width:100%;min-height:46px;padding:10px 44px 10px 40px;border-radius:23px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);appearance:none;-webkit-appearance:none}
@@ -368,7 +374,7 @@ var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHour
 var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
-var APP_VERSION='1.6.0';
+var APP_VERSION='1.7.1';
 function isNative(){try{var c=window.Capacitor;return !!(c&&c.isNativePlatform&&c.isNativePlatform())}catch(e){return false}}
 function apkUrl(){
   var m=/^([a-z0-9-]+)\.github\.io$/i.exec(location.hostname);if(!m)return '';
@@ -471,7 +477,7 @@ var DB={db:null,ok:false,
 var warnedStore=false;
 function saved(ok){ if(!ok&&!warnedStore){warnedStore=true;toast('目前無法永久儲存資料，關閉後可能消失')} }
 
-var S={pets:[],logs:[],worms:[],vaccs:[],lib:[],groups:[],vOpen:{},tlLimit:30,q:'',qAll:false,sel:null,tab:'home',filter:'all',year:new Date().getFullYear()};
+var S={pets:[],logs:[],worms:[],vaccs:[],lib:[],groups:[],vOpen:{},tlLimit:30,tlPage:1,q:'',qAll:false,sel:null,tab:'home',filter:'all',year:new Date().getFullYear()};
 
 function newPet(){
   return {id:uid(),name:'',species:'貓',breed:'',gender:'未知',birthday:'',homeDate:'',photo:'',
@@ -790,6 +796,18 @@ function weightCardHtml(p){
   var last=pts[pts.length-1],prev=pts.length>1?pts[pts.length-2]:null,d=new Date(last.t);
   return '<button class="wcard" data-act="weights" aria-label="查看體重變化"><span class="grow"><span class="lb">體重</span><span class="kg">'+fmtKg(last.kg)+'<small>kg</small>'+(prev?deltaHtml(last.kg-prev.kg):'')+'</span><span class="sub">'+d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+(last.src==='vacc'?'・打預防針時量':'')+'　共 '+pts.length+' 筆</span></span>'+sparkSvg(pts,88,40)+ico('cr',18)+'</button>';
 }
+function pagerHtml(page,pages,attr){
+  if(pages<=1)return '';
+  var b=function(p,label,aria,dis,on){return '<button type="button" '+attr+'="'+p+'"'+(dis?' disabled':'')+(on?' class="on" aria-current="page"':'')+' aria-label="'+aria+'">'+label+'</button>'};
+  var nums=[],set={};
+  [1,pages,page-1,page,page+1].forEach(function(p){if(p>=1&&p<=pages&&!set[p]){set[p]=1;nums.push(p)}});
+  if(page<=3)[2,3,4].forEach(function(p){if(p<=pages&&!set[p]){set[p]=1;nums.push(p)}});
+  if(page>=pages-2)[pages-3,pages-2,pages-1].forEach(function(p){if(p>=1&&!set[p]){set[p]=1;nums.push(p)}});
+  nums.sort(function(a,c){return a-c});
+  var h=b(page-1,'‹','上一頁',page===1,false),last=0;
+  nums.forEach(function(p){if(p-last>1)h+='<span class="gap">…</span>';h+=b(p,p,'第 '+p+' 頁',false,p===page);last=p});
+  return '<nav class="pager" aria-label="分頁">'+h+b(page+1,'›','下一頁',page===pages,false)+'</nav>';
+}
 function niceStep(range,count){var raw=range/Math.max(1,count),p=Math.pow(10,Math.floor(Math.log10(raw))),n=raw/p;return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p}
 function weightChart(pts){
   if(!pts.length)return '';
@@ -806,7 +824,8 @@ function weightChart(pts){
   if(pts.length>1)g+='<text x="'+(W-R)+'" y="'+(H-6)+'" text-anchor="end" font-size="10.5" fill="var(--ink2)">'+fd(pts[pts.length-1].t)+'</text>';
   var line=pts.map(function(p,i){return (i?'L':'M')+X(p.t).toFixed(1)+' '+Y(p.kg).toFixed(1)}).join(' ');
   var area=pts.length>1?'<path d="'+line+' L'+X(pts[pts.length-1].t).toFixed(1)+' '+(H-B)+' L'+X(pts[0].t).toFixed(1)+' '+(H-B)+' Z" fill="var(--primary)" opacity=".1"/>':'';
-  var dots=pts.map(function(p,i){var last=i===pts.length-1;return '<circle cx="'+X(p.t).toFixed(1)+'" cy="'+Y(p.kg).toFixed(1)+'" r="'+(last?5:4)+'" fill="'+(p.src==='vacc'?'var(--surface)':'var(--primary)')+'" stroke="var(--primary)" stroke-width="2"/>'}).join('');
+  var many=pts.length>40;
+  var dots=pts.map(function(p,i){var last=i===pts.length-1;if(many&&!last)return '';return '<circle cx="'+X(p.t).toFixed(1)+'" cy="'+Y(p.kg).toFixed(1)+'" r="'+(last?5:4)+'" fill="'+(p.src==='vacc'?'var(--surface)':'var(--primary)')+'" stroke="var(--primary)" stroke-width="2"/>'}).join('');
   var lp=pts[pts.length-1];
   var lab='<text x="'+Math.min(X(lp.t),W-R).toFixed(1)+'" y="'+(Y(lp.kg)-12).toFixed(1)+'" text-anchor="end" font-size="12" font-weight="700" fill="var(--ink)">'+fmtKg(lp.kg)+' kg</text>';
   var json=JSON.stringify(pts.map(function(p){return [X(p.t),Y(p.kg)]}));
@@ -814,7 +833,7 @@ function weightChart(pts){
 }
 function openWeights(){
   var p=curPet();if(!p)return;
-  var range='all';
+  var range='all',page=1,PER=4,curPts=[];
   var body='<div class="seg" id="w-range" style="margin-bottom:8px"><button data-v="all" class="on">全部</button><button data-v="12">1 年</button><button data-v="6">6 個月</button></div><div id="w-body"></div>';
   openSheet({title:'體重變化・'+p.name,body:body,footer:'<button class="btn primary" id="w-add">'+ico('plus',20)+'記錄體重</button>',
     onClose:function(){sheetRefresh=null},
@@ -827,12 +846,20 @@ function openWeights(){
         if(!pts.length){box.innerHTML='<p class="about">這段期間沒有體重紀錄，選「全部」看看。</p>';return}
         var kgs=pts.map(function(x){return x.kg}),first=pts[0],last=pts[pts.length-1];
         var stats='<div class="wstats"><div><small>最新</small><b>'+fmtKg(last.kg)+'</b></div><div><small>最高</small><b>'+fmtKg(Math.max.apply(null,kgs))+'</b></div><div><small>最低</small><b>'+fmtKg(Math.min.apply(null,kgs))+'</b></div><div><small>期間變化</small><b>'+(pts.length>1?((last.kg-first.kg>=0?'+':'−')+fmtKg(Math.abs(last.kg-first.kg))):'—')+'</b></div></div>';
-        var rows=pts.slice().reverse().map(function(x,i,arr){
-          var prev=arr[i+1],d=new Date(x.t);
+        curPts=pts;
+        box.innerHTML=weightChart(pts)+(pts.length===1?'<p class="about" style="margin:0 0 8px">再多記錄幾次，就能看到變化曲線。</p>':'')+(pts.length>40?'':'<small style="display:block;margin-bottom:8px">實心點：量體重紀錄　空心點：打預防針時量的體重</small>')+stats+'<div class="sechead" id="w-listhead" style="margin:4px 2px 0">明細（'+pts.length+' 筆，由新到舊）</div><div id="w-list"></div>';
+        bindChart($('.wchart',box),pts);
+        paintList();
+      }
+      function paintList(){
+        var desc=curPts.slice().reverse(),pages=Math.max(1,Math.ceil(desc.length/PER));
+        if(page>pages)page=pages;
+        var start=(page-1)*PER;
+        var rows=desc.slice(start,start+PER).map(function(x,i){
+          var prev=desc[start+i+1],d=new Date(x.t);
           return '<button class="hrow" data-wsrc="'+x.src+'" data-wid="'+x.id+'"><span class="d">'+d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+'</span><span class="grow"><span class="wkg">'+fmtKg(x.kg)+' kg</span>'+(prev?deltaHtml(x.kg-prev.kg):'')+'<small style="display:block">'+(x.src==='vacc'?'打預防針：'+esc(x.note):(x.note?esc(x.note):'量體重'))+'</small></span>'+ico('cr',16)+'</button>';
         }).join('');
-        box.innerHTML=weightChart(pts)+(pts.length===1?'<p class="about" style="margin:0 0 8px">再多記錄幾次，就能看到變化曲線。</p>':'')+'<small style="display:block;margin-bottom:8px">實心點：量體重紀錄　空心點：打預防針時量的體重</small>'+stats+'<div class="hist" style="border-top:0;margin-top:0">'+rows+'</div>';
-        bindChart($('.wchart',box),pts);
+        $('#w-list',box).innerHTML='<div class="hist" style="border-top:0;margin-top:0">'+rows+'</div>'+pagerHtml(page,pages,'data-wpg')+(pages>1?'<div class="pageinfo">第 '+(start+1)+'–'+Math.min(start+PER,desc.length)+' 筆，共 '+desc.length+' 筆</div>':'');
       }
       function bindChart(c,pts){
         if(!c)return;var xy=JSON.parse(c.getAttribute('data-pts')),svg=$('svg',c),tip=$('.tip',c),xh=$('.xh',c);
@@ -848,8 +875,8 @@ function openWeights(){
         c.addEventListener('pointermove',function(e){show(e.clientX)});
         c.addEventListener('pointerleave',function(){tip.hidden=true;xh.setAttribute('visibility','hidden')});
       }
-      bindSeg($('#w-range',el),function(v){range=v;paint()});
-      box.addEventListener('click',function(e){var r=e.target.closest('[data-wid]');if(!r)return;if(r.dataset.wsrc==='vacc')openVaccSheet(null,r.dataset.wid);else openLogSheet(r.dataset.wid)});
+      bindSeg($('#w-range',el),function(v){range=v;page=1;paint()});
+      box.addEventListener('click',function(e){var pg=e.target.closest('[data-wpg]');if(pg){if(pg.disabled)return;page=+pg.getAttribute('data-wpg');paintList();var hd=$('#w-listhead',box);if(hd)hd.scrollIntoView({block:'start'});return}var r=e.target.closest('[data-wid]');if(!r)return;if(r.dataset.wsrc==='vacc')openVaccSheet(null,r.dataset.wid);else openLogSheet(r.dataset.wid)});
       $('#w-add',el).onclick=function(){openLogSheet(null,'weight')};
       sheetRefresh=paint;paint();
     }});
@@ -968,7 +995,8 @@ function tlBody(){
   var chips='<div class="filters"><button class="fchip '+(f==='all'?'on':'')+'" data-act="filter" data-f="all">全部 '+base.length+'</button>'+
     TYPES.filter(function(t){return counts[t.id]}).map(function(t){return '<button class="fchip '+(f===t.id?'on':'')+'" data-act="filter" data-f="'+t.id+'">'+t.name+' '+counts[t.id]+'</button>'}).join('')+'</div>';
   var full=base.filter(function(l){return f==='all'||l.type===f});
-  var list=full.slice(0,S.tlLimit),rest=full.length-list.length;
+  var TLP=20,pages=Math.max(1,Math.ceil(full.length/TLP));if(S.tlPage>pages)S.tlPage=pages;
+  var startI=(S.tlPage-1)*TLP,list=full.slice(startI,startI+TLP);
   var out='',lastKey='',now=today(),open=false,showPet=terms.length&&S.qAll&&multi;
   list.forEach(function(l){
     var d=new Date(l.ts),key=ymd(d);
@@ -986,7 +1014,7 @@ function tlBody(){
       (l.note?'<p class="note">'+hl(l.note,terms)+'</p>':'')+(ph?'<div class="thumbs">'+ph+'</div>':'')+'</div></div>';
   });
   if(open)out+='</div>';
-  if(rest>0)out+='<button class="btn block" data-act="tlmore" style="margin:4px 0 8px">再顯示 '+Math.min(30,rest)+' 筆（還有 '+rest+' 筆較早的紀錄）</button>';
+  if(pages>1)out+=pagerHtml(S.tlPage,pages,'data-tlpg')+'<div class="pageinfo" style="margin-bottom:8px">第 '+(startI+1)+'–'+Math.min(startI+TLP,full.length)+' 筆，共 '+full.length+' 筆</div>';
   return info+chips+out;
 }
 function refreshTl(){var b=$('#tlBody');if(!b){renderMain();return}b.innerHTML=tlBody();Photos.hydrate(b);var c=$('.search .clr');if(!!S.q!==!!c){var box=$('.search');if(box){if(S.q&&!c)box.insertAdjacentHTML('beforeend','<button class="clr" data-act="qclear" aria-label="清除搜尋">'+ico('x',18)+'</button>');if(!S.q&&c)c.remove()}}}
@@ -1752,19 +1780,21 @@ async function updateNotifCard(){
 
 /* ================= 事件 ================= */
 document.addEventListener('click',function(e){
+  var tp=e.target.closest('[data-tlpg]');
+  if(tp){if(tp.disabled)return;S.tlPage=+tp.getAttribute('data-tlpg');refreshTl();var sb=$('.search')||$('#tlBody');if(sb)sb.scrollIntoView({block:'start'});return}
   var t=e.target.closest('[data-act]');if(!t)return;
   var a=t.dataset.act;
   if(a==='tab'){S.tab=t.dataset.tab;$('#main').scrollTop=0;render()}
-  else if(a==='selpet'){S.sel=t.dataset.id;lsSet('petnote.sel',S.sel);S.filter='all';S.tlLimit=30;S.vOpen={};render()}
+  else if(a==='selpet'){S.sel=t.dataset.id;lsSet('petnote.sel',S.sel);S.filter='all';S.tlLimit=30;S.tlPage=1;S.vOpen={};render()}
   else if(a==='addpet')openPetSheet();
   else if(a==='editpet')openPetSheet(t.dataset.id||S.sel);
   else if(a==='addlog')openLogSheet();
   else if(a==='weights')openWeights();
   else if(a==='editlog')openLogSheet(t.dataset.id);
-  else if(a==='filter'){S.filter=t.dataset.f;S.tlLimit=30;refreshTl()}
-  else if(a==='tlmore'){S.tlLimit+=30;refreshTl()}
-  else if(a==='qclear'){S.q='';S.filter='all';S.tlLimit=30;renderMain();var qi=$('#tl-q');if(qi)qi.focus()}
-  else if(a==='qscope'){S.qAll=t.dataset.v==='1';S.tlLimit=30;refreshTl()}
+  else if(a==='filter'){S.filter=t.dataset.f;S.tlLimit=30;S.tlPage=1;refreshTl()}
+
+  else if(a==='qclear'){S.q='';S.filter='all';S.tlLimit=30;S.tlPage=1;renderMain();var qi=$('#tl-q');if(qi)qi.focus()}
+  else if(a==='qscope'){S.qAll=t.dataset.v==='1';S.tlLimit=30;S.tlPage=1;refreshTl()}
   else if(a==='vmore'){var vn=t.dataset.item;S.vOpen[vn]=!S.vOpen[vn];renderMain()}
   else if(a==='setyear'){S.year=+t.dataset.y;renderMain()}
   else if(a==='photo')openViewer(t.dataset.id,+t.dataset.idx);
@@ -1792,7 +1822,7 @@ var qTimer=null;
 document.addEventListener('input',function(e){
   if(e.target.id!=='tl-q')return;
   var v=e.target.value;clearTimeout(qTimer);
-  qTimer=setTimeout(function(){S.q=v;S.filter='all';S.tlLimit=30;refreshTl()},180);
+  qTimer=setTimeout(function(){S.q=v;S.filter='all';S.tlLimit=30;S.tlPage=1;refreshTl()},180);
 });
 document.addEventListener('change',function(e){
   if(e.target.type==='file')pickingFile=0;
