@@ -374,8 +374,49 @@ var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHour
 var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
-var APP_VERSION='1.7.2';
+var APP_VERSION='1.8.0';
 function isNative(){try{var c=window.Capacitor;return !!(c&&c.isNativePlatform&&c.isNativePlatform())}catch(e){return false}}
+/* ---- App 版：檢查 GitHub 上的新版本 ---- */
+var UPDATE_REPO='FOX-loop/petnote-web';
+function verCmp(a,b){a=String(a).replace(/^v/i,'').split('.').map(Number);b=String(b).replace(/^v/i,'').split('.').map(Number);for(var i=0;i<3;i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x>y?1:-1}return 0}
+var Updater={
+  checking:false,last:null,
+  async fetchLatest(){
+    var r=await fetch('https://api.github.com/repos/'+UPDATE_REPO+'/releases/latest',{headers:{'Accept':'application/vnd.github+json'},cache:'no-store'});
+    if(!r.ok)throw new Error('http '+r.status);
+    var j=await r.json(),asset=(j.assets||[]).filter(function(a){return /\.apk$/i.test(a.name)})[0];
+    return {version:String(j.tag_name||'').replace(/^v/i,''),notes:j.body||'',url:asset?asset.browser_download_url:'https://github.com/'+UPDATE_REPO+'/releases/latest/download/PetNote.apk',page:j.html_url||('https://github.com/'+UPDATE_REPO+'/releases/latest'),size:asset?asset.size:0};
+  },
+  async check(manual){
+    if(!isNative()||this.checking)return;
+    if(!manual){var lc=+(lsGet('petnote.updChecked')||0);if(Date.now()-lc<6*3600e3)return}
+    this.checking=true;
+    try{
+      var info=await this.fetchLatest();lsSet('petnote.updChecked',String(Date.now()));this.last=info;
+      if(!info.version||verCmp(info.version,APP_VERSION)<=0){if(manual)infoDlg('已經是最新版本（'+APP_VERSION+'）。');return}
+      if(!manual){var sn=JSON.parse(lsGet('petnote.updSnooze')||'{}');if(sn.v===info.version&&Date.now()<sn.until)return}
+      this.prompt(info);
+    }catch(e){if(manual)infoDlg('目前無法檢查更新，請確認網路連線後再試一次。')}
+    finally{this.checking=false;var t=$('#updTxt');if(t)paintUpdTxt()}
+  },
+  prompt(info){
+    var notes=info.notes.replace(/\r/g,'').split('\n').map(function(l){return l.replace(/^#+\s*/,'').replace(/\*\*/g,'').replace(/^[-*]\s+/,'・').trim()}).filter(Boolean).slice(0,10).join('\n');
+    var el=document.createElement('div');el.className='layer center';
+    el.innerHTML='<div class="dlg" role="alertdialog" aria-modal="true" style="max-width:400px"><p style="margin:0 0 6px;font-size:18px;font-weight:800">有新版本 '+esc(info.version)+'</p><p style="margin:0 0 10px;font-size:13.5px;color:var(--ink2)">目前版本 '+esc(APP_VERSION)+(info.size?'・下載約 '+(info.size/1048576).toFixed(1)+' MB':'')+'</p>'+
+      (notes?'<div style="max-height:40vh;overflow:auto;white-space:pre-line;font-size:14px;line-height:1.6;background:var(--surface2);border-radius:12px;padding:10px 12px;margin-bottom:12px">'+esc(notes)+'</div>':'')+
+      '<p style="margin:0 0 14px;font-size:13px;color:var(--ink2)">按「下載更新」後，等下載完成點開檔案，再按「更新」即可，資料會保留。</p>'+
+      '<div class="row"><button class="btn" data-later>稍後再說</button><a class="btn primary" data-dl href="'+esc(info.url)+'" target="_blank" rel="noopener" style="text-decoration:none">下載更新</a></div></div>';
+    el.addEventListener('click',function(e){
+      if(e.target.closest('[data-later]')||e.target===el){lsSet('petnote.updSnooze',JSON.stringify({v:info.version,until:Date.now()+864e5}));closeTop();return}
+      if(e.target.closest('[data-dl]')){lsSet('petnote.updSnooze',JSON.stringify({v:info.version,until:Date.now()+3600e3}));setTimeout(closeTop,300);toast('開始下載，完成後點開檔案按「更新」')}
+    });
+    pushLayer(el);
+  }
+};
+function paintUpdTxt(){
+  var t=$('#updTxt');if(!t)return;var i=Updater.last;
+  t.innerHTML=Updater.checking?'正在檢查…':(i&&i.version&&verCmp(i.version,APP_VERSION)>0?'有新版本 '+esc(i.version)+'　<button class="linkbtn" data-act="updnow" style="display:inline-flex;padding:0;min-height:0">查看</button>':(i?'已是最新版本（'+esc(APP_VERSION)+'）':'開啟 App 時會自動檢查新版本'));
+}
 function apkUrl(){
   var m=/^([a-z0-9-]+)\.github\.io$/i.exec(location.hostname);if(!m)return '';
   var repo=(location.pathname.split('/').filter(Boolean)[0]||'');
@@ -1168,7 +1209,7 @@ function viewMore(){
     h+='<div class="sechead">在其他手機使用</div><div class="card"><p class="about" style="margin:0"><b>iPhone</b>：用 Safari 打開這個網址，點下方「分享」→「加入主畫面」，就會像 App 一樣有圖示。<br><b>Android</b>：用 Chrome 打開，點右上角選單 →「加到主畫面」。'+(au?'也可以安裝 App 版，會在早上跳出提醒通知。':'')+'</p>'+
       (au?'<a class="btn block" style="margin-top:12px;text-decoration:none" href="'+esc(au)+'" target="_blank" rel="noopener">下載 Android App（APK）</a>':'')+'</div>';
   }
-  h+='<div class="sechead">關於</div><div class="about">貓貓筆記 '+APP_VERSION+(isNative()?'（Android App）':'（網頁版）')+'<span id="buildTxt"></span><br>記錄每隻寵物的年齡、紀念日、身體狀況、每月驅蟲與預防針。</div>';
+  h+='<div class="sechead">關於</div><div class="about">貓貓筆記 '+APP_VERSION+(isNative()?'（Android App）':'（網頁版）')+'<span id="buildTxt"></span><br>記錄每隻寵物的年齡、紀念日、身體狀況、每月驅蟲與預防針。</div>'+(isNative()?'<div class="card" style="margin-top:8px"><div class="swrow" style="border-top:0;padding:0"><span><b>App 更新</b><small id="updTxt">開啟 App 時會自動檢查新版本</small></span><button class="btn" data-act="updcheck" style="min-height:40px">檢查更新</button></div></div>':'');
   return h;
 }
 
@@ -1765,6 +1806,7 @@ async function updateStorage(){
   if($('#storeTxt'))$('#storeTxt').textContent=txt+'。';
 }
 async function updateBuild(){
+  paintUpdTxt();
   var t=$('#buildTxt');if(!t||!isNative())return;
   try{var A=window.Capacitor.Plugins.App;if(!A)return;var i=await A.getInfo();if($('#buildTxt'))$('#buildTxt').textContent='　版本代碼 '+i.build}catch(e){}
 }
@@ -1794,6 +1836,8 @@ document.addEventListener('click',function(e){
   else if(a==='editpet')openPetSheet(t.dataset.id||S.sel);
   else if(a==='addlog')openLogSheet();
   else if(a==='weights')openWeights();
+  else if(a==='updcheck'){Updater.check(true);paintUpdTxt()}
+  else if(a==='updnow'){if(Updater.last)Updater.prompt(Updater.last)}
   else if(a==='editlog')openLogSheet(t.dataset.id);
   else if(a==='filter'){S.filter=t.dataset.f;S.tlLimit=30;S.tlPage=1;refreshTl()}
 
@@ -1841,7 +1885,7 @@ document.addEventListener('click',function(e){if(e.target.closest('label[for=imp
 document.addEventListener('visibilitychange',function(){
   if(document.hidden||Layers.length||Busy.el)return;
   if(pickingFile&&Date.now()-pickingFile<120000){pickingFile=0;return}
-  render();
+  render();Updater.check(false);
 });
 function applyTheme(){
   var v=lsGet('petnote.theme'),r=document.documentElement;
@@ -1866,6 +1910,7 @@ function applyTheme(){
   var s=lsGet('petnote.sel');S.sel=(S.pets.filter(function(p){return p.id===s})[0]||S.pets[0]||{}).id||null;
   if(S.logs.some(function(l){return (l.photos||[]).some(function(p){return !Photos.isId(p)})})){S.tab='timeline';await migratePhotos();S.tab='home'}
   render();Notif.sync();
+  setTimeout(function(){Updater.check(false)},2500);
   if(!DB.ok)toast('目前無法永久儲存資料');
   else{var lv=lsGet('petnote.ver');if(lv&&lv!==APP_VERSION)toast('已更新到 '+APP_VERSION+' 版，資料都還在');lsSet('petnote.ver',APP_VERSION)}
   try{
