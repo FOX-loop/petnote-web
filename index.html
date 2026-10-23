@@ -141,6 +141,22 @@ main{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;paddi
 .pagehead h2{margin:0;font-size:22px;font-weight:800}
 .filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 14px 0;padding-right:max(16px,env(safe-area-inset-right,0px))}
 .filters::-webkit-scrollbar{display:none}
+.wcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--surface2)}
+.wcard .grow{flex:1;min-width:0}
+.wcard .lb{font-size:12.5px;color:var(--ink2);display:block}
+.wcard .kg{font-size:26px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wcard .kg small{font-size:14px;font-weight:600;color:var(--ink2);margin-left:2px}
+.wcard .sub{font-size:12.5px;color:var(--ink2);display:block}
+.wcard svg{flex:none}
+.delta{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:99px;font-size:12px;font-weight:700;background:var(--surface);color:var(--ink2);margin-left:6px;font-variant-numeric:tabular-nums;vertical-align:middle}
+.wchart{position:relative;margin:4px 0 6px;touch-action:pan-y}
+.wchart svg{display:block;width:100%;height:auto;overflow:visible}
+.wchart .tip{position:absolute;top:0;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:6px 10px;border-radius:10px;font-size:13px;font-weight:600;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+.wstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0 14px}
+.wstats div{background:var(--surface2);border-radius:12px;padding:8px;min-width:0}
+.wstats small{display:block;font-size:11.5px}
+.wstats b{font-size:15px;font-variant-numeric:tabular-nums}
+.wkg{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
 .search{position:relative;margin:0 0 12px}
 .search .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink2);pointer-events:none}
 .search input{width:100%;min-height:46px;padding:10px 44px 10px 40px;border-radius:23px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);appearance:none;-webkit-appearance:none}
@@ -352,7 +368,7 @@ var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHour
 var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
-var APP_VERSION='1.5.1';
+var APP_VERSION='1.6.0';
 function isNative(){try{var c=window.Capacitor;return !!(c&&c.isNativePlatform&&c.isNativePlatform())}catch(e){return false}}
 function apkUrl(){
   var m=/^([a-z0-9-]+)\.github\.io$/i.exec(location.hostname);if(!m)return '';
@@ -365,7 +381,7 @@ function apkUrl(){
 var TYPES=[
   {id:'vomit',name:'嘔吐',h:18},{id:'stool',name:'軟便／腹瀉',h:38},{id:'appetite',name:'食慾不振',h:62},
   {id:'energy',name:'精神不佳',h:100},{id:'cough',name:'咳嗽／打噴嚏',h:165},{id:'skin',name:'皮膚／毛髮',h:195},
-  {id:'injury',name:'受傷／外傷',h:350},{id:'vet',name:'就醫／看診',h:262},{id:'other',name:'其他',h:215}
+  {id:'injury',name:'受傷／外傷',h:350},{id:'vet',name:'就醫／看診',h:262},{id:'weight',name:'量體重',h:140},{id:'other',name:'其他',h:215}
 ];
 var typeOf=function(id){return TYPES.filter(function(t){return t.id===id})[0]||TYPES[TYPES.length-1]};
 var logLabel=function(l){return (l.type==='other'&&l.custom)?l.custom:typeOf(l.type).name};
@@ -655,7 +671,7 @@ function openSheet(o){
     '<div class="sheet-b gut">'+o.body+'</div>'+(o.footer?'<div class="sheet-f gut">'+o.footer+'</div>':'')+'</div>';
   el.addEventListener('mousedown',function(e){if(e.target===el)closeTop()});
   el.addEventListener('click',function(e){if(e.target.closest('[data-close]'))closeTop()});
-  pushLayer(el);
+  pushLayer(el,o.onClose);
   if(o.onMount)o.onMount(el);
   return el;
 }
@@ -712,7 +728,8 @@ function planMonth(pet,item,cm){
 }
 
 /* ================= 畫面：共用 ================= */
-function render(){renderTop();renderNav();renderMain();renderFab()}
+var sheetRefresh=null;
+function render(){renderTop();renderNav();renderMain();renderFab();if(sheetRefresh)sheetRefresh()}
 function renderTop(){
   var t=new Date();
   var row='<div class="toprow"><span class="brand">貓貓筆記</span><span class="today">'+(t.getMonth()+1)+'月'+t.getDate()+'日 週'+WD[t.getDay()]+'</span></div>';
@@ -748,6 +765,96 @@ function viewEmpty(){
     '<button class="btn primary" data-act="addpet">'+ico('plus')+'新增寵物</button><br><button class="btn" data-act="sample">先看看範例資料</button></div>';
 }
 
+/* ================= 體重 ================= */
+function fmtKg(v){return (Math.round(v*100)/100).toString()}
+function weightPoints(pid){
+  var pts=[];
+  S.logs.forEach(function(l){if(l.petId===pid&&l.type==='weight'&&+l.weight>0)pts.push({t:l.ts,kg:+l.weight,src:'log',id:l.id,note:l.note||''})});
+  S.vaccs.forEach(function(v){if(v.petId===pid&&+v.weight>0){var d=parseD(v.date);pts.push({t:new Date(d.getFullYear(),d.getMonth(),d.getDate(),12).getTime(),kg:+v.weight,src:'vacc',id:v.id,note:v.item})}});
+  return pts.sort(function(a,b){return a.t-b.t});
+}
+function weightDelta(l){var pts=weightPoints(l.petId),i=-1;pts.forEach(function(x,k){if(x.src==='log'&&x.id===l.id)i=k});return i>0?pts[i].kg-pts[i-1].kg:null}
+function deltaHtml(d){if(d==null||Math.abs(d)<0.005)return d==null?'':'<span class="delta">持平</span>';return '<span class="delta">'+(d>0?'+':'−')+fmtKg(Math.abs(d))+' kg</span>'}
+function sparkSvg(pts,w,h){
+  var v=pts.slice(-10);if(v.length<2)return '';
+  var t0=v[0].t,t1=v[v.length-1].t,lo=Math.min.apply(null,v.map(function(p){return p.kg})),hi=Math.max.apply(null,v.map(function(p){return p.kg}));
+  if(hi-lo<0.2){var m=(hi+lo)/2;lo=m-0.1;hi=m+0.1}
+  var X=function(t){return 3+(w-6)*(t1===t0?1:(t-t0)/(t1-t0))},Y=function(k){return 4+(h-8)*(1-(k-lo)/(hi-lo))};
+  var d=v.map(function(p,i){return (i?'L':'M')+X(p.t).toFixed(1)+' '+Y(p.kg).toFixed(1)}).join(' ');
+  var last=v[v.length-1];
+  return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-hidden="true"><path d="'+d+' L'+X(last.t).toFixed(1)+' '+h+' L'+X(v[0].t).toFixed(1)+' '+h+' Z" fill="var(--primary)" opacity=".12"/><path d="'+d+'" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="'+X(last.t).toFixed(1)+'" cy="'+Y(last.kg).toFixed(1)+'" r="3.5" fill="var(--primary)" stroke="var(--surface2)" stroke-width="2"/></svg>';
+}
+function weightCardHtml(p){
+  var pts=weightPoints(p.id);
+  if(!pts.length)return '<button class="wcard" data-act="weights"><span class="grow"><span class="lb">體重</span><span class="kg" style="font-size:17px">還沒有紀錄</span><span class="sub">點這裡記錄第一筆體重</span></span>'+ico('cr',18)+'</button>';
+  var last=pts[pts.length-1],prev=pts.length>1?pts[pts.length-2]:null,d=new Date(last.t);
+  return '<button class="wcard" data-act="weights" aria-label="查看體重變化"><span class="grow"><span class="lb">體重</span><span class="kg">'+fmtKg(last.kg)+'<small>kg</small>'+(prev?deltaHtml(last.kg-prev.kg):'')+'</span><span class="sub">'+d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+(last.src==='vacc'?'・打預防針時量':'')+'　共 '+pts.length+' 筆</span></span>'+sparkSvg(pts,88,40)+ico('cr',18)+'</button>';
+}
+function niceStep(range,count){var raw=range/Math.max(1,count),p=Math.pow(10,Math.floor(Math.log10(raw))),n=raw/p;return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p}
+function weightChart(pts){
+  if(!pts.length)return '';
+  var W=340,H=196,L=38,R=14,T=26,B=24;
+  var t0=pts[0].t,t1=pts[pts.length-1].t;if(t1===t0){t0-=864e5*15;t1+=864e5*15}
+  var lo=Math.min.apply(null,pts.map(function(p){return p.kg})),hi=Math.max.apply(null,pts.map(function(p){return p.kg}));
+  if(hi-lo<0.4){var mid=(hi+lo)/2;lo=mid-0.2;hi=mid+0.2}
+  var st=niceStep(hi-lo,4);lo=Math.floor(lo/st)*st;hi=Math.ceil(hi/st)*st;if(hi===lo)hi=lo+st;
+  var X=function(t){return L+(W-L-R)*(t-t0)/(t1-t0)},Y=function(k){return T+(H-T-B)*(1-(k-lo)/(hi-lo))};
+  var g='';
+  for(var k=lo;k<=hi+1e-9;k+=st){var y=Y(k).toFixed(1);g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/><text x="'+(L-6)+'" y="'+y+'" text-anchor="end" dominant-baseline="central" font-size="10.5" fill="var(--ink2)">'+fmtKg(k)+'</text>'}
+  var fd=function(t){var d=new Date(t);return d.getFullYear()+'/'+(d.getMonth()+1)};
+  g+='<text x="'+L+'" y="'+(H-6)+'" font-size="10.5" fill="var(--ink2)">'+fd(pts[0].t)+'</text>';
+  if(pts.length>1)g+='<text x="'+(W-R)+'" y="'+(H-6)+'" text-anchor="end" font-size="10.5" fill="var(--ink2)">'+fd(pts[pts.length-1].t)+'</text>';
+  var line=pts.map(function(p,i){return (i?'L':'M')+X(p.t).toFixed(1)+' '+Y(p.kg).toFixed(1)}).join(' ');
+  var area=pts.length>1?'<path d="'+line+' L'+X(pts[pts.length-1].t).toFixed(1)+' '+(H-B)+' L'+X(pts[0].t).toFixed(1)+' '+(H-B)+' Z" fill="var(--primary)" opacity=".1"/>':'';
+  var dots=pts.map(function(p,i){var last=i===pts.length-1;return '<circle cx="'+X(p.t).toFixed(1)+'" cy="'+Y(p.kg).toFixed(1)+'" r="'+(last?5:4)+'" fill="'+(p.src==='vacc'?'var(--surface)':'var(--primary)')+'" stroke="var(--primary)" stroke-width="2"/>'}).join('');
+  var lp=pts[pts.length-1];
+  var lab='<text x="'+Math.min(X(lp.t),W-R).toFixed(1)+'" y="'+(Y(lp.kg)-12).toFixed(1)+'" text-anchor="end" font-size="12" font-weight="700" fill="var(--ink)">'+fmtKg(lp.kg)+' kg</text>';
+  var json=JSON.stringify(pts.map(function(p){return [X(p.t),Y(p.kg)]}));
+  return '<div class="wchart" data-pts=\''+json+'\'><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="體重變化折線圖，最新 '+fmtKg(lp.kg)+' 公斤">'+g+area+(pts.length>1?'<path d="'+line+'" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>':'')+dots+lab+'<line class="xh" x1="0" x2="0" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--ink2)" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/></svg><div class="tip" hidden></div></div>';
+}
+function openWeights(){
+  var p=curPet();if(!p)return;
+  var range='all';
+  var body='<div class="seg" id="w-range" style="margin-bottom:8px"><button data-v="all" class="on">全部</button><button data-v="12">1 年</button><button data-v="6">6 個月</button></div><div id="w-body"></div>';
+  openSheet({title:'體重變化・'+p.name,body:body,footer:'<button class="btn primary" id="w-add">'+ico('plus',20)+'記錄體重</button>',
+    onClose:function(){sheetRefresh=null},
+    onMount:function(el){
+      var box=$('#w-body',el);
+      function paint(){
+        var all=weightPoints(p.id),pts=all;
+        if(range!=='all'){var cut=addMonths(today(),-(+range)).getTime();pts=all.filter(function(x){return x.t>=cut})}
+        if(!all.length){box.innerHTML='<div class="empty"><h3>還沒有體重紀錄</h3><p>按下方「記錄體重」新增，或在時間線選「量體重」、打預防針時填體重，都會自動出現在這裡。</p></div>';return}
+        if(!pts.length){box.innerHTML='<p class="about">這段期間沒有體重紀錄，選「全部」看看。</p>';return}
+        var kgs=pts.map(function(x){return x.kg}),first=pts[0],last=pts[pts.length-1];
+        var stats='<div class="wstats"><div><small>最新</small><b>'+fmtKg(last.kg)+'</b></div><div><small>最高</small><b>'+fmtKg(Math.max.apply(null,kgs))+'</b></div><div><small>最低</small><b>'+fmtKg(Math.min.apply(null,kgs))+'</b></div><div><small>期間變化</small><b>'+(pts.length>1?((last.kg-first.kg>=0?'+':'−')+fmtKg(Math.abs(last.kg-first.kg))):'—')+'</b></div></div>';
+        var rows=pts.slice().reverse().map(function(x,i,arr){
+          var prev=arr[i+1],d=new Date(x.t);
+          return '<button class="hrow" data-wsrc="'+x.src+'" data-wid="'+x.id+'"><span class="d">'+d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+'</span><span class="grow"><span class="wkg">'+fmtKg(x.kg)+' kg</span>'+(prev?deltaHtml(x.kg-prev.kg):'')+'<small style="display:block">'+(x.src==='vacc'?'打預防針：'+esc(x.note):(x.note?esc(x.note):'量體重'))+'</small></span>'+ico('cr',16)+'</button>';
+        }).join('');
+        box.innerHTML=weightChart(pts)+(pts.length===1?'<p class="about" style="margin:0 0 8px">再多記錄幾次，就能看到變化曲線。</p>':'')+'<small style="display:block;margin-bottom:8px">實心點：量體重紀錄　空心點：打預防針時量的體重</small>'+stats+'<div class="hist" style="border-top:0;margin-top:0">'+rows+'</div>';
+        bindChart($('.wchart',box),pts);
+      }
+      function bindChart(c,pts){
+        if(!c)return;var xy=JSON.parse(c.getAttribute('data-pts')),svg=$('svg',c),tip=$('.tip',c),xh=$('.xh',c);
+        function show(clientX){
+          var r=svg.getBoundingClientRect(),vx=(clientX-r.left)/r.width*340,bi=0,bd=1e9;
+          xy.forEach(function(q,i){var dd=Math.abs(q[0]-vx);if(dd<bd){bd=dd;bi=i}});
+          var q=xy[bi],pt=pts[bi],d=new Date(pt.t);
+          xh.setAttribute('x1',q[0]);xh.setAttribute('x2',q[0]);xh.setAttribute('visibility','visible');
+          tip.hidden=false;tip.textContent=(d.getMonth()+1)+'/'+d.getDate()+(d.getFullYear()!==new Date().getFullYear()?' '+d.getFullYear():'')+'　'+fmtKg(pt.kg)+' kg';
+          var px=q[0]/340*r.width;tip.style.left=Math.max(60,Math.min(r.width-60,px))+'px';
+        }
+        c.addEventListener('pointerdown',function(e){show(e.clientX)});
+        c.addEventListener('pointermove',function(e){show(e.clientX)});
+        c.addEventListener('pointerleave',function(){tip.hidden=true;xh.setAttribute('visibility','hidden')});
+      }
+      bindSeg($('#w-range',el),function(v){range=v;paint()});
+      box.addEventListener('click',function(e){var r=e.target.closest('[data-wid]');if(!r)return;if(r.dataset.wsrc==='vacc')openVaccSheet(null,r.dataset.wid);else openLogSheet(r.dataset.wid)});
+      $('#w-add',el).onclick=function(){openLogSheet(null,'weight')};
+      sheetRefresh=paint;paint();
+    }});
+}
+
 /* ================= 畫面：首頁 ================= */
 function viewHome(){
   var p=curPet(),now=today(),out=[];
@@ -769,6 +876,7 @@ function viewHome(){
       h+='<div class="age"><div class="age-nums">'+nums+'</div><div class="sub">'+sub+'</div>'+party+'</div>';
     }else h+='<div class="age"><div class="sub">生日設在未來，請確認日期。</div></div>';
   }
+  h+=weightCardHtml(p);
   h+='</section>';
   out.push(h);
   out.push('<div class="actions"><button class="btn primary" data-act="addlog">'+ico('plus',20)+'記錄狀況</button><button class="btn" data-act="tab" data-tab="deworm">'+ico('cal',20)+'驅蟲紀錄</button></div>');
@@ -797,7 +905,7 @@ function viewHome(){
   var rh='<section class="card"><div class="cardhead"><h2>最近狀況</h2>'+(rec.length?'<button class="linkbtn" data-act="tab" data-tab="timeline">全部'+ico('cr',16)+'</button>':'')+'</div>';
   if(!rec.length) rh+='<small>還沒有紀錄。嘔吐、軟便、食慾不好都可以記下來，附上照片更清楚。</small>';
   else rh+=rec.map(function(l){var d=new Date(l.ts);
-    return '<button class="recent" data-act="editlog" data-id="'+l.id+'"><span class="tag" style="--h:'+typeOf(l.type).h+'">'+esc(logLabel(l))+'</span><span class="tx"><time>'+(d.getMonth()+1)+'/'+d.getDate()+' '+hhmm(l.ts)+(l.photos&&l.photos.length?'　'+l.photos.length+' 張照片':'')+'</time>'+(l.note?'<p>'+esc(l.note)+'</p>':'')+'</span></button>'}).join('');
+    return '<button class="recent" data-act="editlog" data-id="'+l.id+'"><span class="tag" style="--h:'+typeOf(l.type).h+'">'+esc(logLabel(l))+'</span><span class="tx"><time>'+(d.getMonth()+1)+'/'+d.getDate()+' '+hhmm(l.ts)+(l.photos&&l.photos.length?'　'+l.photos.length+' 張照片':'')+'</time>'+(l.type==='weight'&&l.weight?'<p><b>'+fmtKg(l.weight)+' kg</b></p>':'')+(l.note?'<p>'+esc(l.note)+'</p>':'')+'</span></button>'}).join('');
   rh+='</section>';
   out.push(rh);
   return '<div class="stack">'+out.join('')+'</div>';
@@ -831,6 +939,10 @@ function hl(text,terms){
   return out+esc(text.slice(pos));
 }
 function logHay(l){
+  if(l.type==='weight'&&l.weight)return logHayBase(l)+'\n'+fmtKg(l.weight)+'kg\n'+fmtKg(l.weight)+' kg';
+  return logHayBase(l);
+}
+function logHayBase(l){
   var d=new Date(l.ts),y=d.getFullYear(),m=d.getMonth()+1,dd=d.getDate(),pet=S.pets.filter(function(p){return p.id===l.petId})[0];
   return [logLabel(l),typeOf(l.type).name,l.note||'',y+'/'+m+'/'+dd,y+'/'+pad(m)+'/'+pad(dd),y+'-'+pad(m)+'-'+pad(dd),y+'年'+m+'月'+dd+'日',m+'月'+dd+'日',m+'/'+dd,pet?pet.name:''].join('\n').toLowerCase();
 }
@@ -870,6 +982,7 @@ function tlBody(){
     var ph=(l.photos||[]).map(function(pid,i){var c=Photos.isId(pid)?Photos.cached(pid):pid;if(!Photos.isId(pid))return '<button data-act="photo" data-id="'+l.id+'" data-idx="'+i+'" aria-label="放大照片"><img decoding="async" loading="lazy" src="'+pid+'" alt=""></button>';return '<button data-act="photo" data-id="'+l.id+'" data-idx="'+i+'" aria-label="放大照片"><img decoding="async" data-ph="'+esc(pid)+'"'+(c?' src="'+c+'"':'')+' alt=""></button>'}).join('');
     var pet=showPet?S.pets.filter(function(x){return x.id===l.petId})[0]:null;
     out+='<div class="entry" role="button" tabindex="0" data-act="editlog" data-id="'+l.id+'"><div class="rail"><i class="dot" style="--h:'+typeOf(l.type).h+'"></i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+typeOf(l.type).h+'">'+hl(logLabel(l),terms)+'</span>'+(pet?'<span class="pill">'+esc(pet.name)+'</span>':'')+'<time style="margin-left:auto">'+hhmm(l.ts)+'</time></div>'+
+      (l.type==='weight'&&l.weight?'<p class="note"><span class="wkg" style="font-size:20px">'+hl(fmtKg(l.weight)+' kg',terms)+'</span>'+deltaHtml(weightDelta(l))+'</p>':'')+
       (l.note?'<p class="note">'+hl(l.note,terms)+'</p>':'')+(ph?'<div class="thumbs">'+ph+'</div>':'')+'</div></div>';
   });
   if(open)out+='</div>';
@@ -1077,18 +1190,20 @@ function openPetSheet(id){
 }
 
 /* ================= 表單：狀況紀錄 ================= */
-function openLogSheet(id){
+function openLogSheet(id,presetType){
   var ex=id&&S.logs.filter(function(l){return l.id===id})[0];
   var p=ex?(S.pets.filter(function(x){return x.id===ex.petId})[0]||curPet()):curPet();if(!p)return;
-  var l=ex?JSON.parse(JSON.stringify(ex)):{id:uid(),petId:p.id,type:'vomit',custom:'',ts:Date.now(),note:'',photos:[]};
+  var l=ex?JSON.parse(JSON.stringify(ex)):{id:uid(),petId:p.id,type:presetType||'vomit',custom:'',ts:Date.now(),note:'',photos:[]};
+  var lastW=weightPoints(p.id).slice(-1)[0];
   var tg=TYPES.map(function(t){return '<button type="button" data-v="'+t.id+'" class="'+(l.type===t.id?'on':'')+'" style="--h:'+t.h+'">'+t.name+'</button>'}).join('');
   var body='<div class="field"><span class="lbl">狀況類型</span><div class="typegrid" id="lf-type">'+tg+'</div></div>'+
     '<div class="field" id="lf-customwrap" '+(l.type==='other'?'':'hidden')+'><label for="lf-custom">自訂名稱（選填）</label><input id="lf-custom" type="text" maxlength="12" placeholder="例如：打噴嚏、跛腳" value="'+esc(l.custom)+'"></div>'+
+    '<div class="field" id="lf-wwrap" '+(l.type==='weight'?'':'hidden')+'><label for="lf-weight">體重（公斤）</label><input id="lf-weight" type="text" inputmode="decimal" autocomplete="off" placeholder="'+(lastW?'上次 '+fmtKg(lastW.kg):'例如 4.25')+'" value="'+(l.weight?fmtKg(l.weight):'')+'"><div class="hint">會自動更新到首頁的體重，並加入體重變化表。</div></div>'+
     '<div class="field"><label for="lf-time">發生時間</label><input id="lf-time" type="datetime-local" value="'+toLocalInput(l.ts)+'"></div>'+
     '<div class="field"><label for="lf-note">說明</label><textarea id="lf-note" placeholder="次數、顏色、當時在做什麼、吃了什麼…">'+esc(l.note)+'</textarea></div>'+
     '<div class="field"><span class="lbl">照片（最多 6 張）</span><div class="pickrow" id="lf-photos"></div><input id="lf-file" class="vh" type="file" accept="image/*" multiple tabindex="-1" aria-hidden="true"></div>';
   var footer=(ex?'<button class="btn danger" id="lf-del">刪除</button>':'')+'<button class="btn primary" id="lf-save">'+(ex?'儲存':'新增紀錄')+'</button>';
-  openSheet({title:(ex?'編輯':'記錄')+'狀況・'+p.name,body:body,footer:footer,onMount:function(el){
+  openSheet({title:(ex?'編輯':'記錄')+(l.type==='weight'?'體重':'狀況')+'・'+p.name,body:body,footer:footer,onMount:function(el){
     var file=$('#lf-file',el),grid=$('#lf-photos',el),origIds=(ex&&ex.photos||[]).slice(),busy=false;
     function paint(){
       grid.innerHTML=l.photos.map(function(it,i){
@@ -1112,12 +1227,18 @@ function openLogSheet(id){
       else if(fs.length>l.photos.length-before)toast('照片最多 6 張，多的已略過');
       file.value='';paint();
     };
-    bindSeg($('#lf-type',el),function(v){$('#lf-customwrap',el).hidden=v!=='other'});
+    bindSeg($('#lf-type',el),function(v){$('#lf-customwrap',el).hidden=v!=='other';$('#lf-wwrap',el).hidden=v!=='weight';if(v==='weight')setTimeout(function(){$('#lf-weight',el).focus()},50)});
+    if(l.type==='weight'&&!ex)setTimeout(function(){var w=$('#lf-weight',el);if(w)w.focus()},300);
     $('#lf-save',el).onclick=async function(){
       var v=$('#lf-time',el).value,ts=v?new Date(v).getTime():Date.now();
       if(isNaN(ts)){toast('請選擇發生時間');return}
       l.type=segVal($('#lf-type',el))||'other';l.custom=l.type==='other'?$('#lf-custom',el).value.trim():'';
       if(busy){toast('照片還在處理中，請稍等一下');return}
+      if(l.type==='weight'){
+        var wr=$('#lf-weight',el).value.trim().replace(',','.'),wv=Math.round(parseFloat(wr)*100)/100;
+        if(!(wv>0)||wv>150){toast('請輸入體重公斤數，例如 4.25');$('#lf-weight',el).focus();return}
+        l.weight=wv;
+      }else delete l.weight;
       l.ts=ts;l.note=$('#lf-note',el).value.trim();
       var ids=[],added=[];
       for(var k=0;k<l.photos.length;k++){
@@ -1638,6 +1759,7 @@ document.addEventListener('click',function(e){
   else if(a==='addpet')openPetSheet();
   else if(a==='editpet')openPetSheet(t.dataset.id||S.sel);
   else if(a==='addlog')openLogSheet();
+  else if(a==='weights')openWeights();
   else if(a==='editlog')openLogSheet(t.dataset.id);
   else if(a==='filter'){S.filter=t.dataset.f;S.tlLimit=30;refreshTl()}
   else if(a==='tlmore'){S.tlLimit+=30;refreshTl()}
