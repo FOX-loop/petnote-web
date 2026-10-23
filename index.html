@@ -374,7 +374,7 @@ var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHour
 var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
-var APP_VERSION='1.7.1';
+var APP_VERSION='1.7.2';
 function isNative(){try{var c=window.Capacitor;return !!(c&&c.isNativePlatform&&c.isNativePlatform())}catch(e){return false}}
 function apkUrl(){
   var m=/^([a-z0-9-]+)\.github\.io$/i.exec(location.hostname);if(!m)return '';
@@ -1168,7 +1168,7 @@ function viewMore(){
     h+='<div class="sechead">在其他手機使用</div><div class="card"><p class="about" style="margin:0"><b>iPhone</b>：用 Safari 打開這個網址，點下方「分享」→「加入主畫面」，就會像 App 一樣有圖示。<br><b>Android</b>：用 Chrome 打開，點右上角選單 →「加到主畫面」。'+(au?'也可以安裝 App 版，會在早上跳出提醒通知。':'')+'</p>'+
       (au?'<a class="btn block" style="margin-top:12px;text-decoration:none" href="'+esc(au)+'" target="_blank" rel="noopener">下載 Android App（APK）</a>':'')+'</div>';
   }
-  h+='<div class="sechead">關於</div><div class="about">貓貓筆記 '+APP_VERSION+(isNative()?'（Android App）':'（網頁版）')+'<br>記錄每隻寵物的年齡、紀念日、身體狀況、每月驅蟲與預防針。</div>';
+  h+='<div class="sechead">關於</div><div class="about">貓貓筆記 '+APP_VERSION+(isNative()?'（Android App）':'（網頁版）')+'<span id="buildTxt"></span><br>記錄每隻寵物的年齡、紀念日、身體狀況、每月驅蟲與預防針。</div>';
   return h;
 }
 
@@ -1764,8 +1764,12 @@ async function updateStorage(){
   try{if(navigator.storage&&navigator.storage.estimate){var e=await navigator.storage.estimate();if(e&&e.usage)txt+='，約佔 '+(e.usage/1048576).toFixed(1)+' MB'}}catch(err){}
   if($('#storeTxt'))$('#storeTxt').textContent=txt+'。';
 }
+async function updateBuild(){
+  var t=$('#buildTxt');if(!t||!isNative())return;
+  try{var A=window.Capacitor.Plugins.App;if(!A)return;var i=await A.getInfo();if($('#buildTxt'))$('#buildTxt').textContent='　版本代碼 '+i.build}catch(e){}
+}
 async function updateNotifCard(){
-  updateStorage();
+  updateStorage();updateBuild();
   var st=await Notif.status(),t=$('#notifTxt'),b=$('#notifBtns');
   if(!t||!b)return;
   var msg={
