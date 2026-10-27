@@ -374,7 +374,7 @@ var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHour
 var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
-var APP_VERSION='1.9.1';
+var APP_VERSION='1.10.0';
 function isNative(){try{var c=window.Capacitor;return !!(c&&c.isNativePlatform&&c.isNativePlatform())}catch(e){return false}}
 /* ---- App 版：檢查 GitHub 上的新版本 ---- */
 var UPDATE_REPO='FOX-loop/petnote-web';
@@ -820,7 +820,7 @@ function weightPoints(pid){
   S.vaccs.forEach(function(v){if(v.petId===pid&&+v.weight>0){var d=parseD(v.date);pts.push({t:new Date(d.getFullYear(),d.getMonth(),d.getDate(),12).getTime(),kg:+v.weight,src:'vacc',id:v.id,note:v.item})}});
   return pts.sort(function(a,b){return a.t-b.t});
 }
-function weightDelta(l){var pts=weightPoints(l.petId),i=-1;pts.forEach(function(x,k){if(x.src==='log'&&x.id===l.id)i=k});return i>0?pts[i].kg-pts[i-1].kg:null}
+function weightDelta(l,src){src=src||'log';var pts=weightPoints(l.petId),i=-1;pts.forEach(function(x,k){if(x.src===src&&x.id===l.id)i=k});return i>0?pts[i].kg-pts[i-1].kg:null}
 function deltaHtml(d){if(d==null||Math.abs(d)<0.005)return d==null?'':'<span class="delta">持平</span>';return '<span class="delta">'+(d>0?'+':'−')+fmtKg(Math.abs(d))+' kg</span>'}
 function sparkSvg(pts,w,h){
   var v=pts.slice(-10);if(v.length<2)return '';
@@ -1014,33 +1014,60 @@ function logHayBase(l){
   var d=new Date(l.ts),y=d.getFullYear(),m=d.getMonth()+1,dd=d.getDate(),pet=S.pets.filter(function(p){return p.id===l.petId})[0];
   return [logLabel(l),typeOf(l.type).name,l.note||'',y+'/'+m+'/'+dd,y+'/'+pad(m)+'/'+pad(dd),y+'-'+pad(m)+'-'+pad(dd),y+'年'+m+'月'+dd+'日',m+'月'+dd+'日',m+'/'+dd,pet?pet.name:''].join('\n').toLowerCase();
 }
+var TL_KIND={worm:{name:'驅蟲',h:290},vacc:{name:'預防針',h:235}};
+var TL_OPTS=[['worm','顯示驅蟲紀錄','每次驅蟲打卡'],['vacc','顯示預防針紀錄','疫苗名稱、注射位置與備註'],['vw','顯示預防針體重紀錄','另外列成一筆「量體重」，篩選量體重時也會出現']];
+function tlShow(k){var v=lsGet('petnote.tl.'+k);if(v==null)return lsGet('petnote.tlMerge')!=='0';return v!=='0'}
+function tlMerge(){return TL_OPTS.some(function(o){return tlShow(o[0])})}
+function tlOptsHtml(){return TL_OPTS.map(function(o){return '<div class="swrow"><span><b>'+o[1]+'</b><small>'+o[2]+'</small></span><span class="sw"><input type="checkbox" data-tlk="'+o[0]+'" '+(tlShow(o[0])?'checked':'')+' aria-label="'+o[1]+'"><i></i></span></div>'}).join('')}
+function openTlOpts(){openSheet({title:'時間線顯示',body:tlOptsHtml(),footer:'<button class="btn primary" data-close>完成</button>'})}
+function dateHay(ds){var a=ds.split('-'),y=+a[0],m=+a[1],d=+a[2];return [y+'/'+m+'/'+d,a[0]+'/'+a[1]+'/'+a[2],ds,y+'年'+m+'月'+d+'日',m+'月'+d+'日',m+'/'+d].join('\n')}
+function petNameOf(id){var x=S.pets.filter(function(p){return p.id===id})[0];return x?x.name:''}
+function tlItems(pred){
+  var out=S.logs.filter(pred).map(function(l){return {k:'log',ts:l.ts,r:l}});
+  if(tlMerge()){
+    if(tlShow('worm'))S.worms.forEach(function(w){if(w.date&&pred(w)){var d=parseD(w.date);out.push({k:'worm',ts:new Date(d.getFullYear(),d.getMonth(),d.getDate(),12).getTime(),r:w})}});
+    S.vaccs.forEach(function(v){if(v.date&&pred(v)){var d=parseD(v.date),t=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12).getTime();if(tlShow('vacc'))out.push({k:'vacc',ts:t,r:v});if(+v.weight>0&&tlShow('vw'))out.push({k:'vw',ts:t,r:v})}});
+  }
+  return out;
+}
+function itemHay(it){
+  if(it.k==='log')return logHay(it.r);
+  var r=it.r,parts=[r.item,r.note||'',dateHay(r.date),petNameOf(r.petId)];
+  if(it.k==='worm')parts.push('驅蟲');
+  else if(it.k==='vw')parts=['量體重','體重',fmtKg(+r.weight)+'kg',fmtKg(+r.weight)+' kg',r.item,dateHay(r.date),petNameOf(r.petId)];
+  else{parts.push('預防針','疫苗');if(r.site)parts.push(siteLabel(r.site))}
+  return parts.join('\n').toLowerCase();
+}
 function viewTimeline(){
-  var p=curPet(),mine=S.logs.filter(function(l){return l.petId===p.id});
-  var head='<div class="pagehead"><h2>'+esc(p.name)+' 的時間線</h2><span class="pill cnt">'+mine.length+' 筆</span></div>';
+  var p=curPet(),mine=tlItems(function(l){return l.petId===p.id});
+  var head='<div class="pagehead"><h2>'+esc(p.name)+' 的時間線</h2><span style="display:flex;align-items:center;gap:8px"><span class="pill cnt">'+mine.length+' 筆</span><button class="iconbtn" style="width:38px;height:38px;border-radius:12px" data-act="tlopts" aria-label="時間線顯示設定">'+ico('gear',20)+'</button></span></div>';
   if(!mine.length&&!S.q) return head+'<div class="empty"><h3>還沒有狀況紀錄</h3><p>遇到嘔吐、軟便、受傷等狀況，點右下角記下時間、說明和照片。</p></div>';
   var box='<div class="search" role="search">'+ico('search',20)+'<input id="tl-q" type="search" enterkeyhint="search" autocomplete="off" placeholder="搜尋說明、狀況類型或日期，例如：軟便、2025/3" value="'+esc(S.q)+'" aria-label="搜尋時間線">'+(S.q?'<button class="clr" data-act="qclear" aria-label="清除搜尋">'+ico('x',18)+'</button>':'')+'</div>';
   return head+box+'<div id="tlBody">'+tlBody()+'</div>';
 }
 function tlBody(){
   var p=curPet(),terms=qTerms(),multi=S.pets.length>1;
-  var base=S.logs.filter(function(l){return (S.qAll&&terms.length&&multi)||l.petId===p.id});
-  if(terms.length)base=base.filter(function(l){var h=logHay(l);return terms.every(function(t){return h.indexOf(t)>=0})});
-  base.sort(function(a,b){return b.ts-a.ts});
-  var counts={};base.forEach(function(l){counts[l.type]=(counts[l.type]||0)+1});
-  var f=S.filter;if(f!=='all'&&!counts[f])f=S.filter='all';
+  var base=tlItems(function(l){return (S.qAll&&terms.length&&multi)||l.petId===p.id});
+  if(terms.length)base=base.filter(function(it){var h=itemHay(it);return terms.every(function(t){return h.indexOf(t)>=0})});
+  var KO={log:0,worm:1,vacc:2,vw:3};base.sort(function(a,b){return b.ts-a.ts||(KO[a.k]-KO[b.k])});
+  var counts={},kc={log:0,worm:0,vacc:0,vw:0};base.forEach(function(it){kc[it.k]++;if(it.k==='log')counts[it.r.type]=(counts[it.r.type]||0)+1;if(it.k==='vw')counts.weight=(counts.weight||0)+1});
+  var mixed=(kc.worm||kc.vacc)&&kc.log;
+  function fcount(x){return x==='logs'?kc.log:(x==='k:worm'?kc.worm:(x==='k:vacc'?kc.vacc:counts[x]))}
+  var f=S.filter;if(f!=='all'&&!fcount(f))f=S.filter='all';
   var info='';
   if(terms.length){
     info='<div class="qinfo"><span>找到 <b>'+base.length+'</b> 筆</span>'+(multi?'<div class="seg"><button data-act="qscope" data-v="0" class="'+(S.qAll?'':'on')+'">只搜'+esc(p.name)+'</button><button data-act="qscope" data-v="1" class="'+(S.qAll?'on':'')+'">所有寵物</button></div>':'')+'</div>';
     if(!base.length)return info+'<div class="empty"><h3>找不到符合的紀錄</h3><p>換個關鍵字試試，或清除搜尋。日期可以打「2025/3」「3月」這樣的格式。</p><button class="btn" data-act="qclear">清除搜尋</button></div>';
   }
-  var chips='<div class="filters"><button class="fchip '+(f==='all'?'on':'')+'" data-act="filter" data-f="all">全部 '+base.length+'</button>'+
+  function chip(id,name,n){return '<button class="fchip '+(f===id?'on':'')+'" data-act="filter" data-f="'+id+'">'+name+' '+n+'</button>'}
+  var chips='<div class="filters">'+chip('all','全部',base.length)+(mixed?chip('logs','狀況紀錄',kc.log):'')+(kc.worm?chip('k:worm','驅蟲',kc.worm):'')+(kc.vacc?chip('k:vacc','預防針',kc.vacc):'')+
     TYPES.filter(function(t){return counts[t.id]}).map(function(t){return '<button class="fchip '+(f===t.id?'on':'')+'" data-act="filter" data-f="'+t.id+'">'+t.name+' '+counts[t.id]+'</button>'}).join('')+'</div>';
-  var full=base.filter(function(l){return f==='all'||l.type===f});
+  var full=base.filter(function(it){return f==='all'||(f==='logs'?it.k==='log':(f.slice(0,2)==='k:'?it.k===f.slice(2):(f==='weight'?(it.k==='vw'||(it.k==='log'&&it.r.type==='weight')):(it.k==='log'&&it.r.type===f))))});
   var TLP=20,pages=Math.max(1,Math.ceil(full.length/TLP));if(S.tlPage>pages)S.tlPage=pages;
   var startI=(S.tlPage-1)*TLP,list=full.slice(startI,startI+TLP);
   var out='',lastKey='',now=today(),open=false,showPet=terms.length&&S.qAll&&multi;
-  list.forEach(function(l){
-    var d=new Date(l.ts),key=ymd(d);
+  list.forEach(function(it){
+    var l=it.r,d=new Date(it.ts),key=ymd(d);
     if(key!==lastKey){
       if(open)out+='</div>';
       var dd=new Date(d.getFullYear(),d.getMonth(),d.getDate()),diff=dayDiff(now,dd);
@@ -1048,6 +1075,8 @@ function tlBody(){
       var rel=diff===0?'今天':diff===1?'昨天':'週'+WD[d.getDay()];
       out+='<h3 class="dayh">'+lbl+'<small>'+rel+'</small></h3><div>';open=true;lastKey=key;
     }
+    if(it.k==='vw'){out+=vwEntry(it,terms,showPet);return}
+    if(it.k!=='log'){out+=recEntry(it,terms,showPet);return}
     var ph=(l.photos||[]).map(function(pid,i){var c=Photos.isId(pid)?Photos.cached(pid):pid;if(!Photos.isId(pid))return '<button data-act="photo" data-id="'+l.id+'" data-idx="'+i+'" aria-label="放大照片"><img decoding="async" loading="lazy" src="'+pid+'" alt=""></button>';return '<button data-act="photo" data-id="'+l.id+'" data-idx="'+i+'" aria-label="放大照片"><img decoding="async" data-ph="'+esc(pid)+'"'+(c?' src="'+c+'"':'')+' alt=""></button>'}).join('');
     var pet=showPet?S.pets.filter(function(x){return x.id===l.petId})[0]:null;
     out+='<div class="entry" role="button" tabindex="0" data-act="editlog" data-id="'+l.id+'"><div class="rail"><i class="dot" style="--h:'+typeOf(l.type).h+'"></i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+typeOf(l.type).h+'">'+hl(logLabel(l),terms)+'</span>'+(pet?'<span class="pill">'+esc(pet.name)+'</span>':'')+'<time style="margin-left:auto">'+hhmm(l.ts)+'</time></div>'+
@@ -1058,6 +1087,21 @@ function tlBody(){
   if(pages>1)out+=pagerHtml(S.tlPage,pages,'data-tlpg')+'<div class="pageinfo" style="margin-bottom:8px">第 '+(startI+1)+'–'+Math.min(startI+TLP,full.length)+' 筆，共 '+full.length+' 筆</div>';
   return info+chips+out;
 }
+function recEntry(it,terms,showPet){
+  var r=it.r,K=TL_KIND[it.k],pet=showPet?S.pets.filter(function(x){return x.id===r.petId})[0]:null,info='';
+  if(it.k==='vacc'){
+    var bits=[];if(r.site)bits.push(hl('注射：'+siteLabel(r.site),terms));
+    if(bits.length)info='<p class="note">'+bits.join('　')+'</p>';
+  }
+  var act=it.k==='worm'?'data-act="tlworm" data-pid="'+r.petId+'" data-item="'+esc(r.item)+'" data-month="'+r.month+'"':'data-act="tlvacc" data-pid="'+r.petId+'" data-id="'+r.id+'"';
+  return '<div class="entry rec" role="button" tabindex="0" '+act+'><div class="rail"><i class="dot" style="--h:'+K.h+'"></i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+K.h+'">'+hl(r.item,terms)+'</span>'+(pet?'<span class="pill">'+esc(pet.name)+'</span>':'')+'<small style="margin-left:auto;color:var(--muted)">'+K.name+'紀錄</small></div>'+info+(r.note?'<p class="note">'+hl(r.note,terms)+'</p>':'')+'</div></div>';
+}
+function vwEntry(it,terms,showPet){
+  var r=it.r,h=typeOf('weight').h,pet=showPet?S.pets.filter(function(x){return x.id===r.petId})[0]:null;
+  return '<div class="entry rec" role="button" tabindex="0" data-act="tlvacc" data-pid="'+r.petId+'" data-id="'+r.id+'"><div class="rail"><i class="dot" style="--h:'+h+'"></i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+h+'">'+hl('量體重',terms)+'</span>'+(pet?'<span class="pill">'+esc(pet.name)+'</span>':'')+'<small style="margin-left:auto;color:var(--muted)">打疫苗時測量</small></div>'+
+    '<p class="note"><span class="wkg" style="font-size:20px">'+hl(fmtKg(+r.weight)+' kg',terms)+'</span>'+deltaHtml(weightDelta(r,'vacc'))+'</p><p class="note" style="color:var(--muted)">施打 '+hl(r.item,terms)+'</p></div></div>';
+}
+function tlSwitchPet(pid){if(pid&&pid!==S.sel&&S.pets.some(function(p){return p.id===pid})){S.sel=pid;lsSet('petnote.sel',pid)}}
 function refreshTl(){var b=$('#tlBody');if(!b){renderMain();return}b.innerHTML=tlBody();Photos.hydrate(b);var c=$('.search .clr');if(!!S.q!==!!c){var box=$('.search');if(box){if(S.q&&!c)box.insertAdjacentHTML('beforeend','<button class="clr" data-act="qclear" aria-label="清除搜尋">'+ico('x',18)+'</button>');if(!S.q&&c)c.remove()}}}
 
 /* ================= 畫面：驅蟲 ================= */
@@ -1214,6 +1258,7 @@ function viewMore(){
   h+='<button class="lrow" data-act="addpet"><span class="av" style="--s:44px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增寵物</b></span></button></div></div>';
   var th=lsGet('petnote.theme')||'system';
   h+='<div class="sechead">外觀</div><div class="card"><div class="seg" id="themeSeg">'+[['system','跟隨手機'],['light','淺色'],['dark','深色']].map(function(t){return '<button data-v="'+t[0]+'" class="'+(th===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</div></div>';
+  h+='<div class="sechead">時間線</div><div class="card"><p class="about" style="margin:0">選擇要和狀況紀錄一起排進時間線的項目，方便對照前後狀況。</p>'+tlOptsHtml()+'</div>';
   h+='<div class="sechead">疫苗群組</div><div class="card"><p class="about" style="margin:0 0 4px">同一群組的疫苗可以互相替代（例如三合一、四合一、五合一），任一劑都算「最近一次」，只會提醒一次。</p><div class="list">'+S.groups.map(function(g){
     var ms=groupMembers(g.id),users=S.pets.filter(function(p){return (p.vaccItems||[]).indexOf('g:'+g.id)>=0}).map(function(p){return p.name});
     return '<button class="lrow" data-act="grpedit" data-id="'+esc(g.id)+'"><span class="grow"><b>'+esc(g.name)+'</b><small style="display:block">'+everyLabel(g.every)+'・'+remindLabel(g.remind)+'　'+(ms.length?ms.map(esc).join('、'):'還沒有疫苗')+(users.length?'<br>追蹤：'+users.map(esc).join('、'):'')+'</small></span>'+ico('cr',18)+'</button>';
@@ -1866,6 +1911,9 @@ document.addEventListener('click',function(e){
   else if(a==='updcheck'){Updater.check(true);paintUpdTxt()}
   else if(a==='updnow'){if(Updater.last)Updater.prompt(Updater.last)}
   else if(a==='editlog')openLogSheet(t.dataset.id);
+  else if(a==='tlopts')openTlOpts();
+  else if(a==='tlworm'){tlSwitchPet(t.dataset.pid);openWormSheet(t.dataset.item,t.dataset.month)}
+  else if(a==='tlvacc'){tlSwitchPet(t.dataset.pid);openVaccSheet(null,t.dataset.id)}
   else if(a==='filter'){S.filter=t.dataset.f;S.tlLimit=30;S.tlPage=1;refreshTl()}
 
   else if(a==='qclear'){S.q='';S.filter='all';S.tlLimit=30;S.tlPage=1;renderMain();var qi=$('#tl-q');if(qi)qi.focus()}
@@ -1890,7 +1938,7 @@ document.addEventListener('click',function(e){
 });
 document.addEventListener('keydown',function(e){
   if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('label[for=importFile]')){e.preventDefault();var fi=$('#importFile');if(fi)fi.click();return}
-  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.entry[data-act]')){e.preventDefault();openLogSheet(e.target.dataset.id)}
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.entry[data-act]')){e.preventDefault();e.target.click()}
   if(e.key==='Escape'&&Layers.length)closeTop();
 });
 var qTimer=null;
@@ -1900,6 +1948,7 @@ document.addEventListener('input',function(e){
   qTimer=setTimeout(function(){S.q=v;S.filter='all';S.tlLimit=30;S.tlPage=1;refreshTl()},180);
 });
 document.addEventListener('change',function(e){
+  if(e.target.dataset&&e.target.dataset.tlk){var k=e.target.dataset.tlk,on=e.target.checked;lsSet('petnote.tl.'+k,on?'1':'0');$$('input[data-tlk="'+k+'"]').forEach(function(x){x.checked=on});S.filter='all';S.tlPage=1;if($('#tlBody'))renderMain();var o=TL_OPTS.filter(function(x){return x[0]===k})[0];toast((on?'已開啟：':'已關閉：')+o[1].replace('顯示',''));return}
   if(e.target.id==='bk-every'){
     var box=$('#bkCustom'),di=$('#bk-days');
     if(e.target.value==='c'){if(box)box.style.display='flex';var n=+(di&&di.value)||S.backup.every||30;S.backup.every=Math.min(365,Math.max(1,Math.round(n)));if(di){di.value=S.backup.every;di.focus();di.select()}saveBackupMeta();toast('每 '+S.backup.every+' 天提醒一次');return}
