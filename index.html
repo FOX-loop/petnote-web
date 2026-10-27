@@ -374,7 +374,7 @@ var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHour
 var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
-var APP_VERSION='1.8.1';
+var APP_VERSION='1.9.1';
 function isNative(){try{var c=window.Capacitor;return !!(c&&c.isNativePlatform&&c.isNativePlatform())}catch(e){return false}}
 /* ---- App 版：檢查 GitHub 上的新版本 ---- */
 var UPDATE_REPO='FOX-loop/petnote-web';
@@ -518,7 +518,7 @@ var DB={db:null,ok:false,
 var warnedStore=false;
 function saved(ok){ if(!ok&&!warnedStore){warnedStore=true;toast('目前無法永久儲存資料，關閉後可能消失')} }
 
-var S={pets:[],logs:[],worms:[],vaccs:[],lib:[],groups:[],vOpen:{},tlLimit:30,tlPage:1,q:'',qAll:false,sel:null,tab:'home',filter:'all',year:new Date().getFullYear()};
+var S={backup:{since:0,last:0,every:30},pets:[],logs:[],worms:[],vaccs:[],lib:[],groups:[],vOpen:{},tlLimit:30,tlPage:1,q:'',qAll:false,sel:null,tab:'home',filter:'all',year:new Date().getFullYear()};
 
 function newPet(){
   return {id:uid(),name:'',species:'貓',breed:'',gender:'未知',birthday:'',homeDate:'',photo:'',
@@ -1118,6 +1118,22 @@ function vaccChip(st,it){
   var warn=it.remind>=0&&(st.state==='overdue'||st.state==='soon');
   return '<span class="pill '+(warn?'warn':'')+'">'+txt+'</span>';
 }
+/* ---- 備份提醒 ---- */
+var BACKUP_OPTS=[[7,'每週'],[30,'每月'],[90,'每 3 個月'],[0,'不提醒']];
+function bkIsCustom(){return !!S.backup.every&&!BACKUP_OPTS.some(function(o){return o[0]===S.backup.every})}
+function bkOptsHtml(){var c=bkIsCustom();function op(o){return '<option value="'+o[0]+'" '+(!c&&S.backup.every===o[0]?'selected':'')+'>'+o[1]+'</option>'}
+  return BACKUP_OPTS.filter(function(o){return o[0]}).map(op).join('')+'<option value="c" '+(c?'selected':'')+'>自訂天數…</option>'+BACKUP_OPTS.filter(function(o){return !o[0]}).map(op).join('')}
+function backupBase(){return S.backup.last||S.backup.since||Date.now()}
+function backupDue(){if(!S.backup.every)return null;var b=new Date(backupBase());return new Date(b.getFullYear(),b.getMonth(),b.getDate()+S.backup.every)}
+function backupOverdueDays(){var d=backupDue();if(!d)return -1;return dayDiff(today(),d)}
+async function saveBackupMeta(){saved(await DB.put('meta',Object.assign({id:'backup'},S.backup)));Notif.sync()}
+async function markBackedUp(){S.backup.last=Date.now();await saveBackupMeta();if(!Layers.length)render();else paintBackupTxt()}
+function paintBackupTxt(){
+  var t=$('#bkTxt');if(!t)return;
+  if(!S.backup.last){t.textContent='還沒有在這支手機匯出過備份。';return}
+  var d=new Date(S.backup.last),ago=dayDiff(today(),new Date(d.getFullYear(),d.getMonth(),d.getDate()));
+  t.textContent='上次備份：'+d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+'（'+(ago===0?'今天':ago+' 天前')+'）';
+}
 function alertsAll(now){
   var out=[];
   S.pets.forEach(function(p){
@@ -1131,12 +1147,17 @@ function alertsAll(now){
       if(names.length)out.push({tone:'warn',pid:p.id,tab:'deworm',text:p.name+'・本月驅蟲待辦：'+names.join('、')});
     }
   });
+  if(S.pets.length&&S.backup.every){
+    var od=backupOverdueDays();
+    if(od>=0){var since=dayDiff(today(),new Date(new Date(backupBase()).setHours(0,0,0,0)));
+      out.push({tone:'warn',act:'exportnow',text:S.backup.last?'已經 '+since+' 天沒備份了，點這裡匯出備份':'還沒備份過資料，點這裡匯出備份'});}
+  }
   return out;
 }
 function alertsHtml(now){
   var al=alertsAll(now);if(!al.length)return '';
   al.sort(function(a,b){return (a.tone==='bad'?0:1)-(b.tone==='bad'?0:1)});
-  return '<div class="alerts">'+al.slice(0,4).map(function(a){return '<button class="alert '+a.tone+'" data-act="alertgo" data-pid="'+a.pid+'" data-tab="'+a.tab+'">'+ico('bell',20)+'<span>'+esc(a.text)+'</span>'+ico('cr',16)+'</button>'}).join('')+'</div>';
+  return '<div class="alerts">'+al.slice(0,4).map(function(a){return '<button class="alert '+a.tone+'" '+(a.act?'data-act="'+a.act+'"':'data-act="alertgo" data-pid="'+a.pid+'" data-tab="'+a.tab+'"')+'>'+ico('bell',20)+'<span>'+esc(a.text)+'</span>'+ico('cr',16)+'</button>'}).join('')+'</div>';
 }
 function vaccSummary(p,now){
   var h='<section class="card"><div class="cardhead"><h2>預防針</h2><button class="linkbtn" data-act="tab" data-tab="vaccine">全部紀錄'+ico('cr',16)+'</button></div>';
@@ -1203,7 +1224,7 @@ function viewMore(){
     return '<button class="lrow" data-act="libedit" data-name="'+esc(l.name)+'"><span class="grow"><b>'+esc(l.name)+'</b><small style="display:block">'+(g?'群組：'+esc(g.name):'獨立・'+everyLabel(l.every)+'・'+remindLabel(l.remind)+(users.length?'　'+users.map(esc).join('、'):''))+'</small></span>'+ico('cr',18)+'</button>';
   }).join('')+'<button class="lrow" data-act="libedit"><span class="av" style="--s:40px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增疫苗</b><small style="display:block">建立後，新增施打紀錄時直接點選</small></span></button></div></div>';
   h+='<div class="sechead">手機通知</div><div class="card"><p class="about" id="notifTxt" style="margin:0">檢查中…</p><div id="notifBtns"></div></div>';
-  h+='<div class="sechead">資料備份</div><div class="card"><div class="actions"><button class="btn" data-act="export">匯出備份</button><label class="btn" for="importFile" role="button" tabindex="0" style="cursor:pointer">匯入備份</label></div><p class="about" id="storeTxt" style="margin-bottom:0"></p><p class="about">資料只存在這支手機（或這個瀏覽器）裡。換手機、重新安裝或清除瀏覽器資料前，請先匯出備份檔並存到雲端硬碟。匯入時會與現有資料合併。使用網頁版時，建議每個月匯出一次。</p></div>';
+  h+='<div class="sechead">資料備份</div><div class="card"><p class="about" id="bkTxt" style="margin:0 0 10px;font-weight:600;color:var(--ink)"></p><div class="actions"><button class="btn" data-act="export">匯出備份</button><label class="btn" for="importFile" role="button" tabindex="0" style="cursor:pointer">匯入備份</label></div><p class="about" id="storeTxt" style="margin-bottom:0"></p><div class="field" style="margin:12px 0 0"><label for="bk-every">備份提醒</label><select id="bk-every">'+bkOptsHtml()+'</select><div id="bkCustom" style="display:'+(bkIsCustom()?'flex':'none')+';align-items:center;gap:8px;margin-top:8px">每<input id="bk-days" type="text" inputmode="numeric" maxlength="3" autocomplete="off" value="'+(S.backup.every||30)+'" style="width:90px;text-align:center">天提醒一次</div><div class="hint">超過這段時間沒匯出，首頁會出現提醒'+(isNative()?'，並在早上 9:00 跳通知':'')+'。</div></div><p class="about">資料只存在這支手機（或這個瀏覽器）裡。換手機、重新安裝或清除瀏覽器資料前，請先匯出備份檔並存到雲端硬碟。匯入時會與現有資料合併。</p></div>';
   if(!isNative()){
     var au=apkUrl();
     h+='<div class="sechead">在其他手機使用</div><div class="card"><p class="about" style="margin:0"><b>iPhone</b>：用 Safari 打開這個網址，點下方「分享」→「加入主畫面」，就會像 App 一樣有圖示。<br><b>Android</b>：用 Chrome 打開，點右上角選單 →「加到主畫面」。'+(au?'也可以安裝 App 版，會在早上跳出提醒通知。':'')+'</p>'+
@@ -1667,15 +1688,15 @@ async function exportData(){
     parts.push('}}');await flush();
     if(native){
       var u=await P.Filesystem.getUri({path:name,directory:'CACHE'});
-      try{await P.Share.share({title:name,url:u.uri,dialogTitle:'儲存或分享備份檔'})}catch(e){}
+      try{await P.Share.share({title:name,url:u.uri,dialogTitle:'儲存或分享備份檔'});await markBackedUp();toast('已匯出備份')}catch(e){}
       return;
     }
     try{
       var file=new File([blob],name,{type:'application/json'});
-      if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}
+      if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});await markBackedUp();toast('已匯出備份');return}
     }catch(e){ if(e&&e.name==='AbortError')return; }
     var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();
-    toast('已產生備份檔');
+    await markBackedUp();toast('已產生備份檔');
   }catch(e){toast('匯出失敗，請確認手機空間是否足夠')}
   finally{exportData.busy=false}
 }
@@ -1751,7 +1772,7 @@ var Notif=(function(){
   function plug(){try{var c=window.Capacitor;if(c&&c.isNativePlatform&&c.isNativePlatform()&&c.Plugins&&c.Plugins.LocalNotifications)return c.Plugins.LocalNotifications}catch(e){}return null}
   async function status(){var P=plug();if(!P)return 'web';try{var r=await P.checkPermissions();return r.display||'prompt'}catch(e){return 'error'}}
   async function ask(){var P=plug();if(!P)return 'web';try{var r=await P.requestPermissions();return r.display||'denied'}catch(e){return 'error'}}
-  function anyReminder(){return S.pets.some(function(p){return p.wormRemind||vItems(p).some(function(i){return i.remind>=0})})}
+  function anyReminder(){return !!S.backup.every||S.pets.some(function(p){return p.wormRemind||vItems(p).some(function(i){return i.remind>=0})})}
   function build(){
     var out=[],now=new Date(),td=today();
     var at=function(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate(),9,0,0)};
@@ -1772,6 +1793,11 @@ var Notif=(function(){
         }
       }
     });
+    if(S.pets.length&&S.backup.every){
+      var bd=backupDue(),bt=bd?at(bd):null;
+      if(bt&&bt<=now)bt=at(addDays(td,1));
+      if(bt)out.push({t:bt,title:'貓貓筆記：該備份資料了',body:'已經一段時間沒匯出備份，打開 App 到「設定 → 匯出備份」存一份到雲端硬碟。'});
+    }
     out.sort(function(a,b){return a.t-b.t});
     return out.slice(0,60).map(function(o,i){return {id:i+1,title:o.title,body:o.body,schedule:{at:o.t,allowWhileIdle:true}}});
   }
@@ -1811,7 +1837,7 @@ async function updateBuild(){
   try{var A=window.Capacitor.Plugins.App;if(!A)return;var i=await A.getInfo();if($('#buildTxt'))$('#buildTxt').textContent='　版本代碼 '+i.build}catch(e){}
 }
 async function updateNotifCard(){
-  updateStorage();updateBuild();
+  paintBackupTxt();updateStorage();updateBuild();
   var st=await Notif.status(),t=$('#notifTxt'),b=$('#notifBtns');
   if(!t||!b)return;
   var msg={
@@ -1836,6 +1862,7 @@ document.addEventListener('click',function(e){
   else if(a==='editpet')openPetSheet(t.dataset.id||S.sel);
   else if(a==='addlog')openLogSheet();
   else if(a==='weights')openWeights();
+  else if(a==='exportnow')exportData();
   else if(a==='updcheck'){Updater.check(true);paintUpdTxt()}
   else if(a==='updnow'){if(Updater.last)Updater.prompt(Updater.last)}
   else if(a==='editlog')openLogSheet(t.dataset.id);
@@ -1873,6 +1900,16 @@ document.addEventListener('input',function(e){
   qTimer=setTimeout(function(){S.q=v;S.filter='all';S.tlLimit=30;S.tlPage=1;refreshTl()},180);
 });
 document.addEventListener('change',function(e){
+  if(e.target.id==='bk-every'){
+    var box=$('#bkCustom'),di=$('#bk-days');
+    if(e.target.value==='c'){if(box)box.style.display='flex';var n=+(di&&di.value)||S.backup.every||30;S.backup.every=Math.min(365,Math.max(1,Math.round(n)));if(di){di.value=S.backup.every;di.focus();di.select()}saveBackupMeta();toast('每 '+S.backup.every+' 天提醒一次');return}
+    if(box)box.style.display='none';
+    S.backup.every=+e.target.value;if(di&&S.backup.every)di.value=S.backup.every;saveBackupMeta();toast(S.backup.every?'已設定備份提醒':'已關閉備份提醒');return}
+  if(e.target.id==='bk-days'){
+    var v=Math.round(+e.target.value);if(!(v>=1)){e.target.value=S.backup.every||30;toast('請輸入 1 到 365 天');return}
+    v=Math.min(365,v);e.target.value=v;S.backup.every=v;saveBackupMeta();
+    var sel=$('#bk-every');if(sel)sel.innerHTML=bkOptsHtml();
+    toast('每 '+v+' 天提醒一次');return}
   if(e.target.type==='file')pickingFile=0;
   if(e.target.id==='importFile'){var f=e.target.files&&e.target.files[0];if(f)importData(f);e.target.value=''}
 });
@@ -1899,6 +1936,8 @@ function applyTheme(){
   S.pets=(await DB.all('pets')).sort(function(a,b){return a.created-b.created});
   S.logs=await DB.all('logs');S.worms=await DB.all('worms');S.vaccs=await DB.all('vaccines');
   var metas=await DB.all('meta');
+  var bm=metas.filter(function(m){return m.id==='backup'})[0];
+  if(bm){S.backup={since:bm.since||Date.now(),last:bm.last||0,every:bm.every==null?30:bm.every}}else{S.backup={since:Date.now(),last:0,every:30};await DB.put('meta',Object.assign({id:'backup'},S.backup))}
   var meta=metas.filter(function(m){return m.id==='vaccLib'})[0],gmeta=metas.filter(function(m){return m.id==='vaccGroups'})[0];
   if(meta&&Array.isArray(meta.items)){
     S.lib=meta.items;
