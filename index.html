@@ -29,6 +29,7 @@
   --shadow:0 1px 2px rgba(31,58,51,.06),0 6px 18px rgba(31,58,51,.07);
   --scrim:rgba(10,20,22,.5);
   --ts:55%; --tl:34%; --bs:62%; --bl:91%;
+  --gl:max(16px,env(safe-area-inset-left,0px)); --gr:max(16px,env(safe-area-inset-right,0px));
   --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px); --navpad:0px;
   --font:system-ui,-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
 }
@@ -73,7 +74,7 @@ body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 va
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none;padding:0}
 :focus-visible{outline:2px solid var(--primary);outline-offset:2px}
-.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.gut{padding-left:var(--gl);padding-right:var(--gr)}
 .ic{display:block;flex:none}
 b{font-weight:700}
 small{font-size:12.5px;color:var(--ink2)}
@@ -87,7 +88,7 @@ small{font-size:12.5px;color:var(--ink2)}
 .hmsg .mascot{width:36px;height:36px;border-radius:11px}
 .empty .mascot{width:112px;height:112px;border-radius:30px;margin:0 auto 14px;box-shadow:var(--shadow)}
 .today{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
-.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-right:calc(-1 * var(--gr));padding-right:var(--gr)}
 .chips::-webkit-scrollbar{display:none}
 .pchip{flex:none;display:flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 8px;border-radius:22px;background:var(--surface);border:1.5px solid var(--line);font-weight:600;max-width:60vw}
 .pchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -159,7 +160,7 @@ main{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;paddi
 
 .pagehead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 12px}
 .pagehead h2{margin:0;font-size:22px;font-weight:800}
-.filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 14px 0;padding-right:max(16px,env(safe-area-inset-right,0px))}
+.filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--gr)) 14px 0;padding-right:var(--gr)}
 .filters::-webkit-scrollbar{display:none}
 .wcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--surface2)}
 .wcard .grow{flex:1;min-width:0}
@@ -310,7 +311,7 @@ mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px
 .thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
 .thumbs button{aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--surface2);min-width:0}
 .thumbs img{width:100%;height:100%;object-fit:cover;display:block}
-.fab{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:16px;height:54px;padding:0 20px 0 16px;border-radius:27px;background:var(--primary);color:var(--on-primary);font-weight:800;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.fab{position:absolute;right:var(--gr);bottom:16px;height:54px;padding:0 20px 0 16px;border-radius:27px;background:var(--primary);color:var(--on-primary);font-weight:800;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 .empty{text-align:center;padding:36px 12px;color:var(--ink2)}
 .empty h3{margin:0 0 6px;color:var(--ink);font-size:18px}
 .empty p{margin:0 0 16px}
@@ -323,7 +324,7 @@ mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px
 .remindline span{flex:1;min-width:0}
 .stampcard h2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .stamps{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.stamp{aspect-ratio:1;min-width:0;border-radius:50%;border:1.5px solid var(--line);color:var(--ink2);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;font-size:13px;font-weight:600;background:var(--bg);font-variant-numeric:tabular-nums}
+.stamp{container-type:inline-size;aspect-ratio:1;min-width:0;border-radius:50%;border:1.5px solid var(--line);color:var(--ink2);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;font-size:13px;font-weight:600;background:var(--bg);font-variant-numeric:tabular-nums}
 .stamp small{font-size:10.5px;color:inherit;opacity:.9}
 .stamp.future{opacity:.55}
 .stamp.now{border-color:var(--primary);color:var(--primary);border-width:2px}
@@ -515,7 +516,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--primary);outline:none
 .btn{border-radius:16px}
 
 /* ===== 1.13 首頁全版主視覺 ===== */
-.homewrap{margin:-6px calc(-1*max(16px,env(safe-area-inset-right,0px))) 0 calc(-1*max(16px,env(safe-area-inset-left,0px)))}
+.homewrap{margin:-6px calc(-1*var(--gr)) 0 calc(-1*var(--gl))}
 .homewrap .hero{border-radius:0;min-height:236px;box-shadow:none;justify-content:flex-end;padding:20px max(18px,env(safe-area-inset-left,0px)) 46px}
 .hero .htop{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hbrand{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:16px;letter-spacing:.04em;text-shadow:0 1px 6px rgba(0,0,0,.25)}
@@ -533,7 +534,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--primary);outline:none
 .hname .grow{flex:1;min-width:0}
 .homewrap .hedit{position:static;flex:none}
 .hpill.dim{font-weight:600;opacity:.92}
-.homesheet{position:relative;margin-top:-28px;border-radius:28px 28px 0 0;background:var(--bg);padding:16px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
+.homesheet{position:relative;margin-top:-28px;border-radius:28px 28px 0 0;background:var(--bg);padding:16px var(--gr) 0 var(--gl)}
 .homemode main{padding-top:0}
 .homewrap{margin-top:0}
 .evcard{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
@@ -595,6 +596,34 @@ nav.tabs button.on .ico{animation:tabpop .35s ease-out}
 .mc,.btn,.hrow,.stamp,.mchip,.pbbtn{transition:transform .12s ease}
 .mc:active,.btn:active,.stamp:active,.pbbtn:active{transform:scale(.97)}
 @media (prefers-reduced-motion:reduce){main.enter *{animation:none!important}.stamp.now{animation:none!important}nav.tabs button.on .ico{animation:none}}
+
+/* ---- 驅蟲集章：圖示與文字跟著格子大小縮放 ---- */
+@supports (width:1cqi){
+  .stamp>span{font-size:clamp(12px,24cqi,20px);white-space:nowrap}
+  .stamp.stamp>small{font-size:clamp(10px,20cqi,16px);white-space:nowrap}
+  .stamp .paw{width:clamp(18px,34cqi,36px);height:clamp(18px,34cqi,36px)}
+}
+/* ---- 平板、桌機：內容置中成一欄，不再撐滿整個螢幕 ---- */
+@media (min-width:700px){
+  :root{--colw:760px;--gl:max(24px,calc((100vw - var(--colw)) / 2));--gr:max(24px,calc((100vw - var(--colw)) / 2))}
+  .chips,.filters{margin-right:0;padding-right:0}
+  .pchip{max-width:260px}
+  .homewrap{margin:0}
+  .homewrap .hero{border-radius:26px;min-height:280px;padding:24px 26px 30px;box-shadow:var(--shadow)}
+  .homesheet{margin-top:16px;border-radius:0;padding:0;background:none}
+  .mgrid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .mgrid.odd .mc:last-child{grid-column:auto;min-height:124px}
+  nav.tabs{padding-left:var(--gl);padding-right:var(--gr)}
+  nav.tabs button{min-height:64px;font-size:12.5px}
+  .fab{right:var(--gr)}
+  .toast{bottom:calc(var(--sab) + 92px)}
+  .sheet{border-radius:24px 24px 0 0}
+}
+@media (min-width:1100px){
+  :root{--colw:820px}
+  body{font-size:16px}
+  .card h2{font-size:17px}
+}
 </style>
 
 <style>
@@ -794,7 +823,7 @@ var DB={db:null,ok:false,
   })}
 };
 var warnedStore=false;
-function saved(ok){ if(!ok&&!warnedStore){warnedStore=true;toast('目前無法永久儲存資料，關閉後可能消失')} }
+function saved(ok){ if(ok&&!saved.quiet)lsSet('petnote.dirty',String(Date.now())); if(!ok&&!warnedStore){warnedStore=true;toast('目前無法永久儲存資料，關閉後可能消失')} }
 
 var S={backup:{since:0,last:0,every:30},foods:[],pets:[],logs:[],worms:[],vaccs:[],lib:[],groups:[],vOpen:{},tlLimit:30,tlPage:1,q:'',qAll:false,sel:null,tab:'home',filter:'all',year:new Date().getFullYear()};
 
@@ -1110,7 +1139,7 @@ function renderMain(){
   else if(S.tab==='vaccine') html=viewVaccine();
   else html=viewDeworm();
   m.innerHTML=html;m.scrollTop=st;
-  if(S.tab==='more')updateNotifCard();
+  if(S.tab==='more'){updateNotifCard();paintCloud()}
   Photos.hydrate(m);
 }
 function viewEmpty(){
@@ -2064,7 +2093,7 @@ function bkOptsHtml(){var c=bkIsCustom();function op(o){return '<option value="'
 function backupBase(){return S.backup.last||S.backup.since||Date.now()}
 function backupDue(){if(!S.backup.every)return null;var b=new Date(backupBase());return new Date(b.getFullYear(),b.getMonth(),b.getDate()+S.backup.every)}
 function backupOverdueDays(){var d=backupDue();if(!d)return -1;return dayDiff(today(),d)}
-async function saveBackupMeta(){saved(await DB.put('meta',Object.assign({id:'backup'},S.backup)));Notif.sync()}
+async function saveBackupMeta(){saved.quiet=true;try{saved(await DB.put('meta',Object.assign({id:'backup'},S.backup)))}finally{saved.quiet=false}Notif.sync()}
 async function markBackedUp(){S.backup.last=Date.now();await saveBackupMeta();if(!Layers.length)render();else paintBackupTxt()}
 function paintBackupTxt(){
   var t=$('#bkTxt');if(!t)return;
@@ -2172,6 +2201,7 @@ function viewMore(){
     return '<button class="lrow" data-act="libedit" data-name="'+esc(l.name)+'"><span class="grow"><b>'+esc(l.name)+'</b><small style="display:block">'+(g?'群組：'+esc(g.name):'獨立・'+everyLabel(l.every)+'・'+remindLabel(l.remind)+(users.length?'　'+users.map(esc).join('、'):''))+'</small></span>'+ico('cr',18)+'</button>';
   }).join('')+'<button class="lrow" data-act="libedit"><span class="av" style="--s:40px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增疫苗</b><small style="display:block">建立後，新增施打紀錄時直接點選</small></span></button></div></div>';
   h+='<div class="sechead">手機通知</div><div class="card"><p class="about" id="notifTxt" style="margin:0">檢查中…</p><div id="notifBtns"></div></div>';
+  h+='<div class="sechead" id="cloudSec" hidden>Google 雲端硬碟備份</div><div class="card" id="cloudBox" hidden></div>';
   h+='<div class="sechead">資料備份</div><div class="card"><p class="about" id="bkTxt" style="margin:0 0 10px;font-weight:600;color:var(--ink)"></p><div class="actions"><button class="btn" data-act="export">匯出備份</button><label class="btn" for="importFile" role="button" tabindex="0" style="cursor:pointer">匯入備份</label></div><p class="about" id="storeTxt" style="margin-bottom:0"></p><div class="field" style="margin:12px 0 0"><label for="bk-every">備份提醒</label><select id="bk-every">'+bkOptsHtml()+'</select><div id="bkCustom" style="display:'+(bkIsCustom()?'flex':'none')+';align-items:center;gap:8px;margin-top:8px">每<input id="bk-days" type="text" inputmode="numeric" maxlength="3" autocomplete="off" value="'+(S.backup.every||30)+'" style="width:90px;text-align:center">天提醒一次</div><div class="hint">超過這段時間沒匯出，首頁會出現提醒'+(isNative()?'，並在早上 9:00 跳通知':'')+'。</div></div><p class="about">資料只存在這支手機（或這個瀏覽器）裡。換手機、重新安裝或清除瀏覽器資料前，請先匯出備份檔並存到雲端硬碟。匯入時會與現有資料合併。</p></div>';
   if(!isNative()){
     var au=apkUrl();
@@ -2679,6 +2709,18 @@ function openWormBackfill(){
 }
 
 /* ================= 備份 ================= */
+async function buildBackupBlob(progress){
+  var ids=[];S.logs.forEach(function(l){(l.photos||[]).forEach(function(p){if(Photos.isId(p))ids.push(p)})});
+  var head=JSON.stringify({app:'petnote',version:4,exported:new Date().toISOString(),vaccLib:S.lib,vaccGroups:S.groups,foods:S.foods,pets:S.pets,logs:S.logs,worms:S.worms,vaccines:S.vaccs});
+  var parts=[head.slice(0,-1)+',"photos":{'],first=true;
+  for(var i=0;i<ids.length;i++){
+    var data=await Photos.full(ids[i]);if(!data)continue;
+    parts.push((first?'':',')+JSON.stringify(ids[i])+':'+JSON.stringify(data));first=false;
+    if(progress&&i%10===9)progress(i+1,ids.length);
+  }
+  parts.push('}}');
+  return new Blob(parts,{type:'application/json'});
+}
 async function exportData(){
   if(exportData.busy)return;exportData.busy=true;
   try{
@@ -2757,6 +2799,141 @@ async function importData(file){
     Busy.hide();render();
     await infoDlg('匯入完成！\n'+np+' 隻寵物、'+nl+' 筆狀況（'+nph+' 張照片）\n'+nw+' 筆驅蟲、'+nv+' 筆預防針'+(bad?'\n\n手機空間不足，有 '+bad+' 張照片先保留原檔，清出空間後重新開啟會自動整理。':''));
   }catch(e){Busy.hide();render();await infoDlg('匯入到一半發生問題，已匯入的部分都保留著。\n可能是手機空間不足，清出空間後再匯入一次即可（重複匯入不會產生重複資料）。')}
+}
+
+/* ================= Google 雲端硬碟備份 ================= */
+var GDrive=(function(){
+  var SCOPE='https://www.googleapis.com/auth/drive.appdata email',FILE='petnote-backup.json',API='https://www.googleapis.com';
+  var cfgP=null,busy=false;
+  function st(){try{return JSON.parse(lsGet('petnote.gd')||'{}')||{}}catch(e){return {}}}
+  function put(o){lsSet('petnote.gd',JSON.stringify(Object.assign(st(),o)))}
+  function plugin(){var c=window.Capacitor;return c&&c.Plugins&&c.Plugins.GDrive}
+  function webCfg(){if(cfgP)return cfgP;cfgP=fetch('cloud.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(j){return j&&typeof j.webClientId==='string'&&/\.apps\.googleusercontent\.com$/.test(j.webClientId)?j.webClientId:null}).catch(function(){return null});return cfgP}
+  async function available(){if(isNative())return !!plugin();if(!/^https:$/.test(location.protocol))return false;return !!(await webCfg())}
+  function linked(){return !!st().email}
+  function redirectUri(){return location.origin+location.pathname.replace(/index\.html$/,'')}
+  // intent：登入完成後要接著做的事（link／backup／restore）
+  async function token(interactive,intent){
+    var s=st();if(s.tok&&s.exp>Date.now()+60000)return s.tok;
+    if(isNative()){
+      var r=await plugin().authorize({interactive:!!interactive});
+      put({tok:r.accessToken,exp:Date.now()+50*60000});return r.accessToken;
+    }
+    if(!interactive)return null;
+    var cid=await webCfg();if(!cid)throw new Error('noconfig');
+    var a=crypto.getRandomValues(new Uint8Array(12)),state=btoa(String.fromCharCode.apply(null,a)).replace(/[^A-Za-z0-9]/g,'');
+    lsSet('petnote.gdState',state+'|'+(intent||'link'));
+    var q={client_id:cid,redirect_uri:redirectUri(),response_type:'token',scope:SCOPE,include_granted_scopes:'true',state:state};
+    if(s.email)q.login_hint=s.email;
+    location.href='https://accounts.google.com/o/oauth2/v2/auth?'+Object.keys(q).map(function(k){return k+'='+encodeURIComponent(q[k])}).join('&');
+    return new Promise(function(){});
+  }
+  // 網頁版：從 Google 登入頁回來時，網址後面會帶 #access_token=…
+  function takeRedirect(){
+    var h=location.hash;if(!h||(h.indexOf('access_token=')<0&&h.indexOf('error=')<0))return null;
+    var q={};h.slice(1).split('&').forEach(function(kv){var i=kv.indexOf('=');if(i>0)q[decodeURIComponent(kv.slice(0,i))]=decodeURIComponent(kv.slice(i+1).replace(/\+/g,' '))});
+    try{history.replaceState(null,'',location.pathname+location.search)}catch(e){location.hash=''}
+    var saved=(lsGet('petnote.gdState')||'').split('|');lsSet('petnote.gdState','');
+    if(!saved[0]||q.state!==saved[0])return {error:'state'};
+    if(q.error)return {error:q.error};
+    put({tok:q.access_token,exp:Date.now()+Math.max(60,(+q.expires_in||3600)-300)*1000});
+    return {intent:saved[1]||'link'};
+  }
+  async function api(path,opt,retry){
+    var tok=await token(!!(opt&&opt.interactive),opt&&opt.intent);
+    if(!tok)throw new Error('needlogin');
+    var o=Object.assign({},opt||{});delete o.interactive;delete o.intent;o.headers=Object.assign({Authorization:'Bearer '+tok},o.headers||{});
+    var r=await fetch(path.indexOf('http')===0?path:API+path,o);
+    if(r.status===401&&!retry){
+      put({tok:null,exp:0});
+      if(isNative()){try{await plugin().clearToken({token:tok})}catch(e){}}
+      return api(path,opt,true);
+    }
+    if(!r.ok){var t='';try{t=(await r.text()).slice(0,200)}catch(e){}var err=new Error('http '+r.status);err.status=r.status;err.detail=t;throw err}
+    return r;
+  }
+  async function findFile(opt){
+    var r=await api('/drive/v3/files?spaces=appDataFolder&fields='+encodeURIComponent('files(id,modifiedTime,size,appProperties)')+'&q='+encodeURIComponent("name='"+FILE+"' and trashed=false"),opt);
+    var j=await r.json();return (j.files||[])[0]||null;
+  }
+  async function link(){
+    var r=await api('https://www.googleapis.com/oauth2/v3/userinfo',{interactive:true,intent:'link'});
+    var u=await r.json();put({email:u.email||'Google 帳號',auto:st().auto!==false});
+    var f=null;try{f=await findFile({})}catch(e){}
+    if(f)put({remote:Date.parse(f.modifiedTime)||0,remoteSize:+f.size||0});
+    return f;
+  }
+  async function backup(opt){
+    opt=opt||{};if(busy)return false;
+    if(!await token(!!opt.interactive,'backup'))throw new Error('needlogin');
+    busy=true;
+    try{
+      var blob=await buildBackupBlob(opt.quiet?null:function(i,n){toast('正在準備照片 '+i+' / '+n)});
+      var f=await findFile({});
+      var meta={appProperties:{pets:String(S.pets.length),logs:String(S.logs.length),ver:APP_VERSION,dev:isNative()?'android':(WebPush.isIOS()?'iphone':'web')}};
+      if(!f){meta.name=FILE;meta.parents=['appDataFolder']}
+      var init=await api('/upload/drive/v3/files'+(f?'/'+f.id:'')+'?uploadType=resumable&fields=id,modifiedTime,size',{method:f?'PATCH':'POST',interactive:opt.interactive,intent:'backup',headers:{'Content-Type':'application/json; charset=UTF-8','X-Upload-Content-Type':'application/json','X-Upload-Content-Length':String(blob.size)},body:JSON.stringify(meta)});
+      var loc=init.headers.get('Location');if(!loc)throw new Error('nolocation');
+      if(!opt.quiet)toast('正在上傳到 Google 雲端硬碟…');
+      var up=await fetch(loc,{method:'PUT',headers:{'Content-Type':'application/json'},body:blob});
+      if(!up.ok)throw new Error('upload '+up.status);
+      var j=await up.json().catch(function(){return {}});
+      put({last:Date.now(),remote:Date.parse(j.modifiedTime)||Date.now(),remoteSize:+j.size||blob.size});
+      await markBackedUp();
+      return true;
+    }finally{busy=false}
+  }
+  async function restore(opt){
+    var f=await findFile(Object.assign({interactive:true,intent:'restore'},opt||{}));
+    if(!f)return null;
+    Busy.show('正在從 Google 雲端硬碟下載備份…');
+    try{var r=await api('/drive/v3/files/'+f.id+'?alt=media',{});var txt=await r.text()}finally{Busy.hide()}
+    put({remote:Date.parse(f.modifiedTime)||0,remoteSize:+f.size||0});
+    var d=new Date(Date.parse(f.modifiedTime));
+    return {name:'Google 雲端硬碟的備份（'+d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+'）',text:function(){return Promise.resolve(txt)}};
+  }
+  async function unlink(){
+    var s=st();
+    if(s.tok){try{await fetch('https://oauth2.googleapis.com/revoke?token='+encodeURIComponent(s.tok),{method:'POST',mode:'no-cors'})}catch(e){}
+      if(isNative()){try{await plugin().clearToken({token:s.tok})}catch(e){}}}
+    lsSet('petnote.gd','');
+  }
+  // 自動備份：有改過資料、距離上次雲端備份超過 12 小時，就在背景上傳（網頁版只在登入還有效時）
+  async function autoTick(){
+    var s=st();if(!s.email||s.auto===false||busy)return;
+    var dirty=+lsGet('petnote.dirty')||0;if(dirty<=(s.last||0)||Date.now()-(s.last||0)<12*36e5)return;
+    if(!isNative()&&!(s.tok&&s.exp>Date.now()+120000))return;
+    try{if(await backup({quiet:true}))paintCloud()}catch(e){}
+  }
+  return {available:available,linked:linked,st:st,put:put,token:token,takeRedirect:takeRedirect,link:link,backup:backup,restore:restore,unlink:unlink,autoTick:autoTick,findFile:findFile};
+})();
+function fmtWhen(t){var d=new Date(t),ago=dayDiff(today(),new Date(d.getFullYear(),d.getMonth(),d.getDate()));return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+'（'+(ago===0?'今天':ago===1?'昨天':ago+' 天前')+'）'}
+function fmtSize(b){return b>=1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB'}
+async function paintCloud(){
+  var box=$('#cloudBox');if(!box)return;
+  if(!await GDrive.available()){var sec=$('#cloudSec');if(sec)sec.hidden=true;box.hidden=true;return}
+  var s=GDrive.st();box=$('#cloudBox');if(!box)return;
+  var sec2=$('#cloudSec');if(sec2)sec2.hidden=false;box.hidden=false;
+  if(!s.email){
+    box.innerHTML='<p class="about" style="margin:0 0 10px">連結 Google 帳號後，備份會存到你自己的 Google 雲端硬碟（App 專用的隱藏資料夾，不會看到你其他檔案）。換手機、從 Android 換到 iPhone，登入同一個帳號就能還原。</p><button class="btn primary block" data-act="gdlink">'+GICON+'連結 Google 帳號</button>';
+    return;
+  }
+  box.innerHTML='<div class="swrow" style="border-top:0;padding-top:0"><span><b>'+esc(s.email)+'</b><small>'+(s.last?'上次上傳：'+fmtWhen(s.last):(s.remote?'雲端已有備份：'+fmtWhen(s.remote):'雲端還沒有備份'))+(s.remoteSize?'・'+fmtSize(s.remoteSize):'')+'</small></span></div>'+
+    '<div class="actions" style="margin-top:4px"><button class="btn primary" data-act="gdbackup">立即備份</button><button class="btn" data-act="gdrestore">從雲端還原</button></div>'+
+    '<div class="swrow"><span><b>自動備份</b><small>'+(isNative()?'資料有變動時，每 12 小時自動上傳一次':'資料有變動、而且最近一小時內有登入過時自動上傳；其他時候請按「立即備份」')+'</small></span><span class="sw"><input type="checkbox" id="gdAuto" '+(s.auto!==false?'checked':'')+' aria-label="自動備份"><i></i></span></div>'+
+    '<button class="btn block" data-act="gdunlink" style="margin-top:6px">取消連結</button>';
+  var au=$('#gdAuto');if(au)au.onchange=function(){GDrive.put({auto:au.checked});toast(au.checked?'已開啟自動備份':'已關閉自動備份')};
+}
+var GICON='<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true" style="background:#fff;border-radius:50%;padding:2px"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.2l7.8 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.8c4.3-4 6.9-9.9 6.9-17.2z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.8c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.8 6.1C6.6 42.6 14.6 48 24 48z"/></svg>';
+function gdErrMsg(e){var m=String(e&&e.message||e);if(/canceled|CANCELED/i.test(m))return '';if(m==='noconfig')return '網頁版還沒設定 Google 登入';if(e&&e.status===403)return 'Google 拒絕存取（403），請取消連結後重新連結';if(/Failed to fetch|NetworkError|network/i.test(m))return '連不上 Google，請確認網路';return '發生問題：'+m.slice(0,80)}
+async function gdAction(kind){
+  try{
+    if(kind==='link'){var f=await GDrive.link();await paintCloud();
+      if(f&&(+f.size||0)>0&&!S.pets.length){if(await confirmDlg('雲端硬碟裡已經有備份（'+fmtWhen(Date.parse(f.modifiedTime))+'）。要現在還原到這支手機嗎？','還原'))return gdAction('restore')}
+      else if(f)toast('已連結，雲端已有備份');else toast('已連結 Google 帳號');return}
+    if(kind==='backup'){Busy.show('正在備份到 Google 雲端硬碟…');try{await GDrive.backup({interactive:true})}finally{Busy.hide()}await paintCloud();toast('已備份到 Google 雲端硬碟');return}
+    if(kind==='restore'){var file=await GDrive.restore();if(!file){await infoDlg('Google 雲端硬碟裡還沒有伴獸筆記的備份。\n請先在原本的手機按「立即備份」。');return}await importData(file);await paintCloud();return}
+  }catch(e){Busy.hide();var m=gdErrMsg(e);if(m)toast(m)}
 }
 
 /* ================= 範例資料 ================= */
@@ -2992,6 +3169,10 @@ document.addEventListener('click',function(e){
   else if(a==='wormset')openWormSettings();
   else if(a==='sample')loadSample();
   else if(a==='export')exportData();
+  else if(a==='gdlink')gdAction('link');
+  else if(a==='gdbackup')gdAction('backup');
+  else if(a==='gdrestore')gdAction('restore');
+  else if(a==='gdunlink'){confirmDlg('取消連結 Google 帳號？\n雲端硬碟裡的備份會保留，之後重新連結就能還原。','取消連結').then(async function(ok){if(!ok)return;await GDrive.unlink();await paintCloud();toast('已取消連結')})}
   else if(a==='vaccadd')openVaccSheet(t.dataset.item);
   else if(a==='vaccedit')openVaccSheet(null,t.dataset.id);
   else if(a==='vaccset')openVaccSettings();
@@ -3046,7 +3227,7 @@ document.addEventListener('click',function(e){if(e.target.closest('label[for=imp
 document.addEventListener('visibilitychange',function(){
   if(document.hidden||Layers.length||Busy.el)return;
   if(pickingFile&&Date.now()-pickingFile<120000){pickingFile=0;return}
-  render();Updater.check(false);feederTick();
+  render();Updater.check(false);feederTick();GDrive.autoTick();
 });
 function applyTheme(){
   var v=lsGet('petnote.theme'),r=document.documentElement;
@@ -3074,8 +3255,11 @@ function applyTheme(){
   for(var mi=0;mi<S.pets.length;mi++){if(S.pets[mi]._mig)await savePet(S.pets[mi])}
   var s=lsGet('petnote.sel');S.sel=(S.pets.filter(function(p){return p.id===s})[0]||S.pets[0]||{}).id||null;
   if(S.logs.some(function(l){return (l.photos||[]).some(function(p){return !Photos.isId(p)})})){S.tab='timeline';await migratePhotos();S.tab='home'}
+  var gdRet=GDrive.takeRedirect();
   render();Notif.sync();animEnter();
   feederTick();
+  if(gdRet){if(gdRet.error){if(gdRet.error!=='access_denied')toast('Google 登入沒有完成，請再試一次')}else{S.tab='more';render();setTimeout(function(){gdAction(gdRet.intent==='backup'||gdRet.intent==='restore'?gdRet.intent:'link')},300)}}
+  else setTimeout(function(){GDrive.autoTick()},4000);
   setTimeout(function(){Updater.check(false)},2500);
   if(!DB.ok)toast('目前無法永久儲存資料');
   else{var lv=lsGet('petnote.ver');if(lv&&lv!==APP_VERSION)toast('已更新到 '+APP_VERSION+' 版，資料都還在');lsSet('petnote.ver',APP_VERSION)}
