@@ -1139,13 +1139,16 @@ function sparkSvg(pts,w,h){
 }
 /* ---- 飲水與運動 ---- */
 var FEEDS=[['dry','乾飼料'],['mixed','乾＋濕食'],['wet','濕食為主'],['fresh','鮮食／生食']];
-var EX_ACTS={'貓':['逗貓棒','追逐遊戲','貓跳台','雷射筆','散步'],'狗':['散步','跑步','丟球','游泳','拔河']};
-function petWater(p){return Object.assign({on:true,feed:'dry',dry:0,wet:0,fresh:0},p.water||{})}
+var EX_ACTS={'貓':['逗貓棒','追逐遊戲','貓跳台','雷射筆','散步'],'狗':['散步','跑步','丟球','游泳','拔河'],'其他':['放風','散步','遊戲','滾輪','飛行']};
+function isOtherSp(p){return !!p&&p.species==='其他'}
+function petWater(p){return Object.assign({on:!isOtherSp(p),feed:'dry',dry:0,wet:0,fresh:0,goal:0},p.water||{})}
 function petEx(p){return Object.assign({on:true,goal:0},p.exercise||{})}
 function r10(x){return Math.round(x/10)*10}
 function foodWater(w){var f=w.feed,v=0;if(f==='dry'||f==='mixed')v+=(+w.dry||0)*0.10;if(f==='mixed'||f==='wet')v+=(+w.wet||0)*0.75;if(f==='fresh')v+=(+w.fresh||0)*0.70;return Math.round(v)}
 function waterTarget(p){
-  var pts=weightPoints(p.id),kg=pts.length?pts[pts.length-1].kg:0;if(!kg)return null;
+  var pts=weightPoints(p.id),kg=pts.length?pts[pts.length-1].kg:0,wg=+petWater(p).goal||0;
+  if(wg>0)return {kg:kg,need:[wg,wg],custom:true};
+  if(isOtherSp(p)||!kg)return null;
   var dog=p.species==='狗';return {kg:kg,need:[r10(kg*(dog?50:40)),r10(kg*60)]};
 }
 function waterDays(p,days){
@@ -1159,10 +1162,10 @@ function waterDays(p,days){
   return out;
 }
 function waterTargetText(p,opt){
-  opt=opt||{};var t=opt.tmp?waterTarget(opt.tmp):waterTarget(p);
-  if(!t)return '先記錄體重，就能依體重算出建議飲水量。';
-  var h='依體重 '+fmtKg(t.kg)+' kg：每天需要約 <b>'+t.need[0]+'–'+t.need[1]+' ml</b> 水分（體重 × '+((opt.tmp||p).species==='狗'?'50':'40')+'–60 ml）。水碗、食物本身的水分、主食加水都會算進飲水量。';
-  if(opt.today){var d=waterDays(p,1)[0],rest=t.need[0]-d.v;h+='<br>今天已攝取 '+d.v+' ml'+(d.food||d.add?'（食物 '+d.food+(d.est?'，估計':'')+'、加水 '+d.add+'）':'')+(rest>0?'，水碗再喝約 <b>'+rest+' ml</b> 就達到建議量下限。':'，已達建議量。')}
+  opt=opt||{};var q=opt.tmp||p,t=waterTarget(q);
+  if(!t)return isOtherSp(q)?'「其他」動物的需水量差異很大，App 不會自動推算。可以在寵物資料的「自訂每日飲水目標」填入獸醫建議的數字，沒填就只記錄、不顯示建議量。':'先記錄體重，就能依體重算出建議飲水量。';
+  var h=t.custom?'每日飲水目標 <b>'+t.need[0]+' ml</b>（自訂）。水碗、食物本身的水分、主食加水都會算進飲水量。':'依體重 '+fmtKg(t.kg)+' kg：每天需要約 <b>'+t.need[0]+'–'+t.need[1]+' ml</b> 水分（體重 × '+((opt.tmp||p).species==='狗'?'50':'40')+'–60 ml）。水碗、食物本身的水分、主食加水都會算進飲水量。';
+  if(opt.today){var d=waterDays(p,1)[0],rest=t.need[0]-d.v;h+='<br>今天已攝取 '+d.v+' ml'+(d.food||d.add?'（食物 '+d.food+(d.est?'，估計':'')+'、加水 '+d.add+'）':'')+(rest>0?'，水碗再喝約 <b>'+rest+' ml</b> 就達到'+(t.custom?'目標':'建議量下限')+'。':'，已達'+(t.custom?'目標':'建議量')+'。')}
   return h;
 }
 function exActs(p){
@@ -1180,7 +1183,7 @@ function dayTotals(pid,type,field,days){
 var FOOD_TYPES=[['dry','乾飼料',3700,'kg',.10],['wet','濕食罐頭',100,'100g',.75],['fresh','鮮食',130,'100g',.70],['puree','肉泥',70,'100g',.85],['freeze','凍乾零食',380,'100g',.05],['raw','生食',140,'100g',.70],['other','其他',300,'100g',.10]];
 function ftype(id){return FOOD_TYPES.filter(function(t){return t[0]===id})[0]||FOOD_TYPES.filter(function(t){return t[0]==='other'})[0]}
 function petFeed(p){
-  var fd=Object.assign({on:true,goal:'keep',meals:null},p.feeding||{});
+  var fd=Object.assign({on:!isOtherSp(p),goal:'keep',kcal:0,meals:null},p.feeding||{});
   if(!Array.isArray(fd.meals)){var m=[],by={};(fd.menu||[]).forEach(function(x){var lb=x.label||'餐點';if(!by[lb]){by[lb]={label:lb,items:[],addw:0};m.push(by[lb])}by[lb].items.push({food:x.food,amt:x.amt,unit:x.unit||'g'})});fd.meals=m}
   delete fd.menu;return fd;
 }
@@ -1212,8 +1215,9 @@ function feedCalc(f,amt,unit){
 function ageMonths(p){if(!p.birthday)return null;var b=parseD(p.birthday),t=today();return (t.getFullYear()-b.getFullYear())*12+(t.getMonth()-b.getMonth())-(t.getDate()<b.getDate()?1:0)}
 function petNeut(p){if(p.neutered==='yes'||p.neutered==='no')return p.neutered;var f=p.feeding&&p.feeding.neutered;return f==='yes'||f==='no'?f:''}
 function petEnergy(p,fd){
-  var pts=weightPoints(p.id),kg=pts.length?pts[pts.length-1].kg:0;if(!kg)return null;
-  fd=fd||petFeed(p);var nv=petNeut(p),dog=p.species==='狗',am=ageMonths(p),neut=nv!=='no',f,lb;
+  var pts=weightPoints(p.id),kg=pts.length?pts[pts.length-1].kg:0;
+  fd=fd||petFeed(p);if(+fd.kcal>0)return {kg:kg,custom:true,label:'自訂目標',target:Math.round(+fd.kcal)};
+  if(isOtherSp(p)||!kg)return null;var nv=petNeut(p),dog=p.species==='狗',am=ageMonths(p),neut=nv!=='no',f,lb;
   if(!dog){
     if(am!=null&&am<12){f=2.5;lb='幼貓'}
     else{ if(am!=null&&am>=132){f=1.1;lb='熟齡貓'}else{f=neut?1.2:1.4;lb=neut?'已結紮成貓':'未結紮成貓'}
@@ -1227,7 +1231,8 @@ function petEnergy(p,fd){
   var rer=70*Math.pow(kg,0.75);return {kg:kg,rer:Math.round(rer),factor:f,label:lb,target:Math.round(rer*f/5)*5};
 }
 function energyText(p,fd){
-  var e=petEnergy(p,fd);if(!e)return '先記錄體重，就能算出每日建議熱量。';
+  var e=petEnergy(p,fd);if(!e)return isOtherSp(p)?'「其他」動物的熱量需求差異很大（例如兔子、鳥、爬蟲），App 不會自動推算。可以在寵物資料的「自訂每日熱量」填入獸醫建議的數字，沒填就只記錄、不顯示建議量。':'先記錄體重，就能算出每日建議熱量。';
+  if(e.custom)return '每日目標熱量 <b>'+e.target+' kcal</b>（自訂，不使用公式）。';
   return '依體重 '+fmtKg(e.kg)+' kg（'+e.label+'）：靜息需求 70 × '+fmtKg(e.kg)+'<sup>0.75</sup> ≈ '+e.rer+' kcal，× '+e.factor+' ＝ 每日建議約 <b>'+e.target+' kcal</b>。';
 }
 function feedWaterFromLogs(pid){
@@ -1248,6 +1253,8 @@ function calcMeal(items,kcalIn,addw,left,lefts){
   return {given:Math.round(given),kcal:Math.round(eaten),fw:Math.round(fw),wml:Math.round((+addw||0)*ratio),ratio:ratio};
 }
 function confettiSvg(){return '<svg class="confetti" width="120" height="44" viewBox="0 0 120 44" aria-hidden="true"><rect x="8" y="6" width="6" height="12" rx="2" fill="#3A86D8" transform="rotate(25 11 12)"/><rect x="40" y="24" width="6" height="12" rx="2" fill="#2F9A5E" transform="rotate(-30 43 30)"/><rect x="74" y="4" width="6" height="12" rx="2" fill="#7A62C9" transform="rotate(50 77 10)"/><circle cx="100" cy="10" r="3" fill="#E07B39"/><circle cx="26" cy="34" r="2.5" fill="#F2A15E"/><circle cx="62" cy="38" r="2.5" fill="#3A86D8"/><rect x="104" y="26" width="6" height="12" rx="2" fill="#E07B39" transform="rotate(-20 107 32)"/></svg>'}
+function wNeedLbl(p,tg){return tg?(tg.custom?'目標 '+tg.need[0]+' ml':'建議 '+tg.need[0]+'–'+tg.need[1]+' ml'):(isOtherSp(p)?'可在寵物資料設定目標':'先記錄體重')}
+function kNoLbl(p){return isOtherSp(p)?'可在寵物資料設定目標':'先記錄體重'}
 function friendlyMsg(p){
   var n=esc(p.name),w=petWater(p),fd=petFeed(p),e=petEx(p);
   if(w.on){var tg=waterTarget(p),wd=waterDays(p,1)[0];if(tg){var r=tg.need[0]-wd.v;if(wd.v<=0)return n+'今天還沒有喝水紀錄，記得幫牠記一下';if(r>0)return n+'今天喝了 <b>'+wd.v+' ml</b>，再 <b>'+r+' ml</b> 就達標囉';}}
@@ -1260,9 +1267,9 @@ function metricCards(p){
   var w=petWater(p),e=petEx(p),fd=petFeed(p),cards=[];
   var card=function(cat,act,chartAct,label,icon,val,unit,sub,pct,extra){return '<div class="mc mc-'+cat+'" role="button" tabindex="0" data-act="'+act+'" aria-label="記錄'+label+'"><button class="hc-chart" data-act="'+chartAct+'" aria-label="查看'+label+'圖表">'+ico('chart',16)+'</button><span class="mlb"><span class="mic">'+ico(icon,17)+'</span>'+label+'</span><span class="mv"><b>'+val+'</b><small>'+unit+'</small></span><span class="msub">'+sub+'</span>'+(extra||'')+(pct!=null?'<span class="mbar2"><i style="width:'+pct+'%"></i></span>':'')+'</div>'};
   if(fd.on){var tk=dayTotals(p.id,'food','kcal',1)[0].v,en=petEnergy(p,fd),diff=en?en.target-tk:0;
-    cards.push(card('k','feedadd','feed','熱量','bowl',fmtKcal(tk),en?'/ '+en.target+' kcal':'kcal',en?(diff>=0?'還可以吃 '+diff+' kcal':'已超過 '+(-diff)+' kcal'):'先記錄體重',en?Math.min(100,Math.round(tk/en.target*100)):null))}
+    cards.push(card('k','feedadd','feed','熱量','bowl',fmtKcal(tk),en?'/ '+en.target+' kcal':'kcal',en?(diff>=0?'還可以吃 '+diff+' kcal':'已超過 '+(-diff)+' kcal'):kNoLbl(p),en?Math.min(100,Math.round(tk/en.target*100)):null))}
   if(w.on){var wd=waterDays(p,1)[0],tg=waterTarget(p);
-    cards.push(card('wa','wateradd','water','飲水','drop',wd.v,'ml',tg?'建議 '+tg.need[0]+'–'+tg.need[1]+' ml':'先記錄體重',tg?Math.min(100,Math.round(wd.v/tg.need[0]*100)):null,(wd.food||wd.add)?'<span class="msub">含食物 '+wd.food+(wd.add?'・加水 '+wd.add:'')+'</span>':''))}
+    cards.push(card('wa','wateradd','water','飲水','drop',wd.v,'ml',wNeedLbl(p,tg),tg?Math.min(100,Math.round(wd.v/tg.need[0]*100)):null,(wd.food||wd.add)?'<span class="msub">含食物 '+wd.food+(wd.add?'・加水 '+wd.add:'')+'</span>':''))}
   if(e.on){var te=dayTotals(p.id,'exercise','min',1)[0].v,wk=dayTotals(p.id,'exercise','min',7),avg=Math.round(wk.reduce(function(a,x){return a+x.v},0)/7);
     cards.push(card('ex','exadd','exercise','運動','run',te,'分鐘',e.goal?'目標 '+e.goal+' 分鐘':'近 7 天平均 '+avg+' 分',e.goal?Math.min(100,Math.round(te/e.goal*100)):null))}
   var pts=weightPoints(p.id);
@@ -1279,7 +1286,7 @@ function healthCardsHtml(p){
   }
   if(w.on){
     var wd=waterDays(p,1)[0],tw=wd.v,tg=waterTarget(p),pct=tg?Math.min(100,Math.round(tw/tg.need[0]*100)):0;
-    cards.push('<div class="hcard" role="button" tabindex="0" data-act="wateradd" aria-label="記錄飲水"><button class="hc-chart" data-act="water" aria-label="查看飲水圖表">'+ico('chart',18)+'</button><span class="lb">今日飲水</span><span class="kg">'+tw+'<small>ml</small></span><span class="sub">'+(tg?'建議 '+tg.need[0]+'–'+tg.need[1]+' ml':'先記錄體重')+'</span>'+(wd.food||wd.add?'<span class="sub">含食物 '+wd.food+(wd.add?'・加水 '+wd.add:'')+'</span>':'')+(tg?'<span class="mbar"><i style="width:'+pct+'%"></i></span>':'')+'</div>');
+    cards.push('<div class="hcard" role="button" tabindex="0" data-act="wateradd" aria-label="記錄飲水"><button class="hc-chart" data-act="water" aria-label="查看飲水圖表">'+ico('chart',18)+'</button><span class="lb">今日飲水</span><span class="kg">'+tw+'<small>ml</small></span><span class="sub">'+(wNeedLbl(p,tg))+'</span>'+(wd.food||wd.add?'<span class="sub">含食物 '+wd.food+(wd.add?'・加水 '+wd.add:'')+'</span>':'')+(tg?'<span class="mbar"><i style="width:'+pct+'%"></i></span>':'')+'</div>');
   }
   if(e.on){
     var te=dayTotals(p.id,'exercise','min',1)[0].v,epct=e.goal?Math.min(100,Math.round(te/e.goal*100)):0;
@@ -2193,12 +2200,14 @@ function openPetSheet(id,focus){
     '<div class="swrow"><span><b>來家紀念日</b><small>依來家日期顯示天數與週年倒數</small></span><span class="sw"><input type="checkbox" id="pf-ann" '+(p.showAnniv?'checked':'')+' aria-label="顯示來家紀念日"><i></i></span></div>'+
     '<h3 class="subh" id="pf-health">餵食、飲水與運動</h3>'+
     '<div class="swrow"><span><b>記錄餵食</b><small>首頁顯示今日熱量與建議量</small></span><span class="sw"><input type="checkbox" id="pf-feedon" '+(pf.on?'checked':'')+' aria-label="記錄餵食"><i></i></span></div>'+
-    '<div id="pf-fset" '+(pf.on?'':'hidden')+'><div><div class="field"><span class="lbl">目標</span><div class="seg" id="pf-goalw"><button type="button" data-v="keep" class="'+(pf.goal==='keep'?'on':'')+'">維持</button><button type="button" data-v="lose" class="'+(pf.goal==='lose'?'on':'')+'">減重</button><button type="button" data-v="gain" class="'+(pf.goal==='gain'?'on':'')+'">增重</button></div></div></div>'+
-    '<p class="about" id="pf-kcal" style="margin:0 0 6px"></p><small style="display:block;margin-bottom:6px">計算方式：靜息需求 RER = 70 × 體重<sup>0.75</sup>，再依年齡、結紮與目標乘上係數（成貓已結紮 1.2、未結紮 1.4、幼貓 2.5、熟齡貓 1.1、減重 0.8；成犬已結紮 1.6、未結紮 1.8、幼犬 2.0–3.0、熟齡犬 1.4、減重 1.0）。僅供參考，實際需求請依獸醫建議。</small></div>'+
+    '<div id="pf-fset" '+(pf.on?'':'hidden')+'><div id="pf-goalwrap"><div class="field"><span class="lbl">目標</span><div class="seg" id="pf-goalw"><button type="button" data-v="keep" class="'+(pf.goal==='keep'?'on':'')+'">維持</button><button type="button" data-v="lose" class="'+(pf.goal==='lose'?'on':'')+'">減重</button><button type="button" data-v="gain" class="'+(pf.goal==='gain'?'on':'')+'">增重</button></div></div></div>'+
+    '<div class="field"><label for="pf-kgoal">自訂每日熱量（kcal，選填）</label><input id="pf-kgoal" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 220" value="'+(pf.kcal||'')+'"><div class="hint" id="pf-kgoalhint">有獸醫建議的數字就填這裡，會取代公式算出的建議量。</div></div>'+
+    '<p class="about" id="pf-kcal" style="margin:0 0 6px"></p><small id="pf-kform" style="display:block;margin-bottom:6px">計算方式：靜息需求 RER = 70 × 體重<sup>0.75</sup>，再依年齡、結紮與目標乘上係數（成貓已結紮 1.2、未結紮 1.4、幼貓 2.5、熟齡貓 1.1、減重 0.8；成犬已結紮 1.6、未結紮 1.8、幼犬 2.0–3.0、熟齡犬 1.4、減重 1.0）。僅供參考，實際需求請依獸醫建議。</small></div>'+
     '<div class="swrow"><span><b>記錄飲水量</b><small>首頁顯示今日飲水與建議量</small></span><span class="sw"><input type="checkbox" id="pf-water" '+(pw.on?'checked':'')+' aria-label="記錄飲水量"><i></i></span></div>'+
     '<div id="pf-wset" '+(pw.on?'':'hidden')+'><div class="field"><label>餵食習慣</label><div class="seg" id="pf-feed">'+FEEDS.map(function(f){return '<button type="button" data-v="'+f[0]+'" class="'+(pw.feed===f[0]?'on':'')+'">'+f[1]+'</button>'}).join('')+'</div></div>'+
     '<div class="row3"><div class="field" data-food="dry"><label for="pf-dry">乾飼料 g／天</label><input id="pf-dry" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 60" value="'+(pw.dry||'')+'"></div><div class="field" data-food="wet"><label for="pf-wet">濕食 g／天</label><input id="pf-wet" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 85" value="'+(pw.wet||'')+'"></div><div class="field" data-food="fresh"><label for="pf-fresh">鮮食 g／天</label><input id="pf-fresh" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 150" value="'+(pw.fresh||'')+'"></div></div>'+
-    '<p class="about" id="pf-wcalc" style="margin:0 0 6px"></p><small style="display:block;margin-bottom:6px">有開「記錄餵食」時，會直接用每一餐實際吃的食物計算水分；這裡的食量只在沒開記錄餵食時用來估算。</small><small style="display:block;margin-bottom:6px">計算方式：每日需水量 = 體重 × '+(p.species==='狗'?'50–60':'40–60')+' ml；食物含水量以乾飼料 10%、濕食 75%、鮮食 70% 估算並扣除。僅供參考，實際需求請詢問獸醫。</small></div>'+
+    '<div class="field"><label for="pf-wgoal">自訂每日飲水目標（ml，選填）</label><input id="pf-wgoal" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 200" value="'+(pw.goal||'')+'"><div class="hint" id="pf-wgoalhint">有獸醫建議的數字就填這裡，會取代依體重算出的建議量。</div></div>'+
+    '<p class="about" id="pf-wcalc" style="margin:0 0 6px"></p><small style="display:block;margin-bottom:6px">有開「記錄餵食」時，會直接用每一餐實際吃的食物計算水分；這裡的食量只在沒開記錄餵食時用來估算。</small><small id="pf-wform" style="display:block;margin-bottom:6px">計算方式：每日需水量 = 體重 × <span id="pf-wrate">'+(p.species==='狗'?'50–60':'40–60')+'</span> ml；食物含水量以乾飼料 10%、濕食 75%、鮮食 70% 估算並扣除。僅供參考，實際需求請詢問獸醫。</small></div>'+
     '<div class="swrow"><span><b>記錄運動</b><small>首頁顯示今日運動時間</small></span><span class="sw"><input type="checkbox" id="pf-ex" '+(pe.on?'checked':'')+' aria-label="記錄運動"><i></i></span></div>'+
     '<div class="field" id="pf-exset" '+(pe.on?'':'hidden')+'><label for="pf-goal">每日運動目標（分鐘，選填）</label><input id="pf-goal" type="text" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="例如 30" value="'+(pe.goal||'')+'"></div>';
   var footer=(isNew?'':'<button class="btn danger" id="pf-del">刪除</button>')+'<button class="btn primary" id="pf-save">'+(isNew?'新增寵物':'儲存')+'</button>';
@@ -2211,23 +2220,29 @@ function openPetSheet(id,focus){
       file.value='';
     };
     var colorTouched=false;bindSeg($('#pf-color',el),function(){colorTouched=true});
-    bindSeg($('#pf-species',el),function(){paintW()});bindSeg($('#pf-gender',el));
-    function readF(){var o=Object.assign(petFeed(p),{on:$('#pf-feedon',el).checked,goal:segVal($('#pf-goalw',el))||'keep'});delete o.neutered;return o}
-    function readW(){var n=function(id){var v=parseInt(($('#'+id,el).value||'').replace(/[^0-9]/g,''),10);return v>0?v:0};return {on:$('#pf-water',el).checked,feed:segVal($('#pf-feed',el))||'dry',dry:n('pf-dry'),wet:n('pf-wet'),fresh:n('pf-fresh')}}
+    var hTouched=false;['pf-feedon','pf-water'].forEach(function(id){$('#'+id,el).addEventListener('change',function(){hTouched=true})});
+    bindSeg($('#pf-species',el),function(v){if(!hTouched){var on=v!=='其他';$('#pf-feedon',el).checked=on;$('#pf-water',el).checked=on}paintW()});bindSeg($('#pf-gender',el));
+    var numIn=function(id,max){var v=parseInt(($('#'+id,el).value||'').replace(/[^0-9]/g,''),10);return v>0?Math.min(v,max):0};
+    function readF(){var o=Object.assign(petFeed(p),{on:$('#pf-feedon',el).checked,goal:segVal($('#pf-goalw',el))||'keep',kcal:numIn('pf-kgoal',9999)});delete o.neutered;return o}
+    function readW(){var n=function(id){var v=parseInt(($('#'+id,el).value||'').replace(/[^0-9]/g,''),10);return v>0?v:0};return {on:$('#pf-water',el).checked,feed:segVal($('#pf-feed',el))||'dry',dry:n('pf-dry'),wet:n('pf-wet'),fresh:n('pf-fresh'),goal:numIn('pf-wgoal',9999)}}
     function paintW(){
       var w=readW(),show={dry:w.feed==='dry'||w.feed==='mixed',wet:w.feed==='wet'||w.feed==='mixed',fresh:w.feed==='fresh'};
       $$('[data-food]',el).forEach(function(f){f.hidden=!show[f.dataset.food]});
       $('#pf-wset',el).hidden=!w.on;$('#pf-exset',el).hidden=!$('#pf-ex',el).checked;
-      var tmp=Object.assign({},p,{species:segVal($('#pf-species',el))||p.species});
-      $('#pf-wcalc',el).innerHTML=isNew?'新增寵物並記錄體重後，就會算出建議飲水量。':waterTargetText(p,{tmp:tmp})+(readF().on?'':'<br>沒有記錄餵食，會用下面的每天食量估算食物水分：約 '+foodWater(w)+' ml／天。');
+      var sp=segVal($('#pf-species',el))||p.species,oth=sp==='其他',tmp=Object.assign({},p,{species:sp,water:w});
+      $('#pf-wform',el).hidden=oth;$('#pf-wrate',el).textContent=sp==='狗'?'50–60':'40–60';
+      $('#pf-wgoalhint',el).textContent=oth?'「其他」動物不會自動推算，填了才會顯示目標與進度。':'有獸醫建議的數字就填這裡，會取代依體重算出的建議量。';
+      $('#pf-wcalc',el).innerHTML=isNew&&!oth&&!w.goal?'新增寵物並記錄體重後，就會算出建議飲水量。':waterTargetText(p,{tmp:tmp})+(readF().on?'':'<br>沒有記錄餵食，會用下面的每天食量估算食物水分：約 '+foodWater(w)+' ml／天。');
       var fo=readF();$('#pf-fset',el).hidden=!fo.on;
       var tmp2=Object.assign({},tmp,{birthday:$('#pf-bd',el).value,neutered:segVal($('#pf-neut',el)),feeding:null});
-      $('#pf-kcal',el).innerHTML=isNew?'新增寵物並記錄體重後，就會算出每日建議熱量。':energyText(tmp2,fo);
+      $('#pf-goalwrap',el).hidden=oth||fo.kcal>0;$('#pf-kform',el).hidden=oth||fo.kcal>0;
+      $('#pf-kgoalhint',el).textContent=oth?'「其他」動物不會自動推算，填了才會顯示目標與進度。':'有獸醫建議的數字就填這裡，會取代公式算出的建議量。';
+      $('#pf-kcal',el).innerHTML=isNew&&!oth&&!fo.kcal?'新增寵物並記錄體重後，就會算出每日建議熱量。':energyText(tmp2,fo);
     }
     bindSeg($('#pf-feed',el),paintW);bindSeg($('#pf-neut',el),paintW);bindSeg($('#pf-goalw',el),paintW);
     $('#pf-feedon',el).addEventListener('change',paintW);$('#pf-bd',el).addEventListener('change',paintW);
     ['pf-water','pf-ex'].forEach(function(id){$('#'+id,el).addEventListener('change',paintW)});
-    ['pf-dry','pf-wet','pf-fresh'].forEach(function(id){$('#'+id,el).addEventListener('input',paintW)});
+    ['pf-dry','pf-wet','pf-fresh','pf-kgoal','pf-wgoal'].forEach(function(id){$('#'+id,el).addEventListener('input',paintW)});
     paintW();
     if(focus==='health')setTimeout(function(){var h=$('#pf-health',el);if(h)h.scrollIntoView({block:'start'})},250);
     $('#pf-name',el).oninput=function(){if(!p.photo)$('#pf-av',el).innerHTML=avatar({name:this.value},88)+'<span class="av-cam">'+ico('cam',16)+'</span>'};
