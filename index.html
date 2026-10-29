@@ -823,9 +823,9 @@ var DB={db:null,ok:false,
   })}
 };
 var warnedStore=false;
-function saved(ok){ if(ok&&!saved.quiet)lsSet('petnote.dirty',String(Date.now())); if(!ok&&!warnedStore){warnedStore=true;toast('目前無法永久儲存資料，關閉後可能消失')} }
+function saved(ok){ if(ok&&!saved.quiet){lsSet('petnote.dirty',String(Date.now()));if(typeof GDrive!=='undefined')GDrive.soon()} if(!ok&&!warnedStore){warnedStore=true;toast('目前無法永久儲存資料，關閉後可能消失')} }
 
-var S={backup:{since:0,last:0,every:30},foods:[],pets:[],logs:[],worms:[],vaccs:[],lib:[],groups:[],vOpen:{},tlLimit:30,tlPage:1,q:'',qAll:false,sel:null,tab:'home',filter:'all',year:new Date().getFullYear()};
+var S={backup:{since:0,last:0,every:30},tomb:{},libMt:0,foods:[],pets:[],logs:[],worms:[],vaccs:[],lib:[],groups:[],vOpen:{},tlLimit:30,tlPage:1,q:'',qAll:false,sel:null,tab:'home',filter:'all',year:new Date().getFullYear()};
 
 function newPet(){
   return {id:uid(),name:'',species:'貓',breed:'',gender:'未知',birthday:'',homeDate:'',photo:'',
@@ -885,25 +885,29 @@ function ensurePet(p){
   if(!Array.isArray(p.wormItems))p.wormItems=[];
   return p;
 }
-async function saveLib(){libDirty=false;saved(await DB.put('meta',{id:'vaccLib',items:S.lib}));saved(await DB.put('meta',{id:'vaccGroups',items:S.groups}));Notif.sync()}
+async function saveLib(keep){libDirty=false;if(!keep){S.libMt=Date.now()}saved(await DB.put('meta',{id:'vaccLib',items:S.lib,mt:S.libMt||0}));saved(await DB.put('meta',{id:'vaccGroups',items:S.groups,mt:S.libMt||0}));Notif.sync()}
+/* ---- 跨裝置同步用：每筆資料記修改時間（mt），刪除時留下標記（tomb） ---- */
+function stampMt(o,keep){if(!keep||!o.mt)o.mt=Date.now();return o}
+async function addTomb(keys){var t=Date.now();keys.forEach(function(k){S.tomb[k]=t});saved(await DB.put('meta',{id:'tomb',items:S.tomb}))}
 function upsert(arr,o){var i=arr.findIndex(function(x){return x.id===o.id});if(i<0)arr.push(o);else arr[i]=o}
-async function savePet(p){delete p._mig;upsert(S.pets,p);S.pets.sort(function(a,b){return a.created-b.created});saved(await DB.put('pets',p));Notif.sync()}
-async function saveLog(l){upsert(S.logs,l);saved(await DB.put('logs',l))}
-async function saveWorm(w){upsert(S.worms,w);saved(await DB.put('worms',w));Notif.sync()}
-async function saveVacc(v){upsert(S.vaccs,v);saved(await DB.put('vaccines',v));Notif.sync()}
+async function savePet(p,keep){delete p._mig;stampMt(p,keep);upsert(S.pets,p);S.pets.sort(function(a,b){return a.created-b.created});saved(await DB.put('pets',p));Notif.sync()}
+async function saveLog(l){stampMt(l);upsert(S.logs,l);saved(await DB.put('logs',l))}
+async function saveWorm(w){stampMt(w);upsert(S.worms,w);saved(await DB.put('worms',w));Notif.sync()}
+async function saveVacc(v){stampMt(v);upsert(S.vaccs,v);saved(await DB.put('vaccines',v));Notif.sync()}
 async function removePet(id){
   var ls=S.logs.filter(function(l){return l.petId===id}),ws=S.worms.filter(function(w){return w.petId===id}),vs=S.vaccs.filter(function(v){return v.petId===id});
   S.pets=S.pets.filter(function(p){return p.id!==id});
   S.logs=S.logs.filter(function(l){return l.petId!==id});S.worms=S.worms.filter(function(w){return w.petId!==id});S.vaccs=S.vaccs.filter(function(v){return v.petId!==id});
+  await addTomb(['pets:'+id].concat(ls.map(function(x){return 'logs:'+x.id}),ws.map(function(x){return 'worms:'+x.id}),vs.map(function(x){return 'vaccines:'+x.id})));
   await DB.del('pets',id);
   for(var i=0;i<ls.length;i++){await DB.del('logs',ls[i].id);await Photos.remove(ls[i].photos||[])}
   for(var j=0;j<ws.length;j++) await DB.del('worms',ws[j].id);
   for(var k=0;k<vs.length;k++) await DB.del('vaccines',vs[k].id);
   Notif.sync();
 }
-async function removeLog(id){var old=S.logs.filter(function(l){return l.id===id})[0];S.logs=S.logs.filter(function(l){return l.id!==id});await DB.del('logs',id);if(old)await Photos.remove(old.photos||[])}
-async function removeWorm(id){S.worms=S.worms.filter(function(w){return w.id!==id});await DB.del('worms',id);Notif.sync()}
-async function removeVacc(id){S.vaccs=S.vaccs.filter(function(v){return v.id!==id});await DB.del('vaccines',id);Notif.sync()}
+async function removeLog(id){await addTomb(['logs:'+id]);var old=S.logs.filter(function(l){return l.id===id})[0];S.logs=S.logs.filter(function(l){return l.id!==id});await DB.del('logs',id);if(old)await Photos.remove(old.photos||[])}
+async function removeWorm(id){await addTomb(['worms:'+id]);S.worms=S.worms.filter(function(w){return w.id!==id});await DB.del('worms',id);Notif.sync()}
+async function removeVacc(id){await addTomb(['vaccines:'+id]);S.vaccs=S.vaccs.filter(function(v){return v.id!==id});await DB.del('vaccines',id);Notif.sync()}
 var curPet=function(){return S.pets.filter(function(p){return p.id===S.sel})[0]||null};
 var wid=function(pid,m,item){return pid+'|'+m+'|'+item};
 
@@ -1217,7 +1221,14 @@ function petFeed(p){
   delete fd.menu;return fd;
 }
 function foodGet(id){return id?S.foods.filter(function(f){return f.id===id})[0]:null}
-async function saveFoods(){saved(await DB.put('meta',{id:'foods',items:S.foods}))}
+var foodSnap={};
+function foodKey(f){var c=Object.assign({},f);delete c.mt;return JSON.stringify(c)}
+function snapFoods(){foodSnap={};S.foods.forEach(function(f){foodSnap[f.id]=foodKey(f)})}
+async function saveFoods(keep){
+  if(!keep){var now=Date.now(),gone=Object.keys(foodSnap).filter(function(id){return !S.foods.some(function(f){return f.id===id})});
+    S.foods.forEach(function(f){if(foodSnap[f.id]!==foodKey(f))f.mt=now});
+    if(gone.length)await addTomb(gone.map(function(id){return 'foods:'+id}))}
+  snapFoods();saved(await DB.put('meta',{id:'foods',items:S.foods}))}
 function gaKcal100(g){if(!g)return 0;var p=+g.p||0,f=+g.f||0,fib=+g.fib||0,m=+g.m||0,a=+g.ash||0,nfe=Math.max(0,100-p-f-fib-m-a);return Math.round(3.5*p+8.5*f+3.5*nfe)}
 function kcalPerG(f){
   if(!f)return null;
@@ -1401,7 +1412,7 @@ async function runFeeder(){
           if(t<=from||t>now)continue;var k=ymd(d);
           if(S.logs.some(function(l){return l.petId===p.id&&l.type==='food'&&l.auto&&l.meal===m.label&&ymd(new Date(l.ts))===k}))continue;
           var its=mealCalc(m);if(!its.length)continue;var c=calcMeal(its,0,m.addw,'0',null);
-          await saveLog({id:uid(),petId:p.id,type:'food',custom:'',ts:t,note:'',photos:[],meal:m.label,items:its,addw:+m.addw||0,left:'0',kcal:c.kcal,wml:c.wml,fw:c.fw,auto:true});made++;
+          await saveLog({id:'auto_'+p.id+'_'+k+'_'+mi+'_'+m.label,petId:p.id,type:'food',custom:'',ts:t,note:'',photos:[],meal:m.label,items:its,addw:+m.addw||0,left:'0',kcal:c.kcal,wml:c.wml,fw:c.fw,auto:true});made++;
         }
       }
       var src=S.pets.filter(function(x){return x.id===p.id})[0];src.feeding=Object.assign(petFeed(src),{autoUpTo:now});await savePet(src);
@@ -2114,10 +2125,12 @@ function alertsAll(now){
       if(names.length)out.push({tone:'warn',pid:p.id,tab:'deworm',text:p.name+'・本月驅蟲待辦：'+names.join('、')});
     }
   });
-  if(S.pets.length&&S.backup.every){
+  if(typeof GDrive!=='undefined'&&GDrive.needsTap())out.push({tone:'warn',act:'gdsync',text:'雲端同步暫停中（Google 登入已過期），點這裡繼續同步'});
+  else if(S.pets.length&&S.backup.every){
     var od=backupOverdueDays();
     if(od>=0){var since=dayDiff(today(),new Date(new Date(backupBase()).setHours(0,0,0,0)));
-      out.push({tone:'warn',act:'exportnow',text:S.backup.last?'已經 '+since+' 天沒備份了，點這裡匯出備份':'還沒備份過資料，點這裡匯出備份'});}
+      if(typeof GDrive!=='undefined'&&GDrive.syncOn())out.push({tone:'warn',act:'gdsync',text:'已經 '+since+' 天沒同步到雲端了，點這裡同步'});
+      else out.push({tone:'warn',act:'exportnow',text:S.backup.last?'已經 '+since+' 天沒備份了，點這裡匯出備份':'還沒備份過資料，點這裡匯出備份'});}
   }
   return out;
 }
@@ -2201,8 +2214,10 @@ function viewMore(){
     return '<button class="lrow" data-act="libedit" data-name="'+esc(l.name)+'"><span class="grow"><b>'+esc(l.name)+'</b><small style="display:block">'+(g?'群組：'+esc(g.name):'獨立・'+everyLabel(l.every)+'・'+remindLabel(l.remind)+(users.length?'　'+users.map(esc).join('、'):''))+'</small></span>'+ico('cr',18)+'</button>';
   }).join('')+'<button class="lrow" data-act="libedit"><span class="av" style="--s:40px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增疫苗</b><small style="display:block">建立後，新增施打紀錄時直接點選</small></span></button></div></div>';
   h+='<div class="sechead">手機通知</div><div class="card"><p class="about" id="notifTxt" style="margin:0">檢查中…</p><div id="notifBtns"></div></div>';
-  h+='<div class="sechead" id="cloudSec" hidden>Google 雲端硬碟備份</div><div class="card" id="cloudBox" hidden></div>';
-  h+='<div class="sechead">資料備份</div><div class="card"><p class="about" id="bkTxt" style="margin:0 0 10px;font-weight:600;color:var(--ink)"></p><div class="actions"><button class="btn" data-act="export">匯出備份</button><label class="btn" for="importFile" role="button" tabindex="0" style="cursor:pointer">匯入備份</label></div><p class="about" id="storeTxt" style="margin-bottom:0"></p><div class="field" style="margin:12px 0 0"><label for="bk-every">備份提醒</label><select id="bk-every">'+bkOptsHtml()+'</select><div id="bkCustom" style="display:'+(bkIsCustom()?'flex':'none')+';align-items:center;gap:8px;margin-top:8px">每<input id="bk-days" type="text" inputmode="numeric" maxlength="3" autocomplete="off" value="'+(S.backup.every||30)+'" style="width:90px;text-align:center">天提醒一次</div><div class="hint">超過這段時間沒匯出，首頁會出現提醒'+(isNative()?'，並在早上 9:00 跳通知':'')+'。</div></div><p class="about">資料只存在這支手機（或這個瀏覽器）裡。換手機、重新安裝或清除瀏覽器資料前，請先匯出備份檔並存到雲端硬碟。匯入時會與現有資料合併。</p></div>';
+  var cloudOn=GDrive.syncOn();
+  h+='<div class="sechead">資料備份與同步</div><div class="card" id="cloudBox" hidden style="margin-bottom:12px"></div>';
+  if(cloudOn)h+='<div class="card"><div class="cardhead" style="margin-bottom:6px"><h2>備份檔案</h2></div><p class="about" style="margin:0 0 10px">資料已經會自動同步到 Google 雲端硬碟。想另外留一份檔案長期保存（例如存在電腦），可以在這裡匯出；匯入時會和現有資料合併。</p><div class="actions"><button class="btn" data-act="export">匯出備份</button><label class="btn" for="importFile" role="button" tabindex="0" style="cursor:pointer">匯入備份</label></div><p class="about" id="storeTxt" style="margin-bottom:0"></p></div>';
+  else h+='<div class="card"><p class="about" id="bkTxt" style="margin:0 0 10px;font-weight:600;color:var(--ink)"></p><div class="actions"><button class="btn" data-act="export">匯出備份</button><label class="btn" for="importFile" role="button" tabindex="0" style="cursor:pointer">匯入備份</label></div><p class="about" id="storeTxt" style="margin-bottom:0"></p><div class="field" style="margin:12px 0 0"><label for="bk-every">備份提醒</label><select id="bk-every">'+bkOptsHtml()+'</select><div id="bkCustom" style="display:'+(bkIsCustom()?'flex':'none')+';align-items:center;gap:8px;margin-top:8px">每<input id="bk-days" type="text" inputmode="numeric" maxlength="3" autocomplete="off" value="'+(S.backup.every||30)+'" style="width:90px;text-align:center">天提醒一次</div><div class="hint">超過這段時間沒匯出，首頁會出現提醒'+(isNative()?'，並在早上 9:00 跳通知':'')+'。</div></div><p class="about">資料只存在這支手機（或這個瀏覽器）裡。換手機、重新安裝或清除瀏覽器資料前，請先匯出備份檔並存到雲端硬碟。匯入時會與現有資料合併。</p></div>';
   if(!isNative()){
     var au=apkUrl();
     h+='<div class="sechead">在其他手機使用</div><div class="card"><p class="about" style="margin:0"><b>iPhone</b>：用 Safari 打開這個網址，點下方「分享」→「加入主畫面」，就會像 App 一樣有圖示。<br><b>Android</b>：用 Chrome 打開，點右上角選單 →「加到主畫面」。'+(au?'也可以安裝 App 版，會在早上跳出提醒通知。':'')+'</p>'+
@@ -2901,36 +2916,143 @@ var GDrive=(function(){
   // 自動備份：有改過資料、距離上次雲端備份超過 12 小時，就在背景上傳（網頁版只在登入還有效時）
   async function autoTick(){
     var s=st();if(!s.email||s.auto===false||busy)return;
-    var dirty=+lsGet('petnote.dirty')||0;if(dirty<=(s.last||0)||Date.now()-(s.last||0)<12*36e5)return;
+    var dirty=+lsGet('petnote.dirty')||0;if(dirty<=(s.last||0)||Date.now()-(s.last||0)<(s.sync!==false?3*864e5:12*36e5))return;
     if(!isNative()&&!(s.tok&&s.exp>Date.now()+120000))return;
     try{if(await backup({quiet:true}))paintCloud()}catch(e){}
   }
-  return {available:available,linked:linked,st:st,put:put,token:token,takeRedirect:takeRedirect,link:link,backup:backup,restore:restore,unlink:unlink,autoTick:autoTick,findFile:findFile};
+  /* ---------- 跨裝置同步 ----------
+     雲端：petnote-sync.json（所有紀錄＋刪除標記，不含照片）＋每張照片一個檔案（ph_xxx）。
+     合併：同一筆以修改時間較新的為準；刪除標記比紀錄新就刪掉。合併後兩邊都更新成同一份。 */
+  var SYNC='petnote-sync.json',STORES=[['pets','pets','pets'],['logs','logs','logs'],['worms','worms','worms'],['vaccines','vaccines','vaccs']],syncing=null,syncTimer=null;
+  async function findName(name){
+    var r=await api('/drive/v3/files?spaces=appDataFolder&fields='+encodeURIComponent('files(id,modifiedTime,size,version)')+'&q='+encodeURIComponent("name='"+name+"' and trashed=false"),{});
+    return ((await r.json()).files||[])[0]||null;
+  }
+  async function listPhotos(){
+    var out={},pt='';
+    do{var r=await api('/drive/v3/files?spaces=appDataFolder&pageSize=1000&fields='+encodeURIComponent('nextPageToken,files(id,name)')+'&q='+encodeURIComponent("name contains 'ph_' and trashed=false")+(pt?'&pageToken='+encodeURIComponent(pt):''),{});
+      var j=await r.json();(j.files||[]).forEach(function(f){if(f.name.indexOf('ph_')===0)out[f.name]=f.id});pt=j.nextPageToken||''}while(pt);
+    return out;
+  }
+  async function uploadSmall(name,body,type,fileId){
+    if(fileId)return (await api('/upload/drive/v3/files/'+fileId+'?uploadType=media&fields=id,version',{method:'PATCH',headers:{'Content-Type':type},body:body})).json();
+    var b='petnote'+Math.random().toString(36).slice(2);
+    var blob=new Blob(['--'+b+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify({name:name,parents:['appDataFolder']})+'\r\n--'+b+'\r\nContent-Type: '+type+'\r\n\r\n',body,'\r\n--'+b+'--'],{type:'multipart/related; boundary='+b});
+    return (await api('/upload/drive/v3/files?uploadType=multipart&fields=id,version',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body:blob})).json();
+  }
+  function localDoc(){
+    var d={app:'petnote',sync:1,tomb:Object.assign({},S.tomb),foods:S.foods,lib:{mt:S.libMt||0,items:S.lib,groups:S.groups}};
+    STORES.forEach(function(x){d[x[0]]=S[x[2]]});return d;
+  }
+  function merge(L,R){
+    var M={app:'petnote',sync:1,tomb:Object.assign({},L.tomb)},cut=Date.now()-400*864e5;
+    Object.keys(R.tomb||{}).forEach(function(k){if((R.tomb[k]||0)>(M.tomb[k]||0))M.tomb[k]=R.tomb[k]});
+    Object.keys(M.tomb).forEach(function(k){if(M.tomb[k]<cut)delete M.tomb[k]});
+    STORES.map(function(x){return x[0]}).concat(['foods']).forEach(function(k){
+      var map={},order=[];
+      (L[k]||[]).forEach(function(r){if(r&&r.id){map[r.id]=r;order.push(r.id)}});
+      (R[k]||[]).forEach(function(r){if(!r||!r.id)return;var c=map[r.id];if(!c){map[r.id]=r;order.push(r.id)}else if((r.mt||0)>(c.mt||0))map[r.id]=r});
+      M[k]=order.map(function(id){return map[id]}).filter(function(r){var t=M.tomb[k+':'+r.id];return !(t&&t>=(r.mt||0))});
+    });
+    M.lib=R.lib&&(R.lib.mt||0)>(L.lib.mt||0)?R.lib:L.lib;
+    return M;
+  }
+  async function applyLocal(M){
+    var changed=false,i;
+    for(var si=0;si<STORES.length;si++){
+      var x=STORES[si],arr=S[x[2]],have={},keep={};
+      arr.forEach(function(r){have[r.id]=r});
+      for(i=0;i<M[x[0]].length;i++){var r=M[x[0]][i];keep[r.id]=1;var c=have[r.id];
+        if(!c||(c.mt||0)!==(r.mt||0)||(!c.mt&&!r.mt&&JSON.stringify(c)!==JSON.stringify(r))){if(x[0]==='pets')ensurePet(r);delete r._mig;upsert(arr,r);await DB.put(x[1],r);changed=true}}
+      var gone=arr.filter(function(r){return !keep[r.id]});
+      for(i=0;i<gone.length;i++){var g=gone[i];arr.splice(arr.indexOf(g),1);await DB.del(x[1],g.id);if(x[0]==='logs'){var still=(g.photos||[]).filter(function(ph){return !S.logs.some(function(l){return (l.photos||[]).indexOf(ph)>=0})});await Photos.remove(still)}changed=true}
+    }
+    if(JSON.stringify(M.foods)!==JSON.stringify(S.foods)){S.foods=M.foods;snapFoods();await DB.put('meta',{id:'foods',items:S.foods});changed=true}
+    if((M.lib.mt||0)!==(S.libMt||0)){S.lib=M.lib.items||[];S.groups=M.lib.groups||[];S.libMt=M.lib.mt||0;await DB.put('meta',{id:'vaccLib',items:S.lib,mt:S.libMt});await DB.put('meta',{id:'vaccGroups',items:S.groups,mt:S.libMt});changed=true}
+    if(JSON.stringify(M.tomb)!==JSON.stringify(S.tomb)){S.tomb=M.tomb;await DB.put('meta',{id:'tomb',items:S.tomb})}
+    S.pets.sort(function(a,b){return a.created-b.created});
+    if(!curPet()){S.sel=S.pets.length?S.pets[0].id:null;lsSet('petnote.sel',S.sel||'');if(typeof applyPetTheme==='function')applyPetTheme()}
+    return changed;
+  }
+  async function syncPhotos(M,progress){
+    var need={},rem=await listPhotos(),haveArr=await DB.keys('photos'),have={},up=[],down=[],del=[];
+    M.logs.forEach(function(l){(l.photos||[]).forEach(function(p){if(Photos.isId(p))need[p]=1})});
+    haveArr.forEach(function(k){have[k]=1});
+    Object.keys(need).forEach(function(id){if(have[id]&&!rem[id])up.push(id);else if(!have[id]&&rem[id])down.push(id)});
+    Object.keys(rem).forEach(function(n){if(!need[n])del.push(rem[n])});
+    var total=up.length+down.length,done=0,i;
+    for(i=0;i<up.length;i++){var data=await Photos.full(up[i]);if(data)await uploadSmall(up[i],data,'text/plain');if(progress)progress(++done,total)}
+    for(i=0;i<down.length;i++){var r=await api('/drive/v3/files/'+rem[down[i]]+'?alt=media',{});var t=await r.text();if(t.indexOf('data:')===0)await Photos.put(down[i],t);if(progress)progress(++done,total)}
+    for(i=0;i<del.length;i++){try{await api('/drive/v3/files/'+del[i],{method:'DELETE'})}catch(e){}}
+    return down.length>0;
+  }
+  async function sync(opt){
+    opt=opt||{};
+    if(syncing)return syncing;
+    syncing=(async function(){
+      if(!await token(!!opt.interactive,'sync'))throw new Error('needlogin');
+      var startDirty=+lsGet('petnote.dirty')||0;
+      var f=await findName(SYNC),R=null,s0=st();
+      if(f&&!opt.force&&s0.rver&&String(f.version)===String(s0.rver)&&startDirty<=(s0.syncedDirty||0)){put({synced:Date.now()});return {changed:false}}
+      if(f){var r=await api('/drive/v3/files/'+f.id+'?alt=media',{});try{R=await r.json()}catch(e){R=null}}
+      var L=localDoc(),M=merge(L,R&&R.app==='petnote'?R:{tomb:{}, lib:{mt:-1}});
+      var changed=await applyLocal(M);
+      var photosIn=await syncPhotos(M,opt.progress||null);
+      var out=localDoc(),rver=f&&f.version;
+      if(!R||fp(R)!==fp(out)){var u=await uploadSmall(SYNC,JSON.stringify(out),'application/json',f&&f.id);rver=u&&u.version}
+      put({synced:Date.now(),syncedDirty:startDirty,rver:rver});
+      S.backup.last=Date.now();await saveBackupMeta();
+      if(changed||photosIn){Notif.sync();if(!Layers.length)render()}
+      return {changed:changed||photosIn};
+    })();
+    try{return await syncing}finally{syncing=null}
+  }
+  function fp(d){
+    var o=[];STORES.map(function(x){return x[0]}).concat(['foods']).forEach(function(k){o.push(k+'='+(d[k]||[]).map(function(r){return r.id+'@'+(r.mt||0)}).sort().join(','))});
+    o.push('tomb='+Object.keys(d.tomb||{}).sort().map(function(k){return k+'@'+d.tomb[k]}).join(','));o.push('lib='+((d.lib&&d.lib.mt)||0));return o.join('|');
+  }
+  function syncOn(){var s=st();return !!s.email&&s.sync!==false}
+  function canSilent(){var s=st();return isNative()||(s.tok&&s.exp>Date.now()+120000)}
+  function needsTap(){var s=st();if(!syncOn()||canSilent())return false;var dirty=+lsGet('petnote.dirty')||0;return dirty>(s.syncedDirty||0)||Date.now()-(s.synced||0)>6*36e5}
+  function quiet(){if(!syncOn()||!canSilent())return;if(syncing){again=true;return}sync({quiet:true}).then(function(){paintCloud();if(again){again=false;soon()}}).catch(function(){})}
+  var again=false;
+  function soon(){if(!syncOn())return;clearTimeout(syncTimer);syncTimer=setTimeout(quiet,1500)}
+  return {available:available,linked:linked,st:st,put:put,token:token,takeRedirect:takeRedirect,link:link,backup:backup,restore:restore,unlink:unlink,autoTick:autoTick,findFile:findFile,
+    sync:sync,syncOn:syncOn,needsTap:needsTap,quiet:quiet,soon:soon,findName:findName};
 })();
 function fmtWhen(t){var d=new Date(t),ago=dayDiff(today(),new Date(d.getFullYear(),d.getMonth(),d.getDate()));return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+'（'+(ago===0?'今天':ago===1?'昨天':ago+' 天前')+'）'}
 function fmtSize(b){return b>=1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB'}
 async function paintCloud(){
   var box=$('#cloudBox');if(!box)return;
-  if(!await GDrive.available()){var sec=$('#cloudSec');if(sec)sec.hidden=true;box.hidden=true;return}
+  if(!await GDrive.available()){box.hidden=true;return}
   var s=GDrive.st();box=$('#cloudBox');if(!box)return;
-  var sec2=$('#cloudSec');if(sec2)sec2.hidden=false;box.hidden=false;
+  box.hidden=false;
   if(!s.email){
-    box.innerHTML='<p class="about" style="margin:0 0 10px">連結 Google 帳號後，備份會存到你自己的 Google 雲端硬碟（App 專用的隱藏資料夾，不會看到你其他檔案）。換手機、從 Android 換到 iPhone，登入同一個帳號就能還原。</p><button class="btn primary block" data-act="gdlink">'+GICON+'連結 Google 帳號</button>';
+    box.innerHTML='<p class="about" style="margin:0 0 10px">連結 Google 帳號後，資料會存到你自己的 Google 雲端硬碟（App 專用的隱藏資料夾，不會看到你其他檔案），並在手機、平板、iPhone、電腦之間自動同步。換手機時登入同一個帳號，資料就會回來。</p><button class="btn primary block" data-act="gdlink">'+GICON+'連結 Google 帳號</button>';
     return;
   }
-  box.innerHTML='<div class="swrow" style="border-top:0;padding-top:0"><span><b>'+esc(s.email)+'</b><small>'+(s.last?'上次上傳：'+fmtWhen(s.last):(s.remote?'雲端已有備份：'+fmtWhen(s.remote):'雲端還沒有備份'))+(s.remoteSize?'・'+fmtSize(s.remoteSize):'')+'</small></span></div>'+
-    '<div class="actions" style="margin-top:4px"><button class="btn primary" data-act="gdbackup">立即備份</button><button class="btn" data-act="gdrestore">從雲端還原</button></div>'+
-    '<div class="swrow"><span><b>自動備份</b><small>'+(isNative()?'資料有變動時，每 12 小時自動上傳一次':'資料有變動、而且最近一小時內有登入過時自動上傳；其他時候請按「立即備份」')+'</small></span><span class="sw"><input type="checkbox" id="gdAuto" '+(s.auto!==false?'checked':'')+' aria-label="自動備份"><i></i></span></div>'+
+  var on=s.sync!==false;
+  box.innerHTML='<div class="swrow" style="border-top:0;padding-top:0"><span><b>'+esc(s.email)+'</b><small>'+(on?(s.synced?'上次同步：'+fmtWhen(s.synced):'還沒同步過'):'自動同步已關閉')+'</small></span></div>'+
+    '<div class="actions" style="margin-top:4px"><button class="btn primary" data-act="gdsync">立即同步</button><button class="btn" data-act="gdrestore">從備份還原</button></div>'+
+    '<div class="swrow"><span><b>自動同步</b><small>'+(isNative()?'打開 App、修改資料後會自動和其他裝置同步':'登入有效時（約 1 小時）會自動同步；過期後首頁會提示，點一下就能繼續')+'</small></span><span class="sw"><input type="checkbox" id="gdAuto" '+(on?'checked':'')+' aria-label="自動同步"><i></i></span></div>'+
+    '<div class="swrow"><span><b>完整備份</b><small>'+(s.last?'上次：'+fmtWhen(s.last)+(s.remoteSize?'・'+fmtSize(s.remoteSize):''):'還沒有完整備份')+'。'+(on?'另外每 3 天自動存一份（含照片），萬一同步出錯可以還原。':'')+'</small></span><button class="btn" data-act="gdbackup" style="min-height:40px;flex:none">立即備份</button></div>'+
     '<button class="btn block" data-act="gdunlink" style="margin-top:6px">取消連結</button>';
-  var au=$('#gdAuto');if(au)au.onchange=function(){GDrive.put({auto:au.checked});toast(au.checked?'已開啟自動備份':'已關閉自動備份')};
+  var au=$('#gdAuto');if(au)au.onchange=function(){GDrive.put({auto:au.checked,sync:au.checked});toast(au.checked?'已開啟自動同步':'已關閉自動同步');render();if(au.checked)GDrive.quiet()};
 }
 var GICON='<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true" style="background:#fff;border-radius:50%;padding:2px"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.2l7.8 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.8c4.3-4 6.9-9.9 6.9-17.2z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.8c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.8 6.1C6.6 42.6 14.6 48 24 48z"/></svg>';
 function gdErrMsg(e){var m=String(e&&e.message||e);if(/canceled|CANCELED/i.test(m))return '';if(m==='noconfig')return '網頁版還沒設定 Google 登入';if(e&&e.status===403)return 'Google 拒絕存取（403），請取消連結後重新連結';if(/Failed to fetch|NetworkError|network/i.test(m))return '連不上 Google，請確認網路';return '發生問題：'+m.slice(0,80)}
+async function runSync(interactive){
+  Busy.show('正在和 Google 雲端硬碟同步…');
+  try{await GDrive.sync({interactive:interactive,force:true,progress:function(i,n){Busy.show('正在同步照片 '+i+' / '+n+' 張…')}})}finally{Busy.hide()}
+  await paintCloud();if(!Layers.length)render();
+}
 async function gdAction(kind){
   try{
-    if(kind==='link'){var f=await GDrive.link();await paintCloud();
-      if(f&&(+f.size||0)>0&&!S.pets.length){if(await confirmDlg('雲端硬碟裡已經有備份（'+fmtWhen(Date.parse(f.modifiedTime))+'）。要現在還原到這支手機嗎？','還原'))return gdAction('restore')}
-      else if(f)toast('已連結，雲端已有備份');else toast('已連結 Google 帳號');return}
+    if(kind==='link'){var f=await GDrive.link();GDrive.put({sync:true,auto:true});await paintCloud();
+      var sd=null;try{sd=await GDrive.findName('petnote-sync.json')}catch(e){}
+      if(!sd&&f&&(+f.size||0)>0&&!S.pets.length&&await confirmDlg('雲端硬碟裡有一份備份（'+fmtWhen(Date.parse(f.modifiedTime))+'）。要先還原到這支手機嗎？','還原')){var bf=await GDrive.restore();if(bf)await importData(bf)}
+      await runSync(true);render();toast(sd?'已連結，資料已和其他裝置同步':'已連結，之後會自動同步');return}
+    if(kind==='sync'){await runSync(true);toast('已同步');return}
     if(kind==='backup'){Busy.show('正在備份到 Google 雲端硬碟…');try{await GDrive.backup({interactive:true})}finally{Busy.hide()}await paintCloud();toast('已備份到 Google 雲端硬碟');return}
     if(kind==='restore'){var file=await GDrive.restore();if(!file){await infoDlg('Google 雲端硬碟裡還沒有伴獸筆記的備份。\n請先在原本的手機按「立即備份」。');return}await importData(file);await paintCloud();return}
   }catch(e){Busy.hide();var m=gdErrMsg(e);if(m)toast(m)}
@@ -3171,8 +3293,9 @@ document.addEventListener('click',function(e){
   else if(a==='export')exportData();
   else if(a==='gdlink')gdAction('link');
   else if(a==='gdbackup')gdAction('backup');
+  else if(a==='gdsync')gdAction('sync');
   else if(a==='gdrestore')gdAction('restore');
-  else if(a==='gdunlink'){confirmDlg('取消連結 Google 帳號？\n雲端硬碟裡的備份會保留，之後重新連結就能還原。','取消連結').then(async function(ok){if(!ok)return;await GDrive.unlink();await paintCloud();toast('已取消連結')})}
+  else if(a==='gdunlink'){confirmDlg('取消連結 Google 帳號？\n這支手機上的資料會保留，但不再和其他裝置同步；雲端硬碟裡的資料也會保留，之後重新連結就會繼續同步。','取消連結').then(async function(ok){if(!ok)return;await GDrive.unlink();render();toast('已取消連結')})}
   else if(a==='vaccadd')openVaccSheet(t.dataset.item);
   else if(a==='vaccedit')openVaccSheet(null,t.dataset.id);
   else if(a==='vaccset')openVaccSettings();
@@ -3227,7 +3350,7 @@ document.addEventListener('click',function(e){if(e.target.closest('label[for=imp
 document.addEventListener('visibilitychange',function(){
   if(document.hidden||Layers.length||Busy.el)return;
   if(pickingFile&&Date.now()-pickingFile<120000){pickingFile=0;return}
-  render();Updater.check(false);feederTick();GDrive.autoTick();
+  render();Updater.check(false);feederTick();GDrive.quiet();GDrive.autoTick();
 });
 function applyTheme(){
   var v=lsGet('petnote.theme'),r=document.documentElement;
@@ -3244,22 +3367,26 @@ function applyTheme(){
   var metas=await DB.all('meta');
   var bm=metas.filter(function(m){return m.id==='backup'})[0];
   if(bm){S.backup={since:bm.since||Date.now(),last:bm.last||0,every:bm.every==null?30:bm.every}}else{S.backup={since:Date.now(),last:0,every:30};await DB.put('meta',Object.assign({id:'backup'},S.backup))}
-  var fm=metas.filter(function(m){return m.id==='foods'})[0];S.foods=fm&&Array.isArray(fm.items)?fm.items:[];
+  var fm=metas.filter(function(m){return m.id==='foods'})[0];S.foods=fm&&Array.isArray(fm.items)?fm.items:[];snapFoods();
+  var tm=metas.filter(function(m){return m.id==='tomb'})[0];S.tomb=tm&&tm.items||{};
   var meta=metas.filter(function(m){return m.id==='vaccLib'})[0],gmeta=metas.filter(function(m){return m.id==='vaccGroups'})[0];
   if(meta&&Array.isArray(meta.items)){
-    S.lib=meta.items;
+    S.lib=meta.items;S.libMt=meta.mt||0;
     if(gmeta&&Array.isArray(gmeta.items))S.groups=gmeta.items;else autoGroup();
   }else{S.lib=JSON.parse(JSON.stringify(DEFAULT_LIB));S.groups=JSON.parse(JSON.stringify(DEFAULT_GROUPS));libDirty=true}
   S.pets.forEach(ensurePet);
-  if(libDirty)await saveLib();
-  for(var mi=0;mi<S.pets.length;mi++){if(S.pets[mi]._mig)await savePet(S.pets[mi])}
+  if(libDirty)await saveLib(true);
+  for(var mi=0;mi<S.pets.length;mi++){if(S.pets[mi]._mig)await savePet(S.pets[mi],true)}
   var s=lsGet('petnote.sel');S.sel=(S.pets.filter(function(p){return p.id===s})[0]||S.pets[0]||{}).id||null;
   if(S.logs.some(function(l){return (l.photos||[]).some(function(p){return !Photos.isId(p)})})){S.tab='timeline';await migratePhotos();S.tab='home'}
   var gdRet=GDrive.takeRedirect();
   render();Notif.sync();animEnter();
   feederTick();
-  if(gdRet){if(gdRet.error){if(gdRet.error!=='access_denied')toast('Google 登入沒有完成，請再試一次')}else{S.tab='more';render();setTimeout(function(){gdAction(gdRet.intent==='backup'||gdRet.intent==='restore'?gdRet.intent:'link')},300)}}
-  else setTimeout(function(){GDrive.autoTick()},4000);
+  if(gdRet){if(gdRet.error){if(gdRet.error!=='access_denied')toast('Google 登入沒有完成，請再試一次')}else{S.tab='more';render();setTimeout(function(){gdAction(gdRet.intent==='backup'||gdRet.intent==='restore'||gdRet.intent==='sync'?gdRet.intent:'link')},300)}}
+  else{setTimeout(function(){GDrive.quiet()},1500);setTimeout(function(){GDrive.autoTick()},6000)}
+  setInterval(function(){if(!document.hidden)GDrive.quiet()},10000);
+  window.addEventListener('focus',function(){GDrive.quiet()});window.addEventListener('online',function(){GDrive.quiet()});
+  if(/[?&]pntest=1/.test(location.search))window.__pn={S:S,saveFoods:saveFoods,saveLib:saveLib,saveLog:saveLog,removeLog:removeLog,savePet:savePet,removePet:removePet,saveWorm:saveWorm,Photos:Photos,GDrive:GDrive,uid:uid,render:render};
   setTimeout(function(){Updater.check(false)},2500);
   if(!DB.ok)toast('目前無法永久儲存資料');
   else{var lv=lsGet('petnote.ver');if(lv&&lv!==APP_VERSION)toast('已更新到 '+APP_VERSION+' 版，資料都還在');lsSet('petnote.ver',APP_VERSION)}

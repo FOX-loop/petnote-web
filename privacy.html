@@ -72,14 +72,14 @@ a{color:var(--primary)}
 </section>
 
 <section>
-<h2>5. Google 雲端硬碟備份（選用）</h2>
+<h2>5. Google 雲端硬碟同步與備份（選用）</h2>
 <p>你可以在「設定 → Google 雲端硬碟備份」連結自己的 Google 帳號。連結時，App 只會向 Google 要求兩項權限：</p>
 <ul>
-<li><b>雲端硬碟中「伴獸筆記專用的隱藏資料夾」</b>（drive.appdata）：只能讀寫伴獸筆記自己建立的備份檔，<b>看不到、也不會讀取你雲端硬碟裡的其他檔案</b>。</li>
+<li><b>雲端硬碟中「伴獸筆記專用的隱藏資料夾」</b>（drive.appdata）：只能讀寫伴獸筆記自己建立的同步與備份檔案，<b>看不到、也不會讀取你雲端硬碟裡的其他檔案</b>。</li>
 <li><b>你的 Email 地址</b>：只用來在設定頁顯示目前連結的帳號。</li>
 </ul>
-<p>備份檔的內容和「匯出備份」相同（寵物資料、紀錄、照片），由你的手機或瀏覽器<b>直接</b>上傳到你的 Google 雲端硬碟，不會經過開發者的伺服器，開發者也沒有辦法存取。Google 帳號的登入授權只保存在你的裝置上。</p>
-<p>你可以隨時按「取消連結」，App 會撤銷授權並刪除裝置上的登入資訊；雲端硬碟裡的備份會保留，如要刪除，可到 Google 雲端硬碟「設定 → 管理應用程式 → 伴獸筆記 → 刪除隱藏的應用程式資料」。Google 對這些資料的處理適用 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 隱私權政策</a>。</p>
+<p>存放的內容和「匯出備份」相同（寵物資料、紀錄、照片、刪除紀錄的標記），用來在你登入同一個 Google 帳號的裝置之間同步，並保留一份完整備份。資料由你的手機或瀏覽器<b>直接</b>上傳到你的 Google 雲端硬碟，不會經過開發者的伺服器，開發者也沒有辦法存取。Google 帳號的登入授權只保存在你的裝置上。</p>
+<p>你可以隨時按「取消連結」，App 會撤銷授權、停止同步並刪除裝置上的登入資訊；雲端硬碟裡的資料會保留，如要刪除，可到 Google 雲端硬碟「設定 → 管理應用程式 → 伴獸筆記 → 刪除隱藏的應用程式資料」。Google 對這些資料的處理適用 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 隱私權政策</a>。</p>
 <p>伴獸筆記對 Google API 資料的使用遵守 <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API 服務使用者資料政策</a>（包括「有限使用」要求）：這些資料只用來提供備份與還原功能，不會轉移給他人、不會用於廣告，也不會由人員閱讀。</p>
 </section>
 
@@ -88,7 +88,7 @@ a{color:var(--primary)}
 <ul>
 <li><b>Google Play 版：</b>App 不會主動連線到開發者的伺服器，更新由 Google Play 處理。</li>
 <li><b>自行安裝的 Android 版（APK）：</b>開啟時會向 GitHub 查詢是否有新版本，只會取得版本資訊，不會傳送你的任何紀錄。</li>
-<li><b>Google 雲端硬碟備份：</b>只有你連結 Google 帳號後，才會依第 5 點連線到 Google 的登入與雲端硬碟服務。</li>
+<li><b>Google 雲端硬碟同步與備份：</b>只有你連結 Google 帳號後，才會依第 5 點連線到 Google 的登入與雲端硬碟服務。</li>
 <li><b>網頁版：</b>網頁由 GitHub Pages 提供，GitHub 可能依其政策記錄一般的連線資訊（例如 IP 位址）。你在網頁版輸入的資料一樣只存在瀏覽器裡；只有開啟通知時，會依第 3 點連線到通知伺服器（Cloudflare 也可能依其政策記錄一般的連線資訊）。</li>
 </ul>
 </section>
@@ -115,7 +115,7 @@ a{color:var(--primary)}
 
 <div class="en">
 <h2>Privacy Policy (English summary)</h2>
-<p>伴獸筆記 (Banshou Notes), developed by FOX loop, stores all pet profiles, records, photos and reminder settings only on your own device (app storage or the browser's local database). We do not collect, share or sell personal data. There are no accounts, ads, analytics or tracking. Photos are read only when you choose them. On Android, reminders are scheduled locally. On the web version, if you turn on notifications, your push subscription, a random device ID and the upcoming reminder titles and times are stored on our notification server (Cloudflare) solely to deliver them; reminders are deleted once sent and everything is deleted when you turn notifications off. Backups are created on your device and saved wherever you choose. If you link a Google account, backups are uploaded directly from your device to a hidden app-specific folder in your own Google Drive (drive.appdata scope, plus your email address to show which account is linked); the developer has no access to them, and use of Google API data complies with the Google API Services User Data Policy, including the Limited Use requirements. Contact: <a href="mailto:foxloop.apps@gmail.com">foxloop.apps@gmail.com</a>. Effective date: October 29, 2026.</p>
+<p>伴獸筆記 (Banshou Notes), developed by FOX loop, stores all pet profiles, records, photos and reminder settings only on your own device (app storage or the browser's local database). We do not collect, share or sell personal data. There are no accounts, ads, analytics or tracking. Photos are read only when you choose them. On Android, reminders are scheduled locally. On the web version, if you turn on notifications, your push subscription, a random device ID and the upcoming reminder titles and times are stored on our notification server (Cloudflare) solely to deliver them; reminders are deleted once sent and everything is deleted when you turn notifications off. Backups are created on your device and saved wherever you choose. If you link a Google account, your data is synced between your devices and backed up directly from each device to a hidden app-specific folder in your own Google Drive (drive.appdata scope, plus your email address to show which account is linked); the developer has no access to them, and use of Google API data complies with the Google API Services User Data Policy, including the Limited Use requirements. Contact: <a href="mailto:foxloop.apps@gmail.com">foxloop.apps@gmail.com</a>. Effective date: October 29, 2026.</p>
 </div>
 </main>
 </body>
