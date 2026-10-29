@@ -2802,7 +2802,7 @@ var Notif=(function(){
       if(list.length)await P.schedule({notifications:list});
     }catch(e){}
   }
-  function queue(){clearTimeout(timer);timer=setTimeout(run,800)}
+  function queue(){clearTimeout(timer);timer=setTimeout(run,800);if(!plug()&&typeof WebPush!=='undefined')WebPush.queue()}
   async function ensure(){
     if(!plug()||!anyReminder()||lsGet('petnote.notifAsked'))return;
     lsSet('petnote.notifAsked','1');
@@ -2814,7 +2814,57 @@ var Notif=(function(){
     var P=plug();if(!P)return false;
     try{await P.schedule({notifications:[{id:9999,title:'伴獸筆記',body:'這是測試通知，看到這則代表提醒功能正常。',schedule:{at:new Date(Date.now()+5000),allowWhileIdle:true}}]});return true}catch(e){return false}
   }
-  return {status:status,ask:ask,ensure:ensure,test:test,sync:queue};
+  return {status:status,ask:ask,ensure:ensure,test:test,sync:queue,build:build};
+})();
+
+/* ================= 網頁版推播（iPhone 加入主畫面／Android Chrome） ================= */
+var WebPush=(function(){
+  var cfg=null,cfgP=null,timer=null;
+  function isIOS(){return /iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}
+  function standalone(){try{return !!(navigator.standalone||matchMedia('(display-mode: standalone)').matches)}catch(e){return false}}
+  function supported(){return 'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window&&/^https:$/.test(location.protocol)}
+  function on(){return lsGet('petnote.push')==='on'}
+  function device(){var d=lsGet('petnote.pushDev');if(!d){var a=crypto.getRandomValues(new Uint8Array(18));d=btoa(String.fromCharCode.apply(null,a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');lsSet('petnote.pushDev',d)}return d}
+  function config(){if(cfgP)return cfgP;cfgP=fetch('push.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(j){cfg=j&&typeof j.server==='string'&&/^https:\/\//.test(j.server)?j.server.replace(/\/+$/,''):null;return cfg}).catch(function(){cfg=null;return null});return cfgP}
+  async function post(path,body){var srv=await config();if(!srv)throw new Error('no server');var r=await fetch(srv+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({device:device()},body||{}))});if(!r.ok)throw new Error('http '+r.status);return r.json()}
+  function keyBytes(b64){var s=b64.replace(/-/g,'+').replace(/_/g,'/');s+='==='.slice((s.length+3)%4);var bin=atob(s),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u}
+  async function state(){
+    if(isNative())return 'native';
+    if(!supported())return isIOS()&&!standalone()?'ios-browser':'unsupported';
+    if(isIOS()&&!standalone())return 'ios-browser';
+    if(!await config())return 'noserver';
+    if(Notification.permission==='denied')return 'denied';
+    if(on()&&Notification.permission==='granted')return 'on';
+    return 'off';
+  }
+  async function enable(){
+    var perm=await Notification.requestPermission();
+    if(perm!=='granted')return perm;
+    var srv=await config();if(!srv)throw new Error('no server');
+    var reg=await navigator.serviceWorker.ready;
+    var key=(await (await fetch(srv+'/vapid')).json()).publicKey;
+    var sub=await reg.pushManager.getSubscription();
+    if(sub){var cur=sub.options&&sub.options.applicationServerKey;if(cur){var a=new Uint8Array(cur),b=keyBytes(key);if(a.length!==b.length||a.some(function(x,i){return x!==b[i]})){await sub.unsubscribe();sub=null}}}
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:keyBytes(key)});
+    await post('/subscribe',{subscription:sub.toJSON()});
+    lsSet('petnote.push','on');await sync();return 'granted';
+  }
+  async function disable(){
+    lsSet('petnote.push','off');
+    try{var reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub)await sub.unsubscribe()}catch(e){}
+    try{await post('/unsubscribe')}catch(e){}
+  }
+  async function sync(){
+    if(!on()||!supported())return;
+    try{var items=Notif.build().map(function(n){return {t:n.schedule.at.getTime(),title:n.title,body:n.body}});await post('/schedule',{items:items});lsSet('petnote.pushSynced',String(Date.now()))}catch(e){}
+  }
+  async function refresh(){
+    if(!on()||!supported()||Notification.permission!=='granted')return;
+    try{var reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(!sub){lsSet('petnote.push','off');return}await post('/subscribe',{subscription:sub.toJSON()});await sync()}catch(e){}
+  }
+  async function test(){return post('/test')}
+  function queue(){if(!on())return;clearTimeout(timer);timer=setTimeout(sync,1500)}
+  return {state:state,enable:enable,disable:disable,sync:sync,queue:queue,refresh:refresh,test:test,isIOS:isIOS};
 })();
 async function updateStorage(){
   var t=$('#storeTxt');if(!t)return;
@@ -2831,6 +2881,20 @@ async function updateNotifCard(){
   paintBackupTxt();updateStorage();updateBuild();
   var st=await Notif.status(),t=$('#notifTxt'),b=$('#notifBtns');
   if(!t||!b)return;
+  if(st==='web'){
+    var ws=await WebPush.state();t=$('#notifTxt');b=$('#notifBtns');if(!t||!b)return;
+    var wm={
+      'ios-browser':'iPhone 要先把伴獸筆記加到主畫面，才能收到通知：\n1. 用 Safari 打開這個網頁\n2. 點下方「分享」→「加入主畫面」\n3. 從主畫面的伴獸筆記圖示打開，再回到這裡開啟通知\n（需要 iOS 16.4 以上）',
+      unsupported:'這個瀏覽器不支援網頁通知。快到期的預防針與本月驅蟲會顯示在首頁最上方。',
+      noserver:'這個網頁版還沒設定通知伺服器，快到期的提醒會顯示在首頁最上方。',
+      denied:'通知被關閉了。iPhone 請到「設定 → 通知 → 伴獸筆記」開啟；其他瀏覽器請在網站設定裡允許通知。',
+      on:'通知已開啟。預防針、驅蟲與備份提醒會在早上 9:00 送到這支手機。\n更改提醒設定後會自動同步。',
+      off:'開啟後，預防針、驅蟲與備份提醒會在早上 9:00 送到這支手機。'
+    };
+    t.style.whiteSpace='pre-line';t.textContent=wm[ws]||'';
+    b.innerHTML=ws==='on'?'<div class="row" style="margin-top:12px"><button class="btn" data-act="wpushtest">傳送測試通知</button><button class="btn" data-act="wpushoff">關閉通知</button></div><small style="display:block;margin-top:8px">開啟通知時，提醒的標題與時間會存到通知伺服器，只用來在時間到時送出通知，關閉後就會刪除。</small>':(ws==='off'?'<button class="btn primary block" data-act="wpushon" style="margin-top:12px">'+ico('bell',20)+'開啟通知</button><small style="display:block;margin-top:8px">開啟後，提醒的標題與時間會存到通知伺服器，只用來在時間到時送出通知。</small>':'');
+    return;
+  }
   var msg={
     web:'網頁版不會跳出手機通知，快到期的預防針與本月驅蟲會顯示在首頁最上方。Android 手機安裝 App 版，才會在早上 9:00 跳通知。',
     granted:'通知已開啟。預防針與驅蟲會依你設定的提醒時間，在早上 9:00 通知你。',
@@ -2890,6 +2954,9 @@ document.addEventListener('click',function(e){
   else if(a==='grpedit')openGroup(t.dataset.id||null);
   else if(a==='wormadd')openWormBackfill();
   else if(a==='alertgo'){S.sel=t.dataset.pid;lsSet('petnote.sel',S.sel);S.tab=t.dataset.tab;$('#main').scrollTop=0;render()}
+  else if(a==='wpushon'){t.disabled=true;WebPush.enable().then(function(r){toast(r==='granted'?'已開啟通知':'沒有允許通知');updateNotifCard()}).catch(function(){t.disabled=false;toast('開啟失敗，請確認網路後再試一次')})}
+  else if(a==='wpushoff'){WebPush.disable().then(function(){toast('已關閉通知');updateNotifCard()})}
+  else if(a==='wpushtest'){WebPush.test().then(function(r){toast(r&&r.ok?'測試通知已送出，幾秒內會收到':'送出失敗，請關閉後重新開啟通知')}).catch(function(){toast('送出失敗，請確認網路')})}
   else if(a==='notifask'){Notif.ask().then(function(){Notif.sync();updateNotifCard()})}
   else if(a==='notiftest'){Notif.test().then(function(ok){toast(ok?'5 秒後會收到測試通知':'無法傳送測試通知')})}
 });
@@ -2969,7 +3036,7 @@ function applyTheme(){
   else{var lv=lsGet('petnote.ver');if(lv&&lv!==APP_VERSION)toast('已更新到 '+APP_VERSION+' 版，資料都還在');lsSet('petnote.ver',APP_VERSION)}
   try{
     var cap=window.Capacitor,native=cap&&cap.isNativePlatform&&cap.isNativePlatform();
-    if(!native&&'serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(function(){});
+    if(!native&&'serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').then(function(){WebPush.refresh()}).catch(function(){});
     if(!native&&navigator.storage&&navigator.storage.persist)navigator.storage.persisted().then(function(p){if(!p)return navigator.storage.persist()}).catch(function(){});
   }catch(e){}
 })();

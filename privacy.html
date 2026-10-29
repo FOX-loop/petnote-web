@@ -32,12 +32,12 @@ a{color:var(--primary)}
 <body>
 <main>
 <header><img src="icons/icon-192.png" alt=""><h1>伴獸筆記 隱私權政策</h1></header>
-<p class="meta">生效日期：2026 年 10 月 28 日　｜　開發者：FOX loop</p>
+<p class="meta">生效日期：2026 年 10 月 29 日　｜　開發者：FOX loop</p>
 
 <div class="sum"><b>重點摘要</b>
 <ul>
 <li>你的寵物資料、照片和紀錄<b>只存在你自己的手機或瀏覽器裡</b>。</li>
-<li>我們<b>不收集、不上傳、不分享、不販售</b>任何個人資料。</li>
+<li>我們<b>不收集、不分享、不販售</b>任何個人資料。只有在網頁版主動開啟通知時，提醒的標題與時間會暫存到通知伺服器，用來準時送出通知。</li>
 <li>沒有帳號、沒有廣告、沒有追蹤或分析工具。</li>
 </ul></div>
 
@@ -54,7 +54,15 @@ a{color:var(--primary)}
 
 <section>
 <h2>3. 通知</h2>
-<p>驅蟲、預防針和備份提醒都是由你的手機在本機排程發出，不經過任何伺服器。你可以隨時在 App 或手機設定裡關閉通知。</p>
+<p><b>Android App：</b>驅蟲、預防針和備份提醒都是由你的手機在本機排程發出，不經過任何伺服器。</p>
+<p><b>網頁版（例如 iPhone 加入主畫面）：</b>網頁沒辦法在關閉時自己跳通知，所以如果你在「設定 → 手機通知」主動開啟通知，會把以下資料傳到開發者在 Cloudflare 上架設的通知伺服器：</p>
+<ul>
+<li>手機的推播訂閱資訊（由 Apple 或 Google 推播服務產生的一組位址與加密金鑰，不含你的姓名、電話或帳號）。</li>
+<li>接下來的提醒內容與時間，例如「麻糬的預防針提醒：貓綜合疫苗今天到期」、早上 9:00。</li>
+<li>一組隨機產生的裝置代碼，用來對應上面兩項。</li>
+</ul>
+<p>這些資料只用來在時間到時送出通知；提醒送出後就會刪除，關閉通知時會刪除全部資料。通知內容會經過加密後交給 Apple 或 Google 的推播服務轉送到你的手機。其他紀錄（狀況、照片、體重、餵食等）不會傳送。不開啟通知就不會傳送任何資料。</p>
+<p>你可以隨時在 App、手機設定或瀏覽器裡關閉通知。</p>
 </section>
 
 <section>
@@ -67,7 +75,7 @@ a{color:var(--primary)}
 <ul>
 <li><b>Google Play 版：</b>App 不會主動連線到開發者的伺服器，更新由 Google Play 處理。</li>
 <li><b>自行安裝的 Android 版（APK）：</b>開啟時會向 GitHub 查詢是否有新版本，只會取得版本資訊，不會傳送你的任何紀錄。</li>
-<li><b>網頁版：</b>網頁由 GitHub Pages 提供，GitHub 可能依其政策記錄一般的連線資訊（例如 IP 位址）。你在網頁版輸入的資料一樣只存在瀏覽器裡。</li>
+<li><b>網頁版：</b>網頁由 GitHub Pages 提供，GitHub 可能依其政策記錄一般的連線資訊（例如 IP 位址）。你在網頁版輸入的資料一樣只存在瀏覽器裡；只有開啟通知時，會依第 3 點連線到通知伺服器（Cloudflare 也可能依其政策記錄一般的連線資訊）。</li>
 </ul>
 </section>
 
@@ -93,7 +101,7 @@ a{color:var(--primary)}
 
 <div class="en">
 <h2>Privacy Policy (English summary)</h2>
-<p>伴獸筆記 (Cat Notes), developed by FOX loop, stores all pet profiles, records, photos and reminder settings only on your own device (app storage or the browser's local database). We do not collect, upload, share or sell any personal data. There are no accounts, ads, analytics or tracking. Photos are read only when you choose them. Reminders are scheduled locally on your device. Backups are created on your device and saved wherever you choose. The Google Play version does not contact our servers; the sideloaded APK only checks GitHub for the latest version number; the web version is hosted on GitHub Pages. Contact: <a href="mailto:foxloop.apps@gmail.com">foxloop.apps@gmail.com</a>. Effective date: October 28, 2026.</p>
+<p>伴獸筆記 (Banshou Notes), developed by FOX loop, stores all pet profiles, records, photos and reminder settings only on your own device (app storage or the browser's local database). We do not collect, share or sell personal data. There are no accounts, ads, analytics or tracking. Photos are read only when you choose them. On Android, reminders are scheduled locally. On the web version, if you turn on notifications, your push subscription, a random device ID and the upcoming reminder titles and times are stored on our notification server (Cloudflare) solely to deliver them; reminders are deleted once sent and everything is deleted when you turn notifications off. Backups are created on your device and saved wherever you choose. Contact: <a href="mailto:foxloop.apps@gmail.com">foxloop.apps@gmail.com</a>. Effective date: October 29, 2026.</p>
 </div>
 </main>
 </body>
