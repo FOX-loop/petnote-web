@@ -1,10 +1,10 @@
 {
-  "name": "貓貓筆記",
-  "short_name": "貓貓筆記",
+  "name": "伴獸筆記",
+  "short_name": "伴獸筆記",
   "lang": "zh-Hant",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#EEF3F1",
+  "background_color": "#F6F5F2",
   "theme_color": "#0F6E7E",
   "icons": [
     {

@@ -9,14 +9,19 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="貓貓筆記">
+<meta name="apple-mobile-web-app-title" content="伴獸筆記">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>貓貓筆記</title>
+<title>伴獸筆記</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* 版面：單欄手機 App。上方寵物切換、中間內容、下方四個分頁。招牌元素是驅蟲「集章」格，像寵物健康手冊蓋章。 */
 :root{
-  --bg:#EEF3F1; --surface:#FFFFFF; --surface2:#E3EBE8; --ink:#14262B; --ink2:#52666B; --line:#D2DDDA;
+  --bg:#F6F5F2; --surface:#FFFFFF; --surface2:#F0EEEA; --ink:#1E2326; --ink2:#5E676B; --line:#E2DFD9;
+  --k:#E07B39; --k-bg:#FDF0E6; --k-tr:#F6D5BE; --k-fg:#9A4A15;
+  --wa:#3A86D8; --wa-bg:#EAF3FC; --wa-tr:#C9DEF5; --wa-fg:#1E5797;
+  --ex:#2F9A5E; --ex-bg:#E8F5EE; --ex-tr:#C5E6D2; --ex-fg:#1D6B3F;
+  --wt:#7A62C9; --wt-bg:#F1EEFB; --wt-tr:#D9D1F3; --wt-fg:#4F3A9A;
+  --pet-hi:#2A8C9C; --round:"Nunito","SF Pro Rounded",ui-rounded,system-ui,-apple-system,"Noto Sans TC",sans-serif;
   --primary:#0F6E7E; --on-primary:#FFFFFF; --primary-soft:#D5EBEE;
   --accent:#D9691F; --accent-soft:#FBE5D2;
   --ok:#277D50; --ok-soft:#D6EFE1; --bad:#B93B35; --bad-soft:#F8DCD9;
@@ -28,7 +33,11 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0E1618; --surface:#162226; --surface2:#1F2F34; --ink:#E4EEEC; --ink2:#9BB0B3; --line:#2B3E43;
+    --bg:#121516; --surface:#1B1F21; --surface2:#252A2D; --ink:#E9ECEC; --ink2:#A3ADB0; --line:#333A3D;
+    --k:#F2A061; --k-bg:#2E2219; --k-tr:#4A3423; --k-fg:#F7C193;
+    --wa:#7DB5F0; --wa-bg:#1A2635; --wa-tr:#2A3D55; --wa-fg:#A9CDF5;
+    --ex:#6CCB94; --ex-bg:#18291F; --ex-tr:#26402F; --ex-fg:#9BDDB6;
+    --wt:#AE9CF0; --wt-bg:#231F35; --wt-tr:#3A3254; --wt-fg:#C9BDF6;
     --primary:#5CC1D0; --on-primary:#06262B; --primary-soft:#173B41;
     --accent:#F29A5B; --accent-soft:#41291A;
     --ok:#5CCB93; --ok-soft:#173528; --bad:#F27D75; --bad-soft:#401E1C;
@@ -38,7 +47,11 @@
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0E1618; --surface:#162226; --surface2:#1F2F34; --ink:#E4EEEC; --ink2:#9BB0B3; --line:#2B3E43;
+  --bg:#121516; --surface:#1B1F21; --surface2:#252A2D; --ink:#E9ECEC; --ink2:#A3ADB0; --line:#333A3D;
+  --k:#F2A061; --k-bg:#2E2219; --k-tr:#4A3423; --k-fg:#F7C193;
+  --wa:#7DB5F0; --wa-bg:#1A2635; --wa-tr:#2A3D55; --wa-fg:#A9CDF5;
+  --ex:#6CCB94; --ex-bg:#18291F; --ex-tr:#26402F; --ex-fg:#9BDDB6;
+  --wt:#AE9CF0; --wt-bg:#231F35; --wt-tr:#3A3254; --wt-fg:#C9BDF6;
   --primary:#5CC1D0; --on-primary:#06262B; --primary-soft:#173B41;
   --accent:#F29A5B; --accent-soft:#41291A;
   --ok:#5CCB93; --ok-soft:#173528; --bad:#F27D75; --bad-soft:#401E1C;
@@ -65,7 +78,7 @@ small{font-size:12.5px;color:var(--ink2)}
 #app{height:100%;display:flex;flex-direction:column;min-height:0}
 #top{flex:none;padding-top:10px;padding-bottom:6px}
 .toprow{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
-.brand{font-weight:800;font-size:17px;letter-spacing:.04em;color:var(--primary)}
+.brand{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:17px;letter-spacing:.04em;color:var(--primary)}
 .today{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
 .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .chips::-webkit-scrollbar{display:none}
@@ -83,7 +96,7 @@ main{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;paddi
 .linkbtn{color:var(--primary);font-weight:600;font-size:14px;min-height:36px;padding:0 4px;display:flex;align-items:center;gap:2px}
 
 .av{width:var(--s,48px);height:var(--s,48px);border-radius:30%;object-fit:cover;flex:none;display:grid;place-items:center;font-weight:700;font-size:calc(var(--s,48px)*.42);color:hsl(var(--h,200) var(--ts) var(--tl));background:hsl(var(--h,200) var(--bs) var(--bl))}
-.pchip .av{border-radius:50%}
+.pchip .av{border-radius:50%;box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--pc,var(--line))}
 
 .pet{border-radius:24px;padding:18px}
 .pet-top{display:flex;gap:14px;align-items:center}
@@ -152,6 +165,105 @@ main{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;paddi
 .wchart{position:relative;margin:4px 0 6px;touch-action:pan-y}
 .wchart svg{display:block;width:100%;height:auto;overflow:visible}
 .wchart .tip{position:absolute;top:0;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:6px 10px;border-radius:10px;font-size:13px;font-weight:600;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+.hcards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.hcards.one{grid-template-columns:1fr}
+.hcard.wide{grid-column:1/-1}
+.mbar.over i{background:var(--warn,#C2410C)}
+.menubox{background:var(--surface2);border-radius:14px;padding:10px 12px;margin:4px 0 8px}
+.menulist div{display:flex;justify-content:space-between;gap:8px;padding:4px 0;font-size:14px;border-bottom:1px dashed var(--line)}
+.menulist div:last-child{border-bottom:0}
+.menulist span{color:var(--ink2);white-space:nowrap}
+.gagrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 10px}
+[data-newfood]{display:inline-flex;align-items:center;gap:4px}
+.mealsum{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:8px;padding:8px 8px 8px 12px;border-radius:14px;background:var(--surface2)}
+.ms-main{flex:1 1 210px;min-width:0;text-align:left;display:block;padding:2px 0}
+.ms-top{display:flex;align-items:center;gap:8px;font-size:13.5px}
+.ms-top b{white-space:nowrap}
+.ms-acts{margin-left:auto}
+.ms-dots{display:flex;flex-wrap:wrap;gap:3px;min-width:0}
+.ms-dots i{width:9px;height:9px;border-radius:50%;display:block;border:1.5px solid var(--ink2);opacity:.6}
+.ms-dots i.d-done{background:var(--ok,#277D50);border-color:var(--ok,#277D50);opacity:1}
+.ms-dots i.d-auto{background:hsl(215 60% 55%);border-color:hsl(215 60% 55%);opacity:1}
+.ms-dots i.d-wauto{border-color:hsl(215 60% 55%);border-style:dotted;opacity:1}
+.ms-dots i.d-extra{width:7px;height:7px;align-self:center}
+.ms-sub{display:block;font-size:12.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.ms-sub b{color:var(--ink);font-weight:700}
+.ms-acts{display:flex;gap:6px;flex:none}
+.ms-btn{display:inline-flex;align-items:center;gap:3px;min-height:36px;padding:0 10px;border-radius:10px;font-size:13px;font-weight:700;background:var(--surface);color:var(--ink2);box-shadow:0 0 0 1px var(--line);white-space:nowrap}
+.ms-btn.primary{background:var(--primary);color:var(--on-primary,#fff);box-shadow:none}
+.mlist{display:flex;flex-direction:column}
+.mrow{display:grid;grid-template-columns:44px minmax(0,1fr) auto auto;gap:8px;align-items:center;min-height:42px;padding:4px 2px;border-bottom:1px dashed var(--line);text-align:left;font-size:14px}
+.mrow:last-child{border-bottom:0}
+.mrow .t{color:var(--ink2);font-variant-numeric:tabular-nums;font-size:13px}
+.mrow .n{font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mrow .n small{font-weight:600;font-size:11px;color:var(--ink2);margin-left:6px}
+.mrow .k{color:var(--ink2);font-size:12.5px;white-space:nowrap}
+.mrow .ok{color:var(--ok,#277D50);display:inline-flex}
+.mrow .wait{font-size:11.5px;color:hsl(215 55% 50%);white-space:nowrap}
+.mrow .todo{display:inline-flex;align-items:center;gap:2px;font-size:12.5px;font-weight:700;color:var(--primary);white-space:nowrap}
+.mealrow{margin-top:10px}
+.mealrow .lb{font-size:12.5px;color:var(--ink2);display:block;margin-bottom:6px}
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchip{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:6px 12px;border-radius:12px;border:1.5px dashed var(--primary);color:var(--primary);background:var(--surface);font-size:13.5px;text-align:left}
+.mchip b{font-weight:800}
+.mchip span{color:var(--ink2);font-size:12.5px}
+.mchip.done{border-style:solid;border-color:transparent;background:var(--soft,var(--surface2));color:var(--ok,#277D50)}
+.hcard,.wcard{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hcard:active,.wcard:active{filter:brightness(.97)}
+.hcard{padding-right:46px}
+.hc-chart{position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--surface);color:var(--primary);box-shadow:0 0 0 1px var(--line)}
+.wcard{padding-right:52px}
+.wcard .hc-chart{top:50%;transform:translateY(-50%)}
+.mchip.autodone{background:hsl(215 60% 94%);color:hsl(215 55% 38%)}
+.autobadge{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:hsl(215 60% 94%);color:hsl(215 55% 30%);margin:0 0 12px}
+.autobadge.warn{background:hsl(35 90% 92%);color:hsl(30 70% 30%)}
+.autobadge small{display:block;color:inherit;opacity:.85;font-size:12.5px;margin-top:2px}
+.autoitems{margin:0 0 10px}
+.airow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.airow .fn{flex:1;min-width:0;font-weight:700}
+.airow .am,.airow .kc{color:var(--ink2);white-space:nowrap}
+.airow input{width:62px!important;min-height:36px!important;padding:4px 6px!important;text-align:center}
+.autotag{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:99px;background:hsl(215 60% 94%);color:hsl(215 55% 38%);white-space:nowrap;margin-right:4px}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .mchip.autodone,:root:not([data-theme=light]) .autobadge,:root:not([data-theme=light]) .autotag{background:hsl(215 35% 22%);color:hsl(215 70% 80%)}:root:not([data-theme=light]) .autobadge.warn{background:hsl(30 40% 20%);color:hsl(35 80% 80%)}}
+:root[data-theme=dark] .mchip.autodone,:root[data-theme=dark] .autobadge,:root[data-theme=dark] .autotag{background:hsl(215 35% 22%);color:hsl(215 70% 80%)}
+:root[data-theme=dark] .autobadge.warn{background:hsl(30 40% 20%);color:hsl(35 80% 80%)}
+.mcauto{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 8px;flex-wrap:wrap}
+.mn-tl{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2);white-space:nowrap}
+.mn-tl input{width:118px!important;min-height:38px!important;padding:6px 8px!important}
+.mn-autow{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink2)}
+.mchip.auto{border-style:dotted}
+.mchip.extra{border-style:dashed;color:var(--ink2);border-color:var(--line)}
+.mealcard{border:1.5px solid var(--line);border-radius:14px;padding:10px;margin-bottom:10px}
+.mchead{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.mchead .mn-lb{flex:1;min-height:40px!important;padding:6px 10px!important;font-weight:700}
+.mchead .mn-k{color:var(--ink2);font-size:13px;white-space:nowrap}
+.mcfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.mn-wl{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2);white-space:nowrap;flex:none}
+.mn-wl input{width:80px!important;flex:none;min-height:38px!important;padding:6px 8px!important;text-align:center}
+.firow{display:grid;grid-template-columns:minmax(0,1fr) 64px 64px auto 34px;gap:6px;align-items:center;margin-bottom:8px}
+.firow:not(:has(.fi-left)){grid-template-columns:minmax(0,1fr) 70px 70px 34px}
+.firow .fn{font-weight:700;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.firow .fn small{display:block;font-weight:500;color:var(--ink2);font-size:12px}
+.firow input,.firow select{min-height:40px!important;padding:6px 6px!important;font-size:14px;text-align:center}
+.firow .fi-left{width:58px}
+.seg.wrap{flex-wrap:wrap}
+.mnrow{display:grid;grid-template-columns:minmax(0,1fr) 62px 66px 36px;gap:6px;align-items:center;margin-bottom:8px}
+.mnrow input,.mnrow select{min-height:40px!important;padding:6px 8px!important;font-size:14px}
+.mnrow select{padding-right:4px!important}
+.hcard{display:block;text-align:left;padding:12px 14px;border-radius:14px;background:var(--surface2);min-width:0;width:100%}
+.hcard .lb{font-size:12.5px;color:var(--ink2);display:block}
+.hcard .kg{display:block;font-size:24px;font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums}
+.hcard .kg small{font-size:13px;font-weight:600;color:var(--ink2);margin-left:3px}
+.hcard .sub{font-size:12px;color:var(--ink2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mbar{display:block;height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+.mbar i{display:block;height:100%;background:var(--primary);border-radius:99px}
+.dotc{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:0}
+.actsum{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.actsum span{background:var(--surface2);border-radius:99px;padding:4px 10px;font-size:13px}
+.row3{display:flex;gap:10px}
+.row3>.field{flex:1;min-width:0}
+.row3>[hidden]{display:none}
+.subh{font-size:15px;margin:18px 0 2px;padding-top:14px;border-top:1px solid var(--line)}
 .wstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0 14px}
 .wstats div{background:var(--surface2);border-radius:12px;padding:8px;min-width:0}
 .wstats small{display:block;font-size:11.5px}
@@ -181,7 +293,9 @@ mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px
 .entry .rail{flex:none;width:14px;position:relative;display:flex;justify-content:center}
 .entry .rail::before{content:"";position:absolute;top:18px;bottom:-12px;width:2px;background:var(--line)}
 .entry:last-child .rail::before{display:none}
-.entry .dot{position:relative;margin-top:8px;width:12px;height:12px;border-radius:50%;background:hsl(var(--h,200) var(--ts) var(--tl));box-shadow:0 0 0 3px var(--bg)}
+.entry .dot{position:relative;margin-top:6px;width:18px;height:18px;border-radius:50%;background:var(--bg);color:hsl(var(--h,200) var(--ts) var(--tl));display:grid;place-items:center}
+.entry .dot svg{display:block;transform:rotate(var(--pr,0deg))}
+.entry .rail{width:18px}
 .ebody{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
 .ehead{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .ehead time{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
@@ -330,6 +444,150 @@ input:focus,select:focus,textarea:focus{border-color:var(--primary);outline:none
 .toast{position:fixed;left:50%;bottom:calc(var(--sab) + 84px);transform:translate(-50%,12px);max-width:86%;padding:11px 18px;border-radius:14px;background:var(--ink);color:var(--bg);font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:80;text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+/* ===== 1.13 改版：照片主視覺、寵物代表色、四色數據卡 ===== */
+.hero{position:relative;border-radius:26px;overflow:hidden;min-height:210px;color:#fff;padding:16px 18px 16px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(150deg,var(--hero-a,var(--primary)) 0%,var(--hero-b,var(--pet-hi)) 100%);box-shadow:var(--shadow)}
+.hero.ph{background-color:#333;background-size:cover;background-position:center 35%}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18) 0%,rgba(0,0,0,0) 30%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.6) 100%);pointer-events:none}
+.hero:not(.ph)::before{background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.22) 100%)}
+.hero .hwm{position:absolute;right:-18px;top:-6px;opacity:.16;transform:rotate(-16deg)}
+.hero .hwm2{position:absolute;left:30px;top:26px;opacity:.12;transform:rotate(14deg)}
+.hero .hbody{position:relative}
+.hero h1{margin:0;font-size:32px;line-height:1.15;font-weight:900;text-shadow:0 1px 8px rgba(0,0,0,.25);overflow-wrap:anywhere}
+.hero .meta{font-size:13.5px;margin-top:3px;opacity:.95;text-shadow:0 1px 6px rgba(0,0,0,.25)}
+.hpills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.hpill{padding:5px 11px;border-radius:99px;background:rgba(255,255,255,.93);color:var(--hero-ink,#1E2326);font-size:12.5px;font-weight:700}
+.hpill b{font-family:var(--round);font-size:14.5px;font-weight:900}
+.hsub{font-size:12.5px;margin-top:8px;opacity:.95;text-shadow:0 1px 6px rgba(0,0,0,.3)}
+.hedit{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.22);color:#fff;display:grid;place-items:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:1}
+.hparty{position:relative;margin-top:10px;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:14px;background:rgba(255,255,255,.95);color:var(--hero-ink);font-weight:800;animation:pop .6s ease-out both}
+.hparty .confetti{position:absolute;right:-30px;top:-26px}
+.hmsg{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:18px;background:var(--primary-soft);font-size:14px;line-height:1.45}
+.hmi{width:34px;height:34px;border-radius:12px;background:var(--primary);display:grid;place-items:center;flex:none}
+.mgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mc{position:relative;display:flex;flex-direction:column;min-height:124px;padding:12px 12px 12px 14px;border-radius:22px;background:var(--mbg);color:var(--ink);cursor:pointer;min-width:0;text-align:left}
+.mc:active{filter:brightness(.97)}
+.mc-k{--mc:var(--k);--mbg:var(--k-bg);--mtr:var(--k-tr);--mfg:var(--k-fg)}
+.mc-wa{--mc:var(--wa);--mbg:var(--wa-bg);--mtr:var(--wa-tr);--mfg:var(--wa-fg)}
+.mc-ex{--mc:var(--ex);--mbg:var(--ex-bg);--mtr:var(--ex-tr);--mfg:var(--ex-fg)}
+.mc-wt{--mc:var(--wt);--mbg:var(--wt-bg);--mtr:var(--wt-tr);--mfg:var(--wt-fg)}
+.mc .mlb{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--mfg)}
+.mc .mic{width:28px;height:28px;border-radius:10px;background:var(--mc);color:#fff;display:grid;place-items:center}
+:root[data-theme=dark] .mc .mic{color:#101416}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .mc .mic{color:#101416}}
+.mc .mv{margin-top:8px;font-family:var(--round);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc .mv b{font-size:28px;font-weight:900;letter-spacing:-.01em}
+.mc .mv small{font-size:12.5px;font-weight:700;color:var(--ink2);margin-left:3px}
+.mc .msub{font-size:12px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc .mbar2{display:block;margin-top:auto;height:10px;border-radius:99px;background:var(--mtr);overflow:hidden}
+.mc .mbar2 i{display:block;height:100%;border-radius:99px;background:var(--mc);min-width:10px}
+.mc .mspark{display:block;margin-top:auto;color:var(--mc)}
+.mc .mspark svg{width:100%;height:26px}
+.mc .hc-chart{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.75);color:var(--mfg);box-shadow:none;display:grid;place-items:center}
+:root[data-theme=dark] .mc .hc-chart{background:rgba(255,255,255,.08)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .mc .hc-chart{background:rgba(255,255,255,.08)}}
+.mgrid.odd .mc:last-child{grid-column:1/-1;min-height:100px}
+.ms-dots svg{display:block}
+.ms-dots .d-done{color:var(--ex)}
+.ms-dots .d-auto{color:hsl(215 55% 50%)}
+.ms-dots .d-wauto{color:hsl(215 55% 55%);opacity:.8}
+.ms-dots .d-wait{color:var(--ink2);opacity:.55}
+.mealsum{background:var(--surface);box-shadow:var(--shadow);border-radius:20px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.swatches button{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;color:var(--ink2);min-width:44px}
+.swatches i{width:36px;height:36px;border-radius:50%;background:var(--sw);display:block}
+.swatches button.on i{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--sw)}
+.swatches button.on{color:var(--ink);font-weight:700}
+.stampfx{position:fixed;inset:0;z-index:90;display:grid;place-items:center;pointer-events:none}
+.stampfx .stin{width:110px;height:110px;border-radius:50%;border:4px solid var(--primary);color:var(--primary);background:color-mix(in srgb,var(--surface) 88%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;animation:stampin 1.05s cubic-bezier(.2,.9,.3,1.2) both;box-shadow:inset 0 0 0 4px var(--surface),inset 0 0 0 6px var(--primary)}
+.stampfx b{font-size:13px;letter-spacing:.2em}
+@keyframes stampin{0%{transform:scale(1.8) rotate(-24deg);opacity:0}25%{transform:scale(.92) rotate(-12deg);opacity:1}35%{transform:scale(1) rotate(-12deg)}80%{opacity:1}100%{transform:scale(1) rotate(-12deg);opacity:0}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.stampfx .stin,.hparty{animation:none}}
+.card{border-radius:22px}
+.btn{border-radius:16px}
+
+/* ===== 1.13 首頁全版主視覺 ===== */
+.homewrap{margin:-6px calc(-1*max(16px,env(safe-area-inset-right,0px))) 0 calc(-1*max(16px,env(safe-area-inset-left,0px)))}
+.homewrap .hero{border-radius:0;min-height:236px;box-shadow:none;justify-content:flex-end;padding:20px max(18px,env(safe-area-inset-left,0px)) 46px}
+.hero .htop{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hbrand{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:16px;letter-spacing:.04em;text-shadow:0 1px 6px rgba(0,0,0,.25)}
+.hdate{font-size:13px;font-weight:600;text-shadow:0 1px 6px rgba(0,0,0,.3)}
+.hchips{position:relative;display:flex;gap:8px;margin-top:12px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+.hchips::-webkit-scrollbar{display:none}
+.hchip{flex:none;display:flex;align-items:center;gap:7px;height:42px;padding:0 14px 0 4px;border-radius:21px;background:rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:14px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);max-width:46vw}
+.hchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hchip:not(.on) span{text-shadow:0 1px 4px rgba(0,0,0,.35)}
+.hchip.on{background:rgba(255,255,255,.96);color:#1E2326}
+.hchip .hav{width:34px;height:34px;border-radius:50%;object-fit:cover;display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;flex:none;box-shadow:0 0 0 2px rgba(255,255,255,.75)}
+.hchip.add{width:42px;padding:0;justify-content:center;background:rgba(255,255,255,.12);border:1.5px dashed rgba(255,255,255,.85)}
+.homewrap .hero .hbody{margin-top:auto}
+.hname{display:flex;align-items:flex-end;gap:10px}
+.hname .grow{flex:1;min-width:0}
+.homewrap .hedit{position:static;flex:none}
+.hpill.dim{font-weight:600;opacity:.92}
+.homesheet{position:relative;margin-top:-28px;border-radius:28px 28px 0 0;background:var(--bg);padding:16px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
+.homemode main{padding-top:0}
+.homewrap{margin-top:0}
+.evcard{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
+.evcard b{display:block;font-size:15px}
+.evcard small{display:block;font-size:12.5px;color:var(--ink2)}
+.evcard .gift{flex:none}
+.evcard.today{background:var(--primary-soft)}
+.evcard.today .confetti{position:absolute;right:4px;top:0}
+.ms-btn:not(.primary){background:var(--primary-soft);color:var(--pet-ink,var(--primary));box-shadow:none}
+
+/* ===== 1.13 分頁橫幅與動畫 ===== */
+.pban{position:relative;overflow:hidden;border-radius:24px;padding:16px;background:linear-gradient(150deg,var(--primary-soft) 0%,color-mix(in srgb,var(--primary-soft) 60%,var(--surface)) 100%);margin:2px 0 14px;color:var(--ink)}
+.pban .pbwm{position:absolute;right:-22px;bottom:-30px;color:var(--primary);opacity:.08;transform:rotate(-18deg)}
+.pbtop{position:relative;display:flex;align-items:center;gap:12px}
+.pbtop .grow{flex:1;min-width:0}
+.pbic{width:42px;height:42px;border-radius:14px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;flex:none}
+.pban h2{margin:0;font-size:20px;font-weight:900;line-height:1.25;overflow-wrap:anywhere}
+.pbsub{font-size:13px;color:var(--ink2);margin-top:2px}
+.pbsub b{color:var(--ink)}
+.pbbtn{flex:none;width:42px;height:42px;border-radius:14px;background:var(--surface);color:var(--pet-ink,var(--primary));display:grid;place-items:center;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.pbbtn.wide{width:auto;padding:0 14px;font-weight:700;font-size:14px}
+.pban .yearnav{background:var(--surface);border-radius:14px}
+.pbrow{position:relative;display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px;border-radius:18px;background:color-mix(in srgb,var(--surface) 82%,transparent)}
+.pbrow .grow{flex:1;min-width:0}
+.pbbig{display:block;font-size:16px;font-weight:800}
+.pbrow small{display:block;font-size:12.5px;color:var(--ink2)}
+.pbring{position:relative;width:64px;height:64px;flex:none}
+.pbring span{position:absolute;inset:0;display:flex;align-items:baseline;justify-content:center;padding-top:20px;white-space:nowrap;font-family:var(--round);font-size:13px;color:var(--ink2);font-weight:700}
+.pbring span b{font-size:20px;color:var(--primary);font-weight:900}
+.pbcount{flex:none;min-width:64px;height:64px;border-radius:18px;background:var(--ex-bg);color:var(--ex-fg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 8px}
+.pbcount.warn{background:var(--k-bg);color:var(--k-fg)}
+.pbcount.bad{background:var(--bad-soft);color:var(--bad)}
+.pbcount b{font-family:var(--round);font-size:24px;font-weight:900;line-height:1}
+.pbcount small{font-size:11px;font-weight:700;color:inherit}
+.stamp.done{flex-direction:column;gap:0}
+.stamp.done .paw{margin-bottom:-1px}
+.stamp.now:not(.done){animation:pulse 2.4s ease-in-out infinite}
+.vprog{display:flex;align-items:center;gap:10px;margin:10px 0 4px}
+.vtrack{position:relative;flex:1;height:10px;border-radius:99px;background:var(--ex-tr)}
+.vtrack i{display:block;height:100%;border-radius:99px;background:var(--ex)}
+.vtrack b{position:absolute;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--surface);color:var(--ex);display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.vprog.warn .vtrack{background:var(--k-tr)}.vprog.warn .vtrack i{background:var(--k)}.vprog.warn .vtrack b{color:var(--k)}
+.vprog.bad .vtrack{background:var(--bad-soft)}.vprog.bad .vtrack i{background:var(--bad)}.vprog.bad .vtrack b{color:var(--bad)}
+.vleft{font-size:12.5px;font-weight:700;color:var(--ink2);white-space:nowrap}
+@keyframes rise{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:none}}
+@keyframes growx{0%{width:0}}
+@keyframes ringin{0%{stroke-dasharray:0 var(--c)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--primary) 35%,transparent)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--primary) 0%,transparent)}}
+@keyframes stepin{0%{opacity:0;transform:scale(.4) rotate(-30deg)}100%{opacity:1;transform:none}}
+@keyframes tabpop{0%{transform:scale(.7)}60%{transform:scale(1.12)}100%{transform:none}}
+main.enter .pban,main.enter .hero,main.enter .stack>*,main.enter .homesheet .stack>*,main.enter #tlBody .entry,main.enter .search,main.enter .filters{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+main.enter .stack>*:nth-child(1){animation-delay:.04s}main.enter .stack>*:nth-child(2){animation-delay:.08s}main.enter .stack>*:nth-child(3){animation-delay:.12s}main.enter .stack>*:nth-child(4){animation-delay:.16s}main.enter .stack>*:nth-child(5){animation-delay:.2s}main.enter .stack>*:nth-child(n+6){animation-delay:.24s}
+main.enter #tlBody .entry:nth-of-type(2){animation-delay:.06s}main.enter #tlBody .entry:nth-of-type(3){animation-delay:.12s}main.enter #tlBody .entry:nth-of-type(n+4){animation-delay:.18s}
+main.enter .entry .dot svg{animation:stepin .5s .15s cubic-bezier(.2,.9,.3,1.3) both}
+main.enter .stamp.done{animation:stepin .45s cubic-bezier(.2,.9,.3,1.3) both}
+main.enter .mbar2 i,main.enter .vtrack i,main.enter .mbar i{animation:growx .9s .15s cubic-bezier(.2,.8,.2,1) both}
+main.enter .ringv{animation:ringin .9s .15s cubic-bezier(.2,.8,.2,1) both}
+nav.tabs button.on .ico{animation:tabpop .35s ease-out}
+.mc,.btn,.hrow,.stamp,.mchip,.pbbtn{transition:transform .12s ease}
+.mc:active,.btn:active,.stamp:active,.pbbtn:active{transform:scale(.97)}
+@media (prefers-reduced-motion:reduce){main.enter *{animation:none!important}.stamp.now{animation:none!important}nav.tabs button.on .ico{animation:none}}
 </style>
 
 <style>
@@ -374,10 +632,12 @@ var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHour
 var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
-var APP_VERSION='1.10.0';
+var APP_VERSION='1.11.0';
 function isNative(){try{var c=window.Capacitor;return !!(c&&c.isNativePlatform&&c.isNativePlatform())}catch(e){return false}}
 /* ---- App 版：檢查 GitHub 上的新版本 ---- */
 var UPDATE_REPO='FOX-loop/petnote-web';
+var IS_PLAY=false; /* Google Play 版編譯時會改成 true：關閉 App 內更新提示，改由 Play 商店更新 */
+var PRIVACY_URL='https://fox-loop.github.io/petnote-web/privacy.html';
 function verCmp(a,b){a=String(a).replace(/^v/i,'').split('.').map(Number);b=String(b).replace(/^v/i,'').split('.').map(Number);for(var i=0;i<3;i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x>y?1:-1}return 0}
 var Updater={
   checking:false,last:null,
@@ -388,7 +648,7 @@ var Updater={
     return {version:String(j.tag_name||'').replace(/^v/i,''),notes:j.body||'',url:asset?asset.browser_download_url:'https://github.com/'+UPDATE_REPO+'/releases/latest/download/PetNote.apk',page:j.html_url||('https://github.com/'+UPDATE_REPO+'/releases/latest'),size:asset?asset.size:0};
   },
   async check(manual){
-    if(!isNative()||this.checking)return;
+    if(!isNative()||IS_PLAY||this.checking)return;
     if(!manual){var lc=+(lsGet('petnote.updChecked')||0);if(Date.now()-lc<6*3600e3)return}
     this.checking=true;
     try{
@@ -428,13 +688,20 @@ function apkUrl(){
 var TYPES=[
   {id:'vomit',name:'嘔吐',h:18},{id:'stool',name:'軟便／腹瀉',h:38},{id:'appetite',name:'食慾不振',h:62},
   {id:'energy',name:'精神不佳',h:100},{id:'cough',name:'咳嗽／打噴嚏',h:165},{id:'skin',name:'皮膚／毛髮',h:195},
-  {id:'injury',name:'受傷／外傷',h:350},{id:'vet',name:'就醫／看診',h:262},{id:'weight',name:'量體重',h:140},{id:'other',name:'其他',h:215}
+  {id:'injury',name:'受傷／外傷',h:350},{id:'vet',name:'就醫／看診',h:300},{id:'weight',name:'量體重',h:256},{id:'water',name:'飲水',h:210},{id:'food',name:'餵食',h:24},{id:'exercise',name:'運動',h:145},{id:'other',name:'其他',h:215}
 ];
 var typeOf=function(id){return TYPES.filter(function(t){return t.id===id})[0]||TYPES[TYPES.length-1]};
 var logLabel=function(l){return (l.type==='other'&&l.custom)?l.custom:typeOf(l.type).name};
 var IC={
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   home:'<path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   list:'<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.3"/><circle cx="4.5" cy="12" r="1.3"/><circle cx="4.5" cy="18" r="1.3"/>',
+  bowl:'<path d="M5 11h14l-1.5 8.5a2 2 0 0 1-2 1.5h-7a2 2 0 0 1-2-1.5z M8 11c0-3 1.8-5 4-5s4 2 4 5"/>',
+  drop:'<path d="M12 3.5c3.5 4.3 6 7.6 6 10.5a6 6 0 0 1-12 0c0-2.9 2.5-6.2 6-10.5z"/>',
+  run:'<path d="M13 4a1.5 1.5 0 1 0 0 .01 M7 21l3-6 3 2v5 M10 15l1-5 4 3 3-1 M6 11l3-3 3 1"/>',
+  scale:'<path d="M5 8h14l-1.5 11h-11z M9 8a3 3 0 0 1 6 0 M12 12v3"/>',
+  chart:'<path d="M4 20h16"/><path d="M7 16v-4M12 16V7M17 16v-6"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M9 15.5l2 2 4-4"/>',
   gear:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9M4 12h16"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
   plus:'<path d="M12 5v14M5 12h14"/>',
@@ -447,6 +714,8 @@ var IC={
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',
   bell:'<path d="M6 17h12l-1.5-2v-4a4.5 4.5 0 0 0-9 0v4z"/><path d="M10 20a2 2 0 0 0 4 0"/>'
 };
+var PAW_D='M7,16.2 a5,4 0 1,0 10,0 a5,4 0 1,0 -10,0 Z M3.5,10.5 a2,2.4 0 1,0 4,0 a2,2.4 0 1,0 -4,0 Z M7.4,6.5 a2.1,2.6 0 1,0 4.2,0 a2.1,2.6 0 1,0 -4.2,0 Z M12.4,6.5 a2.1,2.6 0 1,0 4.2,0 a2.1,2.6 0 1,0 -4.2,0 Z M16.5,10.5 a2,2.4 0 1,0 4,0 a2,2.4 0 1,0 -4,0 Z';
+function PAW_SVG(fill,size,stroke,cls){return '<svg class="paw'+(cls?' '+cls:'')+'" width="'+size+'" height="'+size+'" viewBox="0 0 24 24" aria-hidden="true"><path d="'+PAW_D+'" fill="'+fill+'"'+(stroke?' stroke="'+stroke+'" stroke-width="1.5"':'')+'/></svg>'}
 var ico=function(n,s){s=s||22;return '<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'};
 
 /* ================= 日期計算 ================= */
@@ -518,7 +787,7 @@ var DB={db:null,ok:false,
 var warnedStore=false;
 function saved(ok){ if(!ok&&!warnedStore){warnedStore=true;toast('目前無法永久儲存資料，關閉後可能消失')} }
 
-var S={backup:{since:0,last:0,every:30},pets:[],logs:[],worms:[],vaccs:[],lib:[],groups:[],vOpen:{},tlLimit:30,tlPage:1,q:'',qAll:false,sel:null,tab:'home',filter:'all',year:new Date().getFullYear()};
+var S={backup:{since:0,last:0,every:30},foods:[],pets:[],logs:[],worms:[],vaccs:[],lib:[],groups:[],vOpen:{},tlLimit:30,tlPage:1,q:'',qAll:false,sel:null,tab:'home',filter:'all',year:new Date().getFullYear()};
 
 function newPet(){
   return {id:uid(),name:'',species:'貓',breed:'',gender:'未知',birthday:'',homeDate:'',photo:'',
@@ -683,6 +952,32 @@ async function migratePhotos(){
   }
   if(failed)setTimeout(function(){toast('手機空間不足，部分照片尚未整理完成，原照片都保留著。清出空間後重新開啟 App 會繼續。')},600);
 }
+var PET_COLORS=[
+  {id:'apricot',n:'杏桃',l:['#B35A17','#FCE8D6','#8A4512','#F0A868'],d:['#F2A15E','#3B2A1C','#F7C493','#C8783A']},
+  {id:'ocean',n:'海藍',l:['#2F62B8','#E1EAF8','#244C8F','#6C94DA'],d:['#8DB2F0','#1E2D47','#B8CEF5','#4F78C2']},
+  {id:'teal',n:'青綠',l:['#0F6E7E','#D5EBEE','#0B5562','#3FA3B2'],d:['#5CC1D0','#173B41','#93D9E3','#2A8C9C']},
+  {id:'berry',n:'莓果',l:['#B03A6C','#F9E1EC','#862B52','#E07AA3'],d:['#F08AB4','#3E1F2D','#F6B7D1','#B8527D']},
+  {id:'grape',n:'葡萄',l:['#6A50BC','#ECE7FA','#4F3A9A','#9C86E0'],d:['#AE9CF0','#2A2440','#CDC2F7','#7563C2']},
+  {id:'olive',n:'橄欖',l:['#5B7530','#E9F0DC','#435824','#93AE63'],d:['#A9C47A','#263019','#C8DBA6','#6F8A45']},
+  {id:'cocoa',n:'可可',l:['#7A4E33','#F1E5DC','#5C3A26','#B28467'],d:['#D2A588','#33261E','#E6C8B4','#94684E']},
+  {id:'slate',n:'石墨',l:['#46535B','#E5E9EB','#333D43','#7D8C95'],d:['#AEBBC3','#262D31','#CED7DC','#6B7A83']}
+];
+function petColorId(p){if(p&&p.color&&PET_COLORS.some(function(c){return c.id===p.color}))return p.color;var i=Math.max(0,S.pets.indexOf(p));return PET_COLORS[i%PET_COLORS.length].id}
+function petColorOf(p){var id=petColorId(p);return PET_COLORS.filter(function(c){return c.id===id})[0]}
+function isDark(){var t=document.documentElement.getAttribute('data-theme');if(t==='dark')return true;if(t==='light')return false;try{return matchMedia('(prefers-color-scheme: dark)').matches}catch(e){return false}}
+function applyPetTheme(){
+  var r=document.documentElement.style,p=curPet();
+  if(!p){['--primary','--primary-soft','--on-primary','--pet-hi','--pet-ink','--hero-a','--hero-b','--hero-ink'].forEach(function(k){r.removeProperty(k)});return}
+  var c=petColorOf(p),v=isDark()?c.d:c.l;
+  r.setProperty('--primary',v[0]);r.setProperty('--primary-soft',v[1]);r.setProperty('--pet-ink',v[2]);r.setProperty('--pet-hi',v[3]);r.setProperty('--on-primary',isDark()?'#101416':'#FFFFFF');r.setProperty('--hero-a',c.l[0]);r.setProperty('--hero-b',c.l[3]);r.setProperty('--hero-ink',c.l[2]);
+  var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',isDark()?'#121516':v[0]);
+}
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){applyPetTheme()})}catch(e){}
+function photoColor(url){return new Promise(function(res){var im=new Image();im.onload=function(){try{var cv=document.createElement('canvas');cv.width=cv.height=24;var x=cv.getContext('2d');x.drawImage(im,0,0,24,24);var d=x.getImageData(0,0,24,24).data,best=null,bs=-1;
+  var hs={};for(var i=0;i<d.length;i+=4){var r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,sat=mx===mn?0:(mx-mn)/(1-Math.abs(2*l-1));if(sat<.18||l<.12||l>.92)continue;var h=mx===r?((g-b)/(mx-mn)+6)%6:mx===g?(b-r)/(mx-mn)+2:(r-g)/(mx-mn)+4;h=Math.round(h*60/30)%12;hs[h]=(hs[h]||0)+sat}
+  Object.keys(hs).forEach(function(k){if(hs[k]>bs){bs=hs[k];best=+k*30+15}});
+  if(best==null)return res('slate');var map=[['apricot',28],['ocean',218],['teal',188],['berry',335],['grape',262],['olive',85],['cocoa',20]],pick='slate',dd=999;
+  map.forEach(function(m){var df=Math.min(Math.abs(m[1]-best),360-Math.abs(m[1]-best));if(df<dd){dd=df;pick=m[0]}});res(bs<1.2&&pick==='apricot'?'cocoa':pick)}catch(e){res(null)}};im.onerror=function(){res(null)};im.src=url})}
 function hueOf(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
 function avatar(p,size){
   if(p.photo) return '<img class="av" style="--s:'+size+'px" src="'+p.photo+'" alt="">';
@@ -776,13 +1071,14 @@ function planMonth(pet,item,cm){
 
 /* ================= 畫面：共用 ================= */
 var sheetRefresh=null;
-function render(){renderTop();renderNav();renderMain();renderFab();if(sheetRefresh)sheetRefresh()}
+function render(){applyPetTheme();renderTop();renderNav();renderMain();renderFab();if(sheetRefresh)sheetRefresh()}
 function renderTop(){
   var t=new Date();
-  var row='<div class="toprow"><span class="brand">貓貓筆記</span><span class="today">'+(t.getMonth()+1)+'月'+t.getDate()+'日 週'+WD[t.getDay()]+'</span></div>';
+  var row='<div class="toprow"><span class="brand">'+PAW_SVG('var(--primary)',20)+'伴獸筆記</span><span class="today">'+(t.getMonth()+1)+'月'+t.getDate()+'日 週'+WD[t.getDay()]+'</span></div>';
   if(!S.pets.length){$('#top').innerHTML=row;return}
   $('#top').innerHTML=row+'<div class="chips">'+S.pets.map(function(p){
-    return '<button class="pchip '+(p.id===S.sel?'on':'')+'" data-act="selpet" data-id="'+p.id+'">'+avatar(p,30)+'<span>'+esc(p.name)+'</span></button>';
+    var pc=petColorOf(p),pv=isDark()?pc.d:pc.l;
+    return '<button class="pchip '+(p.id===S.sel?'on':'')+'" data-act="selpet" data-id="'+p.id+'" style="--pc:'+pv[0]+'">'+avatar(p,30)+'<span>'+esc(p.name)+'</span></button>';
   }).join('')+'<button class="pchip add" data-act="addpet" aria-label="新增寵物">'+ico('plus')+'</button></div>';
 }
 function renderNav(){
@@ -829,13 +1125,573 @@ function sparkSvg(pts,w,h){
   var X=function(t){return 3+(w-6)*(t1===t0?1:(t-t0)/(t1-t0))},Y=function(k){return 4+(h-8)*(1-(k-lo)/(hi-lo))};
   var d=v.map(function(p,i){return (i?'L':'M')+X(p.t).toFixed(1)+' '+Y(p.kg).toFixed(1)}).join(' ');
   var last=v[v.length-1];
-  return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-hidden="true"><path d="'+d+' L'+X(last.t).toFixed(1)+' '+h+' L'+X(v[0].t).toFixed(1)+' '+h+' Z" fill="var(--primary)" opacity=".12"/><path d="'+d+'" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="'+X(last.t).toFixed(1)+'" cy="'+Y(last.kg).toFixed(1)+'" r="3.5" fill="var(--primary)" stroke="var(--surface2)" stroke-width="2"/></svg>';
+  return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-hidden="true"><path d="'+d+' L'+X(last.t).toFixed(1)+' '+h+' L'+X(v[0].t).toFixed(1)+' '+h+' Z" fill="currentColor" opacity=".12"/><path d="'+d+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="'+X(last.t).toFixed(1)+'" cy="'+Y(last.kg).toFixed(1)+'" r="3.5" fill="currentColor" stroke="var(--surface2)" stroke-width="2"/></svg>';
+}
+/* ---- 飲水與運動 ---- */
+var FEEDS=[['dry','乾飼料'],['mixed','乾＋濕食'],['wet','濕食為主'],['fresh','鮮食／生食']];
+var EX_ACTS={'貓':['逗貓棒','追逐遊戲','貓跳台','雷射筆','散步'],'狗':['散步','跑步','丟球','游泳','拔河']};
+function petWater(p){return Object.assign({on:true,feed:'dry',dry:0,wet:0,fresh:0},p.water||{})}
+function petEx(p){return Object.assign({on:true,goal:0},p.exercise||{})}
+function r10(x){return Math.round(x/10)*10}
+function foodWater(w){var f=w.feed,v=0;if(f==='dry'||f==='mixed')v+=(+w.dry||0)*0.10;if(f==='mixed'||f==='wet')v+=(+w.wet||0)*0.75;if(f==='fresh')v+=(+w.fresh||0)*0.70;return Math.round(v)}
+function waterTarget(p){
+  var pts=weightPoints(p.id),kg=pts.length?pts[pts.length-1].kg:0;if(!kg)return null;
+  var dog=p.species==='狗';return {kg:kg,need:[r10(kg*(dog?50:40)),r10(kg*60)]};
+}
+function waterDays(p,days){
+  var t=today(),map={},feedOn=petFeed(p).on,est=feedOn?0:foodWater(petWater(p)),out=[];
+  S.logs.forEach(function(l){if(l.petId!==p.id)return;var k=ymd(new Date(l.ts)),m=map[k]||(map[k]={bowl:0,add:0,food:0});
+    if(l.type==='water'&&+l.ml>0)m.bowl+=(+l.ml);
+    else if(l.type==='food'&&feedOn){m.add+=(+l.wml||0);m.food+=foodMoistWater(l)}});
+  for(var i=days-1;i>=0;i--){var d=addDays(t,-i),k=ymd(d),m=map[k]||{bowl:0,add:0,food:0},fd=Math.round(m.food),e=false;
+    if(!feedOn&&est&&(m.bowl>0||i===0)){fd=est;e=true}
+    out.push({d:d,k:k,bowl:Math.round(m.bowl),add:Math.round(m.add),food:fd,est:e,v:Math.round(m.bowl+m.add+fd)})}
+  return out;
+}
+function waterTargetText(p,opt){
+  opt=opt||{};var t=opt.tmp?waterTarget(opt.tmp):waterTarget(p);
+  if(!t)return '先記錄體重，就能依體重算出建議飲水量。';
+  var h='依體重 '+fmtKg(t.kg)+' kg：每天需要約 <b>'+t.need[0]+'–'+t.need[1]+' ml</b> 水分（體重 × '+((opt.tmp||p).species==='狗'?'50':'40')+'–60 ml）。水碗、食物本身的水分、主食加水都會算進飲水量。';
+  if(opt.today){var d=waterDays(p,1)[0],rest=t.need[0]-d.v;h+='<br>今天已攝取 '+d.v+' ml'+(d.food||d.add?'（食物 '+d.food+(d.est?'，估計':'')+'、加水 '+d.add+'）':'')+(rest>0?'，水碗再喝約 <b>'+rest+' ml</b> 就達到建議量下限。':'，已達建議量。')}
+  return h;
+}
+function exActs(p){
+  var base=(EX_ACTS[p.species]||EX_ACTS['貓']).slice();
+  S.logs.forEach(function(l){if(l.petId===p.id&&l.type==='exercise'&&l.act&&base.indexOf(l.act)<0)base.push(l.act)});
+  return base.slice(0,12);
+}
+function dayTotals(pid,type,field,days){
+  var map={},t=today(),out=[];
+  S.logs.forEach(function(l){if(l.petId!==pid)return;var v=0;if(l.type===type&&+l[field]>0)v=+l[field];else if(type==='water'&&l.type==='food'&&+l.wml>0)v=+l.wml;if(v){var k=ymd(new Date(l.ts));map[k]=(map[k]||0)+v}});
+  for(var i=days-1;i>=0;i--){var d=addDays(t,-i),k=ymd(d);out.push({d:d,k:k,v:map[k]||0})}
+  return out;
+}
+/* ---- 餵食與熱量 ---- */
+var FOOD_TYPES=[['dry','乾飼料',3700,'kg',.10],['wet','濕食罐頭',100,'100g',.75],['fresh','鮮食',130,'100g',.70],['puree','肉泥',70,'100g',.85],['freeze','凍乾零食',380,'100g',.05],['raw','生食',140,'100g',.70],['other','其他',300,'100g',.10]];
+function ftype(id){return FOOD_TYPES.filter(function(t){return t[0]===id})[0]||FOOD_TYPES.filter(function(t){return t[0]==='other'})[0]}
+function petFeed(p){
+  var fd=Object.assign({on:true,goal:'keep',meals:null},p.feeding||{});
+  if(!Array.isArray(fd.meals)){var m=[],by={};(fd.menu||[]).forEach(function(x){var lb=x.label||'餐點';if(!by[lb]){by[lb]={label:lb,items:[],addw:0};m.push(by[lb])}by[lb].items.push({food:x.food,amt:x.amt,unit:x.unit||'g'})});fd.meals=m}
+  delete fd.menu;return fd;
+}
+function foodGet(id){return id?S.foods.filter(function(f){return f.id===id})[0]:null}
+async function saveFoods(){saved(await DB.put('meta',{id:'foods',items:S.foods}))}
+function gaKcal100(g){if(!g)return 0;var p=+g.p||0,f=+g.f||0,fib=+g.fib||0,m=+g.m||0,a=+g.ash||0,nfe=Math.max(0,100-p-f-fib-m-a);return Math.round(3.5*p+8.5*f+3.5*nfe)}
+function kcalPerG(f){
+  if(!f)return null;
+  if(f.src==='ga'){var k=gaKcal100(f.ga);return k?k/100:null}
+  if(f.src==='type'){var t=ftype(f.type);return t[3]==='kg'?t[2]/1000:t[2]/100}
+  if(f.unit==='kg')return f.val/1000;if(f.unit==='100g')return f.val/100;
+  return f.pcg?f.val/f.pcg:null;
+}
+function kcalPerPc(f){if(!f)return null;if(f.src==='label'&&f.unit==='pc')return +f.val;var g=kcalPerG(f);return g&&f.pcg?g*f.pcg:null}
+function foodByPc(f){return !!(f&&f.src==='label'&&f.unit==='pc')}
+function foodMoist(f){if(f&&f.src==='ga'&&f.ga&&+f.ga.m>0)return f.ga.m/100;if(f&&+f.moist>0)return Math.min(95,f.moist)/100;return ftype(f&&f.type)[4]}
+function fmtKcal(v){return Math.round(v).toLocaleString('en-US')}
+function foodDesc(f){
+  if(!f)return '';
+  if(f.src==='label')return fmtKcal(f.val)+' kcal/'+(f.unit==='kg'?'kg':f.unit==='100g'?'100g':(f.pc||'份'))+(f.unit==='pc'&&f.pcg?'（每'+(f.pc||'份')+' '+f.pcg+' g）':'');
+  if(f.src==='ga')return '約 '+gaKcal100(f.ga)+' kcal/100g（成分表估算）';
+  var t=ftype(f.type);return '約 '+fmtKcal(t[2])+' kcal/'+(t[3]==='kg'?'kg':'100g')+'（'+t[1]+'平均值）';
+}
+function feedCalc(f,amt,unit){
+  if(!f||!(amt>0))return null;
+  if(unit==='pc'){var k=kcalPerPc(f);if(k==null)return null;return {kcal:Math.round(k*amt),g:f.pcg?Math.round(f.pcg*amt):null}}
+  var kg=kcalPerG(f);if(kg==null)return null;return {kcal:Math.round(kg*amt),g:amt};
+}
+function ageMonths(p){if(!p.birthday)return null;var b=parseD(p.birthday),t=today();return (t.getFullYear()-b.getFullYear())*12+(t.getMonth()-b.getMonth())-(t.getDate()<b.getDate()?1:0)}
+function petNeut(p){if(p.neutered==='yes'||p.neutered==='no')return p.neutered;var f=p.feeding&&p.feeding.neutered;return f==='yes'||f==='no'?f:''}
+function petEnergy(p,fd){
+  var pts=weightPoints(p.id),kg=pts.length?pts[pts.length-1].kg:0;if(!kg)return null;
+  fd=fd||petFeed(p);var nv=petNeut(p),dog=p.species==='狗',am=ageMonths(p),neut=nv!=='no',f,lb;
+  if(!dog){
+    if(am!=null&&am<12){f=2.5;lb='幼貓'}
+    else{ if(am!=null&&am>=132){f=1.1;lb='熟齡貓'}else{f=neut?1.2:1.4;lb=neut?'已結紮成貓':'未結紮成貓'}
+      if(fd.goal==='lose'){f=0.8;lb+='・減重'}else if(fd.goal==='gain'){f=Math.round(f*1.2*100)/100;lb+='・增重'} }
+  }else{
+    if(am!=null&&am<4){f=3.0;lb='4 個月內幼犬'}else if(am!=null&&am<12){f=2.0;lb='幼犬'}
+    else{ if(am!=null&&am>=96){f=1.4;lb='熟齡犬'}else{f=neut?1.6:1.8;lb=neut?'已結紮成犬':'未結紮成犬'}
+      if(fd.goal==='lose'){f=1.0;lb+='・減重'}else if(fd.goal==='gain'){f=Math.round(f*1.2*100)/100;lb+='・增重'} }
+  }
+  if(!nv&&!(am!=null&&am<12))lb+='・未填結紮，先以已結紮計算';
+  var rer=70*Math.pow(kg,0.75);return {kg:kg,rer:Math.round(rer),factor:f,label:lb,target:Math.round(rer*f/5)*5};
+}
+function energyText(p,fd){
+  var e=petEnergy(p,fd);if(!e)return '先記錄體重，就能算出每日建議熱量。';
+  return '依體重 '+fmtKg(e.kg)+' kg（'+e.label+'）：靜息需求 70 × '+fmtKg(e.kg)+'<sup>0.75</sup> ≈ '+e.rer+' kcal，× '+e.factor+' ＝ 每日建議約 <b>'+e.target+' kcal</b>。';
+}
+function feedWaterFromLogs(pid){
+  var start=addDays(today(),-6).getTime(),days={},w=0,any=false;
+  S.logs.forEach(function(l){if(l.petId===pid&&l.type==='food'&&l.ts>=start){var k=ymd(new Date(l.ts));days[k]=1;any=true;w+=foodMoistWater(l)}});
+  var n=Object.keys(days).length;return any?Math.round(w/n):null;
+}
+function foodItemsOf(l){if(Array.isArray(l.items))return l.items;if(l.food||l.fname)return [{food:l.food,fname:l.fname,amt:l.amt,unit:l.unit,pcn:l.pcn,kcal:l.kcal,g:l.g}];return []}
+function foodMoistWater(l){if(l.fw!=null)return +l.fw;var w=0;foodItemsOf(l).forEach(function(it){var f=foodGet(it.food);if(it.g>0&&f)w+=it.g*foodMoist(f)});return w}
+var LEFTS=[['0','吃完'],['0.25','剩¼'],['0.5','剩½'],['0.75','剩¾'],['1','全剩'],['c','自填']];
+function leftLabel(l){if(!l.left||l.left==='0')return '';if(l.left==='c')return '有剩';var f=LEFTS.filter(function(x){return x[0]===l.left})[0];return f?f[1]:''}
+function itemRatio(left,lefts,i,it){if(left==='c'){var a=+it.amt||0,b=+(lefts&&lefts[i])||0;return a>0?Math.max(0,Math.min(1,1-b/a)):1}return 1-(+left||0)}
+function calcMeal(items,kcalIn,addw,left,lefts){
+  var given=0,eaten=0,fw=0,wsum=0,wr=0;
+  items.forEach(function(it,i){var r=itemRatio(left,lefts,i,it),k=+it.kcal||0;given+=k;eaten+=k*r;var f=foodGet(it.food);if(it.g>0&&f)fw+=it.g*r*foodMoist(f);var wt=k||1;wsum+=wt;wr+=wt*r});
+  if(kcalIn>0){var r0=left==='c'?1:1-(+left||0);given+=kcalIn;eaten+=kcalIn*r0;wsum+=kcalIn;wr+=kcalIn*r0}
+  var ratio=wsum?wr/wsum:(left==='c'?1:1-(+left||0));
+  return {given:Math.round(given),kcal:Math.round(eaten),fw:Math.round(fw),wml:Math.round((+addw||0)*ratio),ratio:ratio};
+}
+function confettiSvg(){return '<svg class="confetti" width="120" height="44" viewBox="0 0 120 44" aria-hidden="true"><rect x="8" y="6" width="6" height="12" rx="2" fill="#3A86D8" transform="rotate(25 11 12)"/><rect x="40" y="24" width="6" height="12" rx="2" fill="#2F9A5E" transform="rotate(-30 43 30)"/><rect x="74" y="4" width="6" height="12" rx="2" fill="#7A62C9" transform="rotate(50 77 10)"/><circle cx="100" cy="10" r="3" fill="#E07B39"/><circle cx="26" cy="34" r="2.5" fill="#F2A15E"/><circle cx="62" cy="38" r="2.5" fill="#3A86D8"/><rect x="104" y="26" width="6" height="12" rx="2" fill="#E07B39" transform="rotate(-20 107 32)"/></svg>'}
+function friendlyMsg(p){
+  var n=esc(p.name),w=petWater(p),fd=petFeed(p),e=petEx(p);
+  if(w.on){var tg=waterTarget(p),wd=waterDays(p,1)[0];if(tg){var r=tg.need[0]-wd.v;if(wd.v<=0)return n+'今天還沒有喝水紀錄，記得幫牠記一下';if(r>0)return n+'今天喝了 <b>'+wd.v+' ml</b>，再 <b>'+r+' ml</b> 就達標囉';}}
+  if(fd.on){var en=petEnergy(p,fd);if(en){var tk=dayTotals(p.id,'food','kcal',1)[0].v,d=en.target-tk;if(tk>0&&d>0)return n+'今天吃了 <b>'+fmtKcal(tk)+' kcal</b>，還可以再吃約 <b>'+d+' kcal</b>';if(tk>0&&d<=0)return n+'今天的熱量已經吃夠了'}}
+  if(e.on&&e.goal){var te=dayTotals(p.id,'exercise','min',1)[0].v;if(te<e.goal)return '陪'+n+'再玩 <b>'+(e.goal-te)+' 分鐘</b>就達成今天的運動目標';}
+  if(w.on){var tg2=waterTarget(p);if(tg2)return n+'今天的喝水量已經達標，很棒！'}
+  return '';
+}
+function metricCards(p){
+  var w=petWater(p),e=petEx(p),fd=petFeed(p),cards=[];
+  var card=function(cat,act,chartAct,label,icon,val,unit,sub,pct,extra){return '<div class="mc mc-'+cat+'" role="button" tabindex="0" data-act="'+act+'" aria-label="記錄'+label+'"><button class="hc-chart" data-act="'+chartAct+'" aria-label="查看'+label+'圖表">'+ico('chart',16)+'</button><span class="mlb"><span class="mic">'+ico(icon,17)+'</span>'+label+'</span><span class="mv"><b>'+val+'</b><small>'+unit+'</small></span><span class="msub">'+sub+'</span>'+(extra||'')+(pct!=null?'<span class="mbar2"><i style="width:'+pct+'%"></i></span>':'')+'</div>'};
+  if(fd.on){var tk=dayTotals(p.id,'food','kcal',1)[0].v,en=petEnergy(p,fd),diff=en?en.target-tk:0;
+    cards.push(card('k','feedadd','feed','熱量','bowl',fmtKcal(tk),en?'/ '+en.target+' kcal':'kcal',en?(diff>=0?'還可以吃 '+diff+' kcal':'已超過 '+(-diff)+' kcal'):'先記錄體重',en?Math.min(100,Math.round(tk/en.target*100)):null))}
+  if(w.on){var wd=waterDays(p,1)[0],tg=waterTarget(p);
+    cards.push(card('wa','wateradd','water','飲水','drop',wd.v,'ml',tg?'建議 '+tg.need[0]+'–'+tg.need[1]+' ml':'先記錄體重',tg?Math.min(100,Math.round(wd.v/tg.need[0]*100)):null,(wd.food||wd.add)?'<span class="msub">含食物 '+wd.food+(wd.add?'・加水 '+wd.add:'')+'</span>':''))}
+  if(e.on){var te=dayTotals(p.id,'exercise','min',1)[0].v,wk=dayTotals(p.id,'exercise','min',7),avg=Math.round(wk.reduce(function(a,x){return a+x.v},0)/7);
+    cards.push(card('ex','exadd','exercise','運動','run',te,'分鐘',e.goal?'目標 '+e.goal+' 分鐘':'近 7 天平均 '+avg+' 分',e.goal?Math.min(100,Math.round(te/e.goal*100)):null))}
+  var pts=weightPoints(p.id);
+  if(pts.length){var last=pts[pts.length-1],prev=pts.length>1?pts[pts.length-2]:null,d=new Date(last.t),dl=prev?last.kg-prev.kg:null;
+    cards.push(card('wt','weightadd','weights','體重','scale',fmtKg(last.kg),'kg',(dl==null?'':(Math.abs(dl)<0.005?'持平・':(dl>0?'+':'−')+fmtKg(Math.abs(dl))+' kg・'))+(d.getMonth()+1)+'/'+d.getDate()+(last.src==='vacc'?' 打針時量':''),null,'<span class="mspark">'+sparkSvg(pts,120,26)+'</span>'))}
+  else cards.push(card('wt','weightadd','weights','體重','scale','—','kg','點這裡記錄第一筆',null));
+  return '<div class="mgrid'+(cards.length%2?' odd':'')+'">'+cards.join('')+'</div>';
+}
+function healthCardsHtml(p){
+  var w=petWater(p),e=petEx(p),fd=petFeed(p),cards=[],wide='';
+  if(fd.on){
+    var tk=dayTotals(p.id,'food','kcal',1)[0].v,en=petEnergy(p,fd),kp=en?Math.min(100,Math.round(tk/en.target*100)):0,diff=en?en.target-tk:0;
+    wide='<div class="hcard wide" role="button" tabindex="0" data-act="feedadd" aria-label="記錄餵食"><button class="hc-chart" data-act="feed" aria-label="查看熱量圖表">'+ico('chart',18)+'</button><span class="lb">今日熱量</span><span class="kg">'+fmtKcal(tk)+(en?'<small>/ '+en.target+' kcal</small>':'<small>kcal</small>')+'</span><span class="sub">'+(en?(diff>=0?'還可以吃約 '+diff+' kcal':'已超過 '+(-diff)+' kcal'):'先記錄體重，就能算出建議熱量')+'</span>'+(en?'<span class="mbar'+(diff<0?' over':'')+'"><i style="width:'+kp+'%"></i></span>':'')+'</div>';
+  }
+  if(w.on){
+    var wd=waterDays(p,1)[0],tw=wd.v,tg=waterTarget(p),pct=tg?Math.min(100,Math.round(tw/tg.need[0]*100)):0;
+    cards.push('<div class="hcard" role="button" tabindex="0" data-act="wateradd" aria-label="記錄飲水"><button class="hc-chart" data-act="water" aria-label="查看飲水圖表">'+ico('chart',18)+'</button><span class="lb">今日飲水</span><span class="kg">'+tw+'<small>ml</small></span><span class="sub">'+(tg?'建議 '+tg.need[0]+'–'+tg.need[1]+' ml':'先記錄體重')+'</span>'+(wd.food||wd.add?'<span class="sub">含食物 '+wd.food+(wd.add?'・加水 '+wd.add:'')+'</span>':'')+(tg?'<span class="mbar"><i style="width:'+pct+'%"></i></span>':'')+'</div>');
+  }
+  if(e.on){
+    var te=dayTotals(p.id,'exercise','min',1)[0].v,epct=e.goal?Math.min(100,Math.round(te/e.goal*100)):0;
+    var wk=dayTotals(p.id,'exercise','min',7),avg=Math.round(wk.reduce(function(a,x){return a+x.v},0)/7);
+    cards.push('<div class="hcard" role="button" tabindex="0" data-act="exadd" aria-label="記錄運動"><button class="hc-chart" data-act="exercise" aria-label="查看運動圖表">'+ico('chart',18)+'</button><span class="lb">今日運動</span><span class="kg">'+te+'<small>分鐘</small></span><span class="sub">'+(e.goal?'目標 '+e.goal+' 分鐘':'近 7 天平均 '+avg+' 分')+'</span>'+(e.goal?'<span class="mbar"><i style="width:'+epct+'%"></i></span>':'')+'</div>');
+  }
+  return (wide||cards.length)?'<div class="hcards'+(cards.length===1&&!wide?' one':'')+'">'+wide+cards.join('')+'</div>':'';
+}
+var WSTACK=[['bowl','水碗','var(--wa)'],['food','食物水分','var(--k)'],['add','主食加水','var(--wa-tr)']];
+function barChart(days,o){
+  var W=340,H=180,L=36,R=10,T=16,B=24,n=days.length;
+  var vals=days.map(function(x){return x.v}),mx=Math.max.apply(null,vals.concat([o.hi||0,o.goal||0,1]));
+  var st=niceStep(mx,4);mx=Math.ceil(mx/st)*st;
+  var X=function(i){return L+(W-L-R)*i/n},bw=Math.max(1.5,(W-L-R)/n*0.68),Y=function(v){return T+(H-T-B)*(1-v/mx)};
+  var g='';
+  for(var k=0;k<=mx+1e-9;k+=st){var y=Y(k).toFixed(1);g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)"/><text x="'+(L-5)+'" y="'+y+'" text-anchor="end" dominant-baseline="central" font-size="10.5" fill="var(--ink2)">'+k+'</text>'}
+  if(o.lo!=null&&o.hi!=null)g+='<rect x="'+L+'" y="'+Y(o.hi).toFixed(1)+'" width="'+(W-L-R)+'" height="'+Math.max(1,Y(o.lo)-Y(o.hi)).toFixed(1)+'" fill="var(--ok,#2E9E6A)" opacity=".13"/>';
+  if(o.goal)g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(o.goal).toFixed(1)+'" y2="'+Y(o.goal).toFixed(1)+'" stroke="var(--ok,#2E9E6A)" stroke-width="1.5" stroke-dasharray="5 4"/>';
+  var bars=days.map(function(x,i){if(!x.v)return '';var bx=(X(i)+((W-L-R)/n-bw)/2).toFixed(1);
+    if(o.stack){var acc=0,out='';o.stack.forEach(function(sg){var v=x[sg[0]]||0;if(!v)return;var y0=Y(acc),y1=Y(acc+v);out+='<rect x="'+bx+'" y="'+y1.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(.5,y0-y1).toFixed(1)+'" fill="'+sg[2]+'"/>';acc+=v});return out}
+    var y=Y(x.v);return '<rect x="'+bx+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+(H-B-y).toFixed(1)+'" rx="'+Math.min(4,bw/2).toFixed(1)+'" fill="'+(o.color||'var(--primary)')+'"/>'}).join('');
+  var fd=function(d){return (d.getMonth()+1)+'/'+d.getDate()};
+  g+='<text x="'+L+'" y="'+(H-6)+'" font-size="10.5" fill="var(--ink2)">'+fd(days[0].d)+'</text><text x="'+(W-R)+'" y="'+(H-6)+'" text-anchor="end" font-size="10.5" fill="var(--ink2)">今天</text>';
+  return '<div class="wchart bchart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(o.label)+'">'+g+bars+'<line class="xh" x1="0" x2="0" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--ink2)" stroke-dasharray="3 3" visibility="hidden"/></svg><div class="tip" hidden></div></div>';
+}
+function bindBars(c,days,unit,isW){
+  if(!c)return;var svg=$('svg',c),tip=$('.tip',c),xh=$('.xh',c),n=days.length;
+  function show(cx){var r=svg.getBoundingClientRect(),vx=(cx-r.left)/r.width*340,i=Math.max(0,Math.min(n-1,Math.floor((vx-36)/((340-46)/n)))),x=36+(340-46)*(i+.5)/n,d=days[i].d;
+    xh.setAttribute('x1',x);xh.setAttribute('x2',x);xh.setAttribute('visibility','visible');tip.hidden=false;tip.textContent=(d.getMonth()+1)+'/'+d.getDate()+'　'+days[i].v+' '+unit+(isW&&days[i].v?'（水碗 '+days[i].bowl+'・食物 '+days[i].food+'・加水 '+days[i].add+'）':'');tip.style.left=Math.max(60,Math.min(r.width-60,x/340*r.width))+'px'}
+  c.addEventListener('pointerdown',function(e){show(e.clientX)});c.addEventListener('pointermove',function(e){show(e.clientX)});
+  c.addEventListener('pointerleave',function(){tip.hidden=true;xh.setAttribute('visibility','hidden')});
+}
+function feedLogRow(l){var d=new Date(l.ts),lf=leftLabel(l);
+  return '<button class="hrow" data-lid="'+l.id+'"><span class="d">'+(d.getMonth()+1)+'/'+d.getDate()+' '+hhmm(l.ts)+'</span><span class="grow"><span class="wkg">'+fmtKcal(l.kcal)+' kcal</span>'+(lf?'<span class="delta">'+lf+'</span>':'')+'<small style="display:block">'+esc(feedLabel(l))+(l.addw?'・加水 '+l.addw+' ml':'')+(l.note?'・'+esc(l.note):'')+'</small></span>'+(l.auto?'<span class="autotag">'+ico('lock',13)+'餵食機</span>':'')+ico('cr',16)+'</button>'}
+function feedLabel(l){var its=foodItemsOf(l),t=its.map(function(it){return it.fname+' '+fmtKg(it.amt)+(it.unit==='pc'?' '+(it.pcn||'份'):' g')}).join('＋');if(l.kcalIn)t+=(t?'＋':'')+'其他 '+l.kcalIn+' kcal';if(!t&&l.kcal)t='直接填寫熱量';return (l.meal?l.meal+'・':'')+t}
+function mealCalc(m){var its=[];(m.items||[]).forEach(function(x){var f=foodGet(x.food),c=feedCalc(f,x.amt,x.unit);if(c)its.push({food:f.id,fname:f.name,amt:x.amt,unit:x.unit,pcn:f.pc||'份',kcal:c.kcal,g:c.g})});return its}
+function mealKcal(m){return mealCalc(m).reduce(function(a,x){return a+x.kcal},0)}
+function todayMealLog(p,label){var k=ymd(today());return S.logs.filter(function(l){return l.petId===p.id&&l.type==='food'&&l.meal===label&&ymd(new Date(l.ts))===k}).sort(function(a,b){return b.ts-a.ts})[0]}
+function mealEntries(p){
+  var fd=petFeed(p),k=ymd(today()),todays=S.logs.filter(function(l){return l.petId===p.id&&l.type==='food'&&ymd(new Date(l.ts))===k}).sort(function(a,b){return a.ts-b.ts}),used={},out=[];
+  var tmin=function(ts){var d=new Date(ts);return d.getHours()*60+d.getMinutes()},hm=function(t){if(!t)return null;var a=t.split(':');return (+a[0])*60+(+a[1]||0)};
+  fd.meals.forEach(function(m,i){
+    var lg=todays.filter(function(l){return !used[l.id]&&l.meal===m.label&&(m.auto?l.auto:!l.auto)}).pop();
+    if(lg)used[lg.id]=1;
+    out.push({label:m.label,i:i,auto:!!m.auto,log:lg||null,kcal:lg?lg.kcal:mealKcal(m),t:lg?tmin(lg.ts):hm(m.time),time:m.time||'',ord:i});
+  });
+  todays.forEach(function(l){if(!used[l.id])out.push({label:l.meal||(foodItemsOf(l)[0]||{}).fname||'加餐',extra:true,auto:!!l.auto,log:l,kcal:l.kcal,t:tmin(l.ts),ord:99})});
+  out.sort(function(a,b){var x=a.t==null?9999:a.t,y=b.t==null?9999:b.t;return x-y||a.ord-b.ord});
+  return out;
+}
+function mealChecklist(p){
+  var fd=petFeed(p);if(!fd.on)return '';var es=mealEntries(p);if(!es.length)return '';
+  var done=es.filter(function(e){return e.log}),kc=done.reduce(function(a,e){return a+(+e.kcal||0)},0);
+  var now=new Date(),nm=now.getHours()*60+now.getMinutes(),pend=es.filter(function(e){return !e.log});
+  var next=pend.filter(function(e){return e.t==null||e.t>=nm-60})[0]||pend[0];
+  var dots=es.map(function(e){var k=e.log?(e.auto?'d-auto':'d-done'):(e.auto?'d-wauto':'d-wait');return PAW_SVG(e.log?'currentColor':'none',e.extra?13:16,e.log?'':'currentColor',k)}).join('');
+  var nx=next?(next.auto?'下一餐 <b>'+esc(next.label)+'</b> '+next.time+'・餵食機':'下一餐 <b>'+esc(next.label)+'</b>'+(next.time?' '+next.time:'')):'今天的餐都記好了';
+  var act=next&&!next.auto?'<button class="ms-btn primary" data-act="eatmeal" data-i="'+next.i+'">'+ico('check',15)+'記'+esc(next.label)+'</button>':'';
+  return '<div class="mealsum"><button class="ms-main" data-act="meals" aria-label="查看今日餐點"><span class="ms-top"><b>今日餐點 '+done.length+'/'+es.length+'</b><span class="ms-dots">'+dots+'</span></span><span class="ms-sub">'+nx+'・已吃 '+fmtKcal(kc)+' kcal</span></button><div class="ms-acts">'+act+'<button class="ms-btn" data-act="feedadd">'+ico('plus',15)+'加餐</button></div></div>';
+}
+function mealListHtml(p){
+  var es=mealEntries(p);if(!es.length)return '';
+  return '<div class="mlist">'+es.map(function(e){
+    var lf=e.log?leftLabel(e.log):'',st,act;
+    if(e.log){act='data-act="editlog" data-id="'+e.log.id+'"';st=(e.log.auto?'<span class="autotag">'+ico('lock',12)+'餵食機</span>':'<span class="ok">'+ico('check',14)+'</span>')}
+    else if(e.auto){act='data-act="autowait" data-i="'+e.i+'"';st='<span class="wait">等待餵食機</span>'}
+    else{act='data-act="eatmeal" data-i="'+e.i+'"';st='<span class="todo">'+ico('plus',14)+'記錄</span>'}
+    var tt=e.log?hhmm(e.log.ts):(e.time||'—');
+    return '<button class="mrow'+(e.log?' done':'')+'" '+act+'><span class="t">'+tt+'</span><span class="n">'+esc(e.label)+(e.extra?'<small>加餐</small>':'')+'</span><span class="k">'+fmtKcal(e.kcal)+' kcal'+(lf?'・'+lf:'')+'</span>'+st+'</button>'}).join('')+'</div>';
+}
+var feederBusy=false;
+async function runFeeder(){
+  if(feederBusy)return 0;feederBusy=true;var made=0;
+  try{
+    var now=Date.now();
+    for(var pi=0;pi<S.pets.length;pi++){
+      var p=S.pets[pi],fd=petFeed(p),am=fd.meals.filter(function(m){return m.auto&&m.time});
+      if(!fd.on||!am.length)continue;
+      var from=Math.max(+fd.autoUpTo||now,now-31*864e5),d=new Date(from);d=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+      for(;d.getTime()<=now;d=addDays(d,1)){
+        for(var mi=0;mi<am.length;mi++){
+          var m=am[mi],hm=m.time.split(':'),t=new Date(d.getFullYear(),d.getMonth(),d.getDate(),+hm[0]||0,+hm[1]||0).getTime();
+          if(t<=from||t>now)continue;var k=ymd(d);
+          if(S.logs.some(function(l){return l.petId===p.id&&l.type==='food'&&l.auto&&l.meal===m.label&&ymd(new Date(l.ts))===k}))continue;
+          var its=mealCalc(m);if(!its.length)continue;var c=calcMeal(its,0,m.addw,'0',null);
+          await saveLog({id:uid(),petId:p.id,type:'food',custom:'',ts:t,note:'',photos:[],meal:m.label,items:its,addw:+m.addw||0,left:'0',kcal:c.kcal,wml:c.wml,fw:c.fw,auto:true});made++;
+        }
+      }
+      var src=S.pets.filter(function(x){return x.id===p.id})[0];src.feeding=Object.assign(petFeed(src),{autoUpTo:now});await savePet(src);
+    }
+  }catch(e){}
+  feederBusy=false;return made;
+}
+setInterval(function(){if(!document.hidden&&!Layers.length)feederTick()},60000);
+async function feederTick(){var n=await runFeeder();if(n){render();toast('已依餵食機排程記錄 '+n+' 餐')}}
+var enterT=null;function animEnter(){var m=$('#main');if(!m)return;m.classList.remove('enter');void m.offsetWidth;m.classList.add('enter');clearTimeout(enterT);enterT=setTimeout(function(){m.classList.remove('enter')},1200)}
+function stamp(){
+  try{var el=document.createElement('div');el.className='stampfx';el.innerHTML='<span class="stin">'+PAW_SVG('currentColor',34)+'<b>完成</b></span>';document.body.appendChild(el);setTimeout(function(){el.remove()},1100)}catch(e){}
+}
+async function eatMeal(p,i){
+  var fd=petFeed(p),m=fd.meals[i];if(!m)return;var its=mealCalc(m);
+  if(!its.length){toast('這一餐的食物已被刪除，請重新設定菜單');return}
+  var c=calcMeal(its,0,m.addw,'0',null);
+  await saveLog({id:uid(),petId:p.id,type:'food',custom:'',ts:Date.now(),note:'',photos:[],meal:m.label,items:its,addw:+m.addw||0,left:'0',kcal:c.kcal,wml:c.wml,fw:c.fw});
+  render();stamp();toast('已記錄'+m.label+'。收碗後點「'+m.label+'」可以填剩食');
+}
+function openFeedSheet(){
+  var p=curPet();if(!p)return;
+  var range=7,page=1,PER=4;
+  var body='<div class="seg" id="h-range" style="margin-bottom:8px"><button data-v="7" class="on">7 天</button><button data-v="30">30 天</button><button data-v="90">90 天</button></div><div id="h-body"></div>';
+  openSheet({title:'餵食與熱量・'+p.name,body:body,footer:'<button class="btn" id="h-set">'+ico('gear',20)+'設定</button><button class="btn primary" id="h-add">'+ico('plus',20)+'記錄餵食</button>',
+    onClose:function(){sheetRefresh=null},
+    onMount:function(el){
+      var box=$('#h-body',el);
+      function paint(){
+        var fd=petFeed(p),en=petEnergy(p,fd),days=dayTotals(p.id,'food','kcal',range),tot=days.reduce(function(a,x){return a+x.v},0),rec=days.filter(function(x){return x.v>0}).length;
+        var near=en?days.filter(function(x){return x.v>0&&Math.abs(x.v-en.target)<=en.target*0.1}).length:0;
+        var menu='<div class="menubox"><div class="cardhead" style="margin:0 0 6px"><h2 style="font-size:15px">今日餐點</h2><button class="linkbtn" id="h-menu">'+(fd.meals.length?'編輯菜單':'設定固定菜單')+ico('cr',16)+'</button></div>'+(mealEntries(p).length?mealListHtml(p)+'<small style="display:block;margin-top:6px">點「記錄」記下這一餐；記過的點進去可以填剩食。'+(fd.meals.some(function(m){return m.auto})?'餵食機的餐時間到會自動記錄。':'')+'</small>':'')+(fd.meals.length?'':'<small>把每天固定的幾餐設成菜單，之後每一餐按一下就記好。</small>')+'</div>';
+        var by={};S.logs.forEach(function(l){if(l.petId===p.id&&l.type==='food'&&+l.kcal>0&&new Date(l.ts)>=days[0].d){var its=foodItemsOf(l);if(l.items){its.forEach(function(x,i){var a=x.fname||'其他';by[a]=(by[a]||0)+(+x.kcal||0)*itemRatio(l.left,l.lefts,i,x)});if(l.kcalIn)by['直接填寫']=(by['直接填寫']||0)+l.kcalIn*(1-(+l.left||0))}else{var a=l.fname||'直接填寫';by[a]=(by[a]||0)+(+l.kcal)}}});
+        var names=Object.keys(by).sort(function(a,b){return by[b]-by[a]});
+        var share=names.length?'<div class="actsum">'+names.map(function(a){return '<span><b>'+esc(a)+'</b> '+(tot?Math.round(by[a]/tot*100):0)+'%</span>'}).join('')+'</div>':'';
+        var stats='<div class="wstats"><div><small>今天</small><b>'+fmtKcal(days[days.length-1].v)+'</b></div><div><small>平均／天</small><b>'+(rec?fmtKcal(tot/rec):0)+'</b></div><div><small>有紀錄</small><b>'+rec+' 天</b></div><div><small>接近建議</small><b>'+(en?near+' 天':'—')+'</b></div></div>';
+        box.innerHTML='<p class="about" style="margin:0 0 8px">'+energyText(p,fd)+'</p>'+menu+'<div class="cardhead" style="margin:12px 0 4px"><h2 style="font-size:15px">每日熱量（kcal）</h2><button class="linkbtn" id="h-foods">我的食物'+ico('cr',16)+'</button></div>'+
+          barChart(days,{label:'每日熱量長條圖',goal:en?en.target:0,color:'var(--k)'})+(en?'<small style="display:block;margin-bottom:8px">虛線：每日建議 '+en.target+' kcal；接近建議＝相差 10% 以內</small>':'')+share+stats+'<div class="sechead" style="margin:4px 2px 0">最近紀錄</div><div id="h-list"></div>';
+        bindBars($('.bchart',box),days,'kcal');paintList();
+        $('#h-menu',box).onclick=function(){openMenuSheet(p)};
+        $('#h-foods',box).onclick=function(){openFoodList()};
+
+      }
+      function paintList(){
+        var list=S.logs.filter(function(l){return l.petId===p.id&&l.type==='food'}).sort(function(a,b){return b.ts-a.ts}),pages=Math.max(1,Math.ceil(list.length/PER));
+        if(page>pages)page=pages;var start=(page-1)*PER;
+        $('#h-list',box).innerHTML=list.length?'<div class="hist" style="border-top:0;margin-top:0">'+list.slice(start,start+PER).map(feedLogRow).join('')+'</div>'+pagerHtml(page,pages,'data-hpg'):'<p class="about">還沒有紀錄，按下方「記錄餵食」新增。</p>';
+      }
+      bindSeg($('#h-range',el),function(v){range=+v;paint()});
+      box.addEventListener('click',function(e){var pg=e.target.closest('[data-hpg]');if(pg){if(pg.disabled)return;page=+pg.getAttribute('data-hpg');paintList();return}var r=e.target.closest('[data-lid]');if(r)openLogSheet(r.dataset.lid)});
+      $('#h-add',el).onclick=function(){openFeedLog(null)};
+      $('#h-set',el).onclick=function(){openPetSheet(p.id,'health')};
+      sheetRefresh=paint;paint();
+    }});
+}
+function openFoodList(){
+  var body='<div id="fl-body"></div>';
+  openSheet({title:'我的食物',body:body,footer:'<button class="btn primary" id="fl-add">'+ico('plus',20)+'新增食物</button>',onMount:function(el){
+    var box=$('#fl-body',el);
+    function paint(){
+      box.innerHTML='<p class="about" style="margin:0 0 8px">每樣食物只要填一次熱量，所有寵物共用。熱量可以照包裝上的寫法填，沒有寫的話可以用成分表或類型估算。</p>'+(S.foods.length?'<div class="list">'+S.foods.map(function(f){return '<button class="lrow" data-fid="'+f.id+'"><span class="grow"><b>'+esc(f.name)+'</b><small style="display:block">'+ftype(f.type)[1]+'・'+esc(foodDesc(f))+'</small></span>'+ico('cr',18)+'</button>'}).join('')+'</div>':'<div class="empty"><h3>還沒有食物</h3><p>按下方「新增食物」，把常吃的飼料、罐頭、零食加進來。</p></div>');
+    }
+    box.addEventListener('click',function(e){var r=e.target.closest('[data-fid]');if(r)openFoodSheet(r.dataset.fid,paint)});
+    $('#fl-add',el).onclick=function(){openFoodSheet(null,paint)};
+    paint();
+  }});
+}
+function openFoodSheet(id,onSaved){
+  var ex=foodGet(id),f=ex?JSON.parse(JSON.stringify(ex)):{id:uid(),name:'',type:'dry',src:'label',unit:'kg',val:'',pc:'罐',pcg:'',ga:{}};
+  f.ga=f.ga||{};
+  var tb=FOOD_TYPES.map(function(t){return '<button type="button" data-v="'+t[0]+'" class="'+(f.type===t[0]?'on':'')+'" style="--h:30">'+t[1]+'</button>'}).join('');
+  var gaF=[['p','粗蛋白'],['f','粗脂肪'],['fib','粗纖維'],['m','水分'],['ash','灰分']];
+  var body='<div class="field"><label for="ff-name">名稱</label><input id="ff-name" type="text" maxlength="24" autocomplete="off" placeholder="例如：○○牌室內貓飼料" value="'+esc(f.name)+'"></div>'+
+    '<div class="field"><span class="lbl">類型</span><div class="typegrid" id="ff-type">'+tb+'</div></div>'+
+    '<div class="field"><span class="lbl">熱量從哪裡來</span><div class="seg" id="ff-src"><button type="button" data-v="label" class="'+(f.src==='label'?'on':'')+'">包裝標示</button><button type="button" data-v="ga" class="'+(f.src==='ga'?'on':'')+'">成分表估算</button><button type="button" data-v="type" class="'+(f.src==='type'?'on':'')+'">類型平均</button></div></div>'+
+    '<div id="ff-label"><div class="row2"><div class="field"><label for="ff-val">熱量</label><input id="ff-val" type="text" inputmode="decimal" maxlength="7" autocomplete="off" placeholder="例如 3800" value="'+(f.val||'')+'"></div><div class="field"><span class="lbl">單位</span><div class="seg" id="ff-unit"><button type="button" data-v="kg" class="'+(f.unit==='kg'?'on':'')+'">kcal/kg</button><button type="button" data-v="100g" class="'+(f.unit==='100g'?'on':'')+'">/100g</button><button type="button" data-v="pc" class="'+(f.unit==='pc'?'on':'')+'">/份</button></div></div></div>'+
+      '<div class="hint" style="margin:-6px 0 12px">包裝上常見寫法：「代謝能 3,800 kcal/kg」、「熱量 85 kcal/100g」、「每罐 70 kcal」。</div></div>'+
+    '<div id="ff-gawrap"><div class="hint" style="margin:0 0 8px">照包裝「成分分析」填百分比，用修正 Atwater 公式估算：蛋白質 × 3.5 ＋ 脂肪 × 8.5 ＋ 碳水 × 3.5（kcal/100g）。</div><div class="gagrid">'+gaF.map(function(g){return '<div class="field"><label for="ff-'+g[0]+'">'+g[1]+' %</label><input id="ff-'+g[0]+'" type="text" inputmode="decimal" maxlength="5" autocomplete="off" value="'+(f.ga[g[0]]!=null&&f.ga[g[0]]!==''?f.ga[g[0]]:'')+'"></div>'}).join('')+'</div></div>'+
+    '<div id="ff-pcwrap"><div class="row2"><div class="field"><label for="ff-pc">份量名稱</label><input id="ff-pc" type="text" maxlength="4" autocomplete="off" placeholder="罐、包、條" value="'+esc(f.pc||'罐')+'"></div><div class="field"><label for="ff-pcg">每份幾克（選填）</label><input id="ff-pcg" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="例如 85" value="'+(f.pcg||'')+'"></div></div><div class="hint" style="margin:-6px 0 12px">填了每份克數，就能用「幾罐」或「幾克」記錄，也能算進食物的含水量。</div></div>'+
+    '<div class="field" id="ff-mwrap"><label for="ff-moist">水分 %（選填）</label><input id="ff-moist" type="text" inputmode="decimal" maxlength="4" autocomplete="off" value="'+(f.moist||'')+'"><div class="hint">包裝「成分分析」上的水分，用來算這樣食物提供多少水。沒填就用類型平均值。</div></div>'+
+    '<p class="about" id="ff-out" style="margin:4px 0 0"></p>';
+  var footer=(ex?'<button class="btn danger" id="ff-del">刪除</button>':'')+'<button class="btn primary" id="ff-save">'+(ex?'儲存':'新增')+'</button>';
+  openSheet({title:ex?'編輯食物':'新增食物',body:body,footer:footer,onMount:function(el){
+    var num=function(id){var v=parseFloat(($('#'+id,el).value||'').replace(',','.'));return isNaN(v)?null:v};
+    function read(){
+      var o={id:f.id,name:$('#ff-name',el).value.trim(),type:segVal($('#ff-type',el))||'other',src:segVal($('#ff-src',el))||'label',unit:segVal($('#ff-unit',el))||'kg',val:num('ff-val')||0,pc:$('#ff-pc',el).value.trim()||'份',pcg:num('ff-pcg')||0,moist:Math.min(95,num('ff-moist')||0),ga:{}};
+      gaF.forEach(function(g){var v=num('ff-'+g[0]);if(v!=null)o.ga[g[0]]=v});return o;
+    }
+    function paint(){
+      var o=read();$('#ff-label',el).hidden=o.src!=='label';$('#ff-gawrap',el).hidden=o.src!=='ga';$('#ff-mwrap',el).hidden=o.src==='ga';$('#ff-moist',el).placeholder='預設 '+Math.round(ftype(o.type)[4]*100)+'（'+ftype(o.type)[1]+'平均）';
+      var out=$('#ff-out',el);
+      if(o.src==='ga'){var k=gaKcal100(o.ga);out.innerHTML=(o.ga.p!=null&&o.ga.f!=null)?'估算熱量約 <b>'+k+' kcal/100g</b>（'+fmtKcal(k*10)+' kcal/kg）':'至少要填粗蛋白和粗脂肪。'}
+      else if(o.src==='type'){out.innerHTML='使用'+ftype(o.type)[1]+'的平均值：'+esc(foodDesc(o))+'。不同商品差異很大，有包裝標示時建議改填標示。'}
+      else out.innerHTML=o.val?'＝ '+esc(foodDesc(o)):'';
+    }
+    bindSeg($('#ff-type',el),paint);bindSeg($('#ff-src',el),paint);bindSeg($('#ff-unit',el),paint);
+    $$('input',el).forEach(function(i){i.addEventListener('input',paint)});paint();
+    $('#ff-save',el).onclick=async function(){
+      var o=read();
+      if(!o.name){toast('請輸入食物名稱');$('#ff-name',el).focus();return}
+      if(o.src==='label'&&!(o.val>0)){toast('請輸入熱量數字');$('#ff-val',el).focus();return}
+      if(o.src==='ga'&&!(o.ga.p>0&&o.ga.f>=0&&o.ga.f!=null)){toast('請至少填粗蛋白和粗脂肪');return}
+      if(o.src!=='label'){o.unit=ftype(o.type)[3]}
+      upsert(S.foods,o);await saveFoods();closeTop();if(onSaved)onSaved(o);render();toast(ex?'已儲存':'已新增 '+o.name);
+    };
+    var del=$('#ff-del',el);
+    if(del)del.onclick=async function(){
+      if(!await confirmDlg('刪除「'+f.name+'」？已記錄的餵食紀錄會保留熱量數字。','刪除',true))return;
+      S.foods=S.foods.filter(function(x){return x.id!==f.id});await saveFoods();closeTop();if(onSaved)onSaved(null);render();toast('已刪除');
+    };
+  }});
+}
+function openMenuSheet(p){
+  var fd=petFeed(p),meals=JSON.parse(JSON.stringify(fd.meals||[])),hw=petWater(p).on;
+  openSheet({title:'固定菜單・'+p.name,body:'<p class="about" style="margin:0 0 8px">設定每天固定的幾餐。之後在首頁或「餵食與熱量」點一下餐別就記好這一餐。<br>用定時餵食機的話，設定時間並開啟「餵食機自動記錄」，時間到了會自動記下來，不用每天手動記；有剩再點進去改。</p><div id="mn-meals"></div><button class="btn" id="mn-addmeal" style="width:100%">'+ico('plus',20)+'新增一餐</button><p class="about" id="mn-tot" style="margin:10px 0 0"></p>',footer:'<button class="btn primary" id="mn-save">儲存</button>',onMount:function(el){
+    var box=$('#mn-meals',el);
+    function opts(sel){return '<option value="">選擇食物…</option>'+S.foods.map(function(f){return '<option value="'+f.id+'" '+(f.id===sel?'selected':'')+'>'+esc(f.name)+'</option>'}).join('')}
+    function unitsFor(f){var u=[];if(!f)return [['g','克']];if(!foodByPc(f)||f.pcg)u.push(['g','克']);if(kcalPerPc(f)!=null)u.push(['pc',f.pc||'份']);if(foodByPc(f))u.reverse();return u}
+    function paint(){
+      if(!S.foods.length){box.innerHTML='<div class="empty"><h3>還沒有食物</h3><p>先新增常吃的飼料或罐頭。</p><button class="btn" id="mn-goto">新增食物</button></div>';$('#mn-goto',el).onclick=function(){openFoodSheet(null,function(){paint()})};$('#mn-addmeal',el).hidden=true;tot();return}
+      $('#mn-addmeal',el).hidden=false;
+      box.innerHTML=meals.map(function(m,mi){
+        return '<div class="mealcard" data-mi="'+mi+'"><div class="mchead"><input type="text" class="mn-lb" maxlength="6" placeholder="餐別" value="'+esc(m.label||'')+'"><span class="mn-k"></span><button type="button" class="iconbtn mn-rmm" style="width:36px;height:36px" aria-label="刪除這一餐">'+ico('x',16)+'</button></div>'+
+          m.items.map(function(x,ii){var f=foodGet(x.food),us=unitsFor(f);if(!us.some(function(u){return u[0]===x.unit}))x.unit=us[0][0];
+            return '<div class="mnrow" data-ii="'+ii+'"><select class="mn-f">'+opts(x.food)+'</select><input type="text" class="mn-amt" inputmode="decimal" maxlength="5" placeholder="份量" value="'+(x.amt||'')+'"><select class="mn-u">'+us.map(function(u){return '<option value="'+u[0]+'" '+(x.unit===u[0]?'selected':'')+'>'+esc(u[1])+'</option>'}).join('')+'</select><button type="button" class="iconbtn mn-rm" style="width:36px;height:36px" aria-label="移除">'+ico('x',16)+'</button></div>'}).join('')+
+          '<div class="mcauto"><label class="mn-tl">時間<input type="time" class="mn-time" value="'+esc(m.time||'')+'"></label><span class="mn-autow"><span>餵食機自動記錄</span><span class="sw"><input type="checkbox" class="mn-auto" '+(m.auto?'checked':'')+' aria-label="餵食機自動記錄"><i></i></span></span></div>'+
+          '<div class="mcfoot"><button type="button" class="linkbtn mn-additem">'+ico('plus',16)+'加食物</button>'+(hw||m.addw?'<label class="mn-wl">主食加水<input type="text" class="mn-w" inputmode="numeric" maxlength="4" placeholder="0" value="'+(m.addw||'')+'">ml</label>':'')+'</div></div>';
+      }).join('');
+      tot();
+    }
+    function tot(){
+      $$('.mealcard',box).forEach(function(c){var m=meals[+c.dataset.mi];$('.mn-k',c).textContent=fmtKcal(mealKcal(m))+' kcal'});
+      var t=meals.reduce(function(a,m){return a+mealKcal(m)},0),en=petEnergy(p);
+      $('#mn-tot',el).innerHTML=meals.length?'全部餐點合計約 <b>'+fmtKcal(t)+' kcal</b>'+(en?'，每日建議 '+en.target+' kcal':''):'';
+    }
+    function at(e){var c=e.target.closest('.mealcard');if(!c)return null;var m=meals[+c.dataset.mi],r=e.target.closest('.mnrow');return {m:m,c:c,x:r?m.items[+r.dataset.ii]:null,ii:r?+r.dataset.ii:-1}}
+    box.addEventListener('input',function(e){var a=at(e);if(!a)return;var t=e.target.classList;
+      if(t.contains('mn-lb'))a.m.label=e.target.value.trim();
+      if(t.contains('mn-time'))a.m.time=e.target.value;
+      if(t.contains('mn-w')){var w=parseInt(e.target.value.replace(/[^0-9]/g,''),10);a.m.addw=w>0?w:0}
+      if(t.contains('mn-amt')&&a.x){var v=parseFloat(e.target.value.replace(',','.'));a.x.amt=v>0?v:0}tot()});
+    box.addEventListener('change',function(e){var a=at(e);if(a&&e.target.classList.contains('mn-time'))a.m.time=e.target.value;
+      if(a&&e.target.classList.contains('mn-auto')){a.m.auto=e.target.checked;if(a.m.auto&&!a.m.time){toast('請先設定這一餐的時間');var ti=$('.mn-time',a.c);if(ti)ti.focus()}}
+      if(!a||!a.x)return;if(e.target.classList.contains('mn-f')){a.x.food=e.target.value;var f=foodGet(a.x.food);a.x.unit=foodByPc(f)?'pc':'g';paint()}if(e.target.classList.contains('mn-u')){a.x.unit=e.target.value;tot()}});
+    box.addEventListener('click',function(e){var a=at(e);if(!a)return;
+      if(e.target.closest('.mn-rm')){a.m.items.splice(a.ii,1);paint()}
+      else if(e.target.closest('.mn-rmm')){meals.splice(+a.c.dataset.mi,1);paint()}
+      else if(e.target.closest('.mn-additem')){a.m.items.push({food:'',amt:0,unit:'g'});paint()}});
+    $('#mn-addmeal',el).onclick=function(){var names=['早餐','午餐','晚餐','宵夜','點心'],used=meals.map(function(m){return m.label}),nm=names.filter(function(n){return used.indexOf(n)<0})[0]||'第 '+(meals.length+1)+' 餐';meals.push({label:nm,items:[{food:'',amt:0,unit:'g'}],addw:0});paint()};
+    paint();
+    $('#mn-save',el).onclick=async function(){
+      var out=[],bad=0,labels={};
+      meals.forEach(function(m){var its=m.items.filter(function(x){return x.food&&x.amt>0});bad+=m.items.length-its.length;if(!its.length&&!m.addw)return;var lb=m.label||'餐點';while(labels[lb])lb+='＊';labels[lb]=1;out.push({label:lb,items:its,addw:+m.addw||0,time:m.time||'',auto:!!(m.auto&&m.time)})});
+      if(meals.some(function(m){return m.auto&&!m.time})){toast('開啟自動記錄的餐要設定時間');return}
+      out.sort(function(a,b){return (a.time||'99')<(b.time||'99')?-1:(a.time||'99')>(b.time||'99')?1:0});
+      if(bad&&!await confirmDlg('有 '+bad+' 項沒選食物或沒填份量，會略過。要儲存嗎？','儲存'))return;
+      var src=S.pets.filter(function(x){return x.id===p.id})[0],nf=Object.assign(petFeed(src),{meals:out});
+      if(out.some(function(m){return m.auto})){nf.autoUpTo=today().getTime()}
+      src.feeding=nf;await savePet(src);closeTop();var n=await runFeeder();render();toast('已儲存菜單'+(n?'，已補記今天 '+n+' 餐':''));
+    };
+  }});
+}
+function openAutoFeed(ex){
+  var p=S.pets.filter(function(x){return x.id===ex.petId})[0]||curPet();if(!p)return;
+  var l=JSON.parse(JSON.stringify(ex)),its=foodItemsOf(l);l.lefts=l.lefts||[];if(!l.left)l.left='0';
+  var d=new Date(l.ts);
+  var body='<div class="autobadge">'+ico('lock',18)+'<div><b>餵食機自動記錄</b><small>'+(d.getMonth()+1)+'/'+d.getDate()+' '+hhmm(l.ts)+(l.meal?'・'+esc(l.meal):'')+'　依固定菜單的排程記錄，內容已鎖定</small></div></div>'+
+    '<div class="autoitems" id="af-items"></div>'+(l.addw?'<div class="hint" style="margin:-4px 0 12px">主食加水 '+l.addw+' ml</div>':'')+
+    '<div class="field"><span class="lbl">剩食</span><div class="seg wrap" id="af-left">'+LEFTS.map(function(x){return '<button type="button" data-v="'+x[0]+'" class="'+(l.left===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div></div>'+
+    '<div class="hint" id="af-out" style="margin:-4px 0 14px;padding:8px 10px;border-radius:10px;background:var(--surface2)"></div>'+
+    '<div class="field"><label for="af-note">備註（選填）</label><input id="af-note" type="text" maxlength="40" autocomplete="off" placeholder="例如：只吃了乾糧" value="'+esc(l.note||'')+'"></div>'+
+    '<button type="button" class="linkbtn" id="af-unlock" style="margin:4px 0 0;color:var(--ink2)">'+ico('edit',16)+'修改份量、時間或刪除這筆…</button>';
+  openSheet({title:'餵食紀錄・'+p.name,body:body,footer:'<button class="btn primary" id="af-save">儲存</button>',onMount:function(el){
+    function paint(){
+      var cus=l.left==='c';
+      $('#af-items',el).innerHTML=its.map(function(x,i){return '<div class="airow"><span class="fn">'+esc(x.fname||'（已刪除）')+'</span><span class="am">'+fmtKg(x.amt)+(x.unit==='pc'?' '+esc(x.pcn||'份'):' g')+'</span><span class="kc">'+(x.kcal||0)+' kcal</span>'+(cus?'<input type="text" class="af-l" data-i="'+i+'" inputmode="decimal" maxlength="6" placeholder="剩" value="'+(l.lefts[i]||'')+'">':'')+'</div>'}).join('')+(cus?'<div class="hint" style="margin:-2px 0 10px">「剩」填剩下多少（和份量同單位）。</div>':'');
+      var c=calcMeal(its,0,l.addw,l.left,l.lefts);
+      $('#af-out',el).innerHTML='放了 '+fmtKcal(c.given)+' kcal'+(c.kcal!==c.given?'，<b>吃了 '+fmtKcal(c.kcal)+' kcal</b>':'，<b>全部吃完</b>')+(petWater(p).on?'<br>計入今日飲水 '+(c.wml+c.fw)+' ml（食物水分 '+c.fw+(l.addw?'＋加水 '+c.wml:'')+'）':'');
+    }
+    paint();
+    bindSeg($('#af-left',el),function(v){l.left=v;paint()});
+    $('#af-items',el).addEventListener('input',function(e){if(!e.target.classList.contains('af-l'))return;var v=parseFloat(e.target.value.replace(',','.'));l.lefts[+e.target.dataset.i]=v>=0?v:0;var c=calcMeal(its,0,l.addw,l.left,l.lefts);$('#af-out',el).innerHTML='放了 '+fmtKcal(c.given)+' kcal，<b>吃了 '+fmtKcal(c.kcal)+' kcal</b>'+(petWater(p).on?'<br>計入今日飲水 '+(c.wml+c.fw)+' ml':'')});
+    $('#af-unlock',el).onclick=async function(){
+      if(!await confirmDlg('這筆是餵食機依排程自動記錄的。\n只有餵食機當天實際放的量不同、或這餐沒有放飯時才需要修改。\n\n確定要解除鎖定嗎？','解除鎖定'))return;
+      closeTop();setTimeout(function(){openFeedLog(ex.id,null,true)},350);
+    };
+    $('#af-save',el).onclick=async function(){
+      if(l.left==='c'){for(var i=0;i<its.length;i++){if((+l.lefts[i]||0)>its[i].amt){toast('剩下的份量比放的還多，請再確認');return}}}
+      var c=calcMeal(its,0,l.addw,l.left,l.lefts),out=Object.assign({},ex,{left:l.left,kcal:c.kcal,wml:c.wml,fw:c.fw,note:$('#af-note',el).value.trim()});
+      if(l.left==='c')out.lefts=l.lefts.slice(0,its.length).map(function(x){return +x||0});else delete out.lefts;
+      await saveLog(out);closeTop();render();toast('已儲存');
+    };
+  }});
+}
+function openFeedLog(id,preMeal,unlock){
+  var ex=id&&S.logs.filter(function(l){return l.id===id})[0];
+  if(ex&&ex.auto&&!unlock)return openAutoFeed(ex);
+  var p=ex?(S.pets.filter(function(x){return x.id===ex.petId})[0]||curPet()):curPet();if(!p)return;
+  var fd=petFeed(p),hw=petWater(p).on||(ex&&ex.addw);
+  var l=ex?JSON.parse(JSON.stringify(ex)):{id:uid(),petId:p.id,type:'food',custom:'',ts:Date.now(),note:'',photos:[],meal:'',items:[],kcalIn:0,addw:0,left:'0',lefts:[]};
+  l.items=foodItemsOf(l).map(function(x){return Object.assign({},x)});l.lefts=l.lefts||[];if(!l.left)l.left='0';
+  if(ex&&!ex.items&&ex.kcal&&!ex.food){l.kcalIn=ex.kcal}
+  var mode=(l.kcalIn&&!l.items.length)?'kcal':'food';
+  var mealNames=uniq(fd.meals.map(function(m){return m.label}).concat(['早餐','午餐','晚餐','宵夜','點心']));
+  if(l.meal&&mealNames.indexOf(l.meal)<0)mealNames.push(l.meal);
+  if(!ex&&preMeal){var pm=fd.meals.filter(function(m){return m.label===preMeal})[0];l.meal=preMeal;if(pm){l.items=mealCalc(pm);l.addw=+pm.addw||0}}
+  var body='<div class="field"><span class="lbl">餐別（選填）</span><div class="typegrid" id="fl-meal">'+mealNames.map(function(n){return '<button type="button" data-v="'+esc(n)+'" class="'+(l.meal===n?'on':'')+'" style="--h:30">'+esc(n)+'</button>'}).join('')+'</div><div class="hint" id="fl-mealhint" hidden></div></div>'+
+    '<div class="field"><span class="lbl">記錄方式</span><div class="seg" id="fl-mode"><button type="button" data-v="food" class="'+(mode==='food'?'on':'')+'">選擇食物</button><button type="button" data-v="kcal" class="'+(mode==='kcal'?'on':'')+'">直接填熱量</button></div></div>'+
+    '<div id="fl-foodwrap"><div class="field"><span class="lbl">點選食物加入（可以加好幾樣）</span><div class="typegrid" id="fl-foods"></div></div><div id="fl-items"></div></div>'+
+    '<div class="field" id="fl-kcalwrap"><label for="fl-kcal">熱量（kcal）</label><input id="fl-kcal" type="text" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="例如 80" value="'+(l.kcalIn||'')+'"></div>'+
+    (hw?'<div class="field"><label for="fl-addw">主食加水（ml，選填）</label><input id="fl-addw" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 20" value="'+(l.addw||'')+'"><div class="hint">食物本身的水分和加的水，都會依吃掉的比例自動算進今日飲水，不用另外記。</div></div>':'')+
+    '<div class="field"><span class="lbl">剩食</span><div class="seg wrap" id="fl-left">'+LEFTS.map(function(x){return '<button type="button" data-v="'+x[0]+'" class="'+(l.left===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div><div class="hint">還沒收碗可以先選「吃完」，之後再回來改。</div></div>'+
+    '<div class="hint" id="fl-out" style="margin:-4px 0 14px;padding:8px 10px;border-radius:10px;background:var(--surface2)"></div>'+
+    '<div class="field"><label for="fl-time">時間</label><input id="fl-time" type="datetime-local" value="'+toLocalInput(l.ts)+'"></div>'+
+    '<div class="field"><label for="fl-note">備註（選填）</label><input id="fl-note" type="text" maxlength="40" autocomplete="off" placeholder="例如：吃得很慢、換新口味" value="'+esc(l.note||'')+'"></div>';
+  var footer=(ex?'<button class="btn danger" id="fl-del">刪除</button>':'')+'<button class="btn primary" id="fl-save">'+(ex?'儲存':'記錄')+'</button>';
+  if(ex&&ex.auto)body='<div class="autobadge warn">'+ico('lock',18)+'<div><b>已解除鎖定</b><small>這筆是餵食機自動記錄的，修改後仍會標示為餵食機紀錄。這餐沒放飯的話可以刪除，刪除後不會再自動補回。</small></div></div>'+body;
+  openSheet({title:(ex?'編輯餵食・':'記錄餵食・')+p.name,body:body,footer:footer,onMount:function(el){
+    function unitsFor(f){var u=[];if(!f)return [['g','克']];if(!foodByPc(f)||f.pcg)u.push(['g','克']);if(kcalPerPc(f)!=null)u.push(['pc',f.pc||'份']);if(foodByPc(f))u.reverse();return u}
+    function recalcItem(x){var f=foodGet(x.food);if(f){var c=feedCalc(f,x.amt,x.unit);x.kcal=c?c.kcal:0;x.g=c?c.g:null;x.fname=f.name;x.pcn=f.pc||'份'}}
+    function paintFoods(){$('#fl-foods',el).innerHTML=S.foods.map(function(f){var on=l.items.some(function(x){return x.food===f.id});return '<button type="button" data-v="'+f.id+'" class="'+(on?'on':'')+'" style="--h:30">'+esc(f.name)+'</button>'}).join('')+'<button type="button" data-newfood style="--h:30">'+ico('plus',16)+' 新增食物</button>'}
+    function paintItems(){
+      var cus=l.left==='c';
+      $('#fl-items',el).innerHTML=l.items.length?l.items.map(function(x,i){var f=foodGet(x.food),us=unitsFor(f);
+        return '<div class="firow" data-i="'+i+'"><span class="fn">'+esc(x.fname||'（已刪除）')+'<small>'+(x.kcal?x.kcal+' kcal':'')+'</small></span><input type="text" class="fi-amt" inputmode="decimal" maxlength="6" placeholder="份量" value="'+(x.amt||'')+'"'+(f?'':' disabled')+'><select class="fi-u"'+(f?'':' disabled')+'>'+us.map(function(u){return '<option value="'+u[0]+'" '+(x.unit===u[0]?'selected':'')+'>'+esc(u[1])+'</option>'}).join('')+'</select>'+(cus?'<input type="text" class="fi-left" inputmode="decimal" maxlength="6" placeholder="剩" value="'+(l.lefts[i]||'')+'">':'')+'<button type="button" class="iconbtn fi-rm" style="width:34px;height:34px" aria-label="移除">'+ico('x',15)+'</button></div>'}).join('')+(cus?'<div class="hint">「剩」欄位填剩下多少（和份量同單位）。</div>':'')
+        :'<div class="hint" style="margin-bottom:12px">'+(S.foods.length?'點上面的食物加入這一餐。':'先新增常吃的食物，填一次熱量，之後就能直接點選。')+'</div>';
+    }
+    function paintOut(){
+      var md=segVal($('#fl-mode',el))||'food';$('#fl-foodwrap',el).hidden=md!=='food';$('#fl-kcalwrap',el).hidden=md!=='kcal';
+      var kin=md==='kcal'?(parseInt(($('#fl-kcal',el).value||'').replace(/[^0-9]/g,''),10)||0):0,its=md==='food'?l.items:[];
+      var aw=$('#fl-addw',el)?(parseInt(($('#fl-addw',el).value||'').replace(/[^0-9]/g,''),10)||0):0;
+      var c=calcMeal(its,kin,aw,l.left,l.lefts),en=petEnergy(p),k=ymd(today()),prev=0;
+      S.logs.forEach(function(x){if(x.petId===p.id&&x.type==='food'&&x.id!==l.id&&ymd(new Date(x.ts))===k)prev+=(+x.kcal||0)});
+      var h=c.given?'給了 '+fmtKcal(c.given)+' kcal'+(c.kcal!==c.given?'，<b>吃了 '+fmtKcal(c.kcal)+' kcal</b>':'，<b>全部吃完</b>'):'選擇食物並填份量，會自動算出熱量。';
+      if(petWater(p).on&&(aw||c.fw))h+='<br>計入今日飲水 <b>'+(c.wml+c.fw)+' ml</b>（食物水分 '+c.fw+(aw?'＋加水 '+c.wml:'')+'）';
+      if(en)h+='<br>今天'+(c.kcal?'加上這餐':'已吃')+' '+fmtKcal(prev+c.kcal)+' / 建議 '+en.target+' kcal';
+      $('#fl-out',el).innerHTML=h;
+    }
+    function paint(){paintFoods();paintItems();paintOut()}
+    paint();
+    bindSeg($('#fl-mode',el),paintOut);
+    bindSeg($('#fl-left',el),function(v){l.left=v;paintItems();paintOut()});
+    bindSeg($('#fl-meal',el),function(v){
+      if(l.meal===v){l.meal='';$$('#fl-meal button',el).forEach(function(b){b.classList.remove('on')});return}
+      l.meal=v;var pm=fd.meals.filter(function(m){return m.label===v})[0],hint=$('#fl-mealhint',el);
+      if(pm&&pm.auto){hint.hidden=false;hint.textContent=v+'由餵食機自動記錄，這裡記的是額外加的食物（例如罐頭），會另外算熱量。';return}
+      if(pm&&!l.items.length&&!ex){l.items=mealCalc(pm);if($('#fl-addw',el)&&pm.addw){$('#fl-addw',el).value=pm.addw}hint.hidden=false;hint.textContent='已帶入固定菜單的'+v+'，可以再調整。';paint()}
+    });
+    $('#fl-foods',el).addEventListener('click',function(e){
+      if(e.target.closest('[data-newfood]')){openFoodSheet(null,function(nf){if(nf){var x={food:nf.id,amt:0,unit:foodByPc(nf)?'pc':'g'};recalcItem(x);l.items.push(x)}paint()});return}
+      var b=e.target.closest('button[data-v]');if(!b)return;var fid=b.dataset.v,idx=-1;l.items.forEach(function(x,i){if(x.food===fid)idx=i});
+      if(idx<0){var f=foodGet(fid),x={food:fid,amt:0,unit:foodByPc(f)?'pc':'g'};recalcItem(x);l.items.push(x);idx=l.items.length-1;paint()}
+      setTimeout(function(){var r=$('.firow[data-i="'+idx+'"] .fi-amt',el);if(r)r.focus()},30);
+    });
+    var it=$('#fl-items',el);
+    it.addEventListener('input',function(e){var r=e.target.closest('.firow');if(!r)return;var i=+r.dataset.i,x=l.items[i];
+      if(e.target.classList.contains('fi-amt')){var v=parseFloat(e.target.value.replace(',','.'));x.amt=v>0?v:0;recalcItem(x);var sm=$('.fn small',r);if(sm)sm.textContent=x.kcal?x.kcal+' kcal':''}
+      if(e.target.classList.contains('fi-left')){var lv=parseFloat(e.target.value.replace(',','.'));l.lefts[i]=lv>=0?lv:0}
+      paintOut()});
+    it.addEventListener('change',function(e){var r=e.target.closest('.firow');if(!r||!e.target.classList.contains('fi-u'))return;var x=l.items[+r.dataset.i];x.unit=e.target.value;recalcItem(x);paintItems();paintOut()});
+    it.addEventListener('click',function(e){var b=e.target.closest('.fi-rm');if(!b)return;var i=+b.closest('.firow').dataset.i;l.items.splice(i,1);l.lefts.splice(i,1);paint()});
+    ['fl-kcal','fl-addw'].forEach(function(id){var x=$('#'+id,el);if(x)x.addEventListener('input',paintOut)});
+    if(!ex&&!l.items.length&&S.foods.length===0)setTimeout(function(){},0);
+    $('#fl-save',el).onclick=async function(){
+      var md=segVal($('#fl-mode',el))||'food',v=$('#fl-time',el).value,ts=v?new Date(v).getTime():Date.now();
+      if(isNaN(ts)){toast('請選擇時間');return}
+      var its=[],kin=0;
+      if(md==='food'){its=l.items.filter(function(x){return x.amt>0&&(x.kcal>0||!foodGet(x.food))});if(!its.length){toast('請點選食物並填份量，或改用「直接填熱量」');return}if(its.length<l.items.length){toast('有食物沒填份量，請填寫或移除');return}}
+      else{kin=parseInt(($('#fl-kcal',el).value||'').replace(/[^0-9]/g,''),10)||0;if(!(kin>0)||kin>20000){toast('請輸入熱量，例如 80');$('#fl-kcal',el).focus();return}}
+      var aw=$('#fl-addw',el)?(parseInt(($('#fl-addw',el).value||'').replace(/[^0-9]/g,''),10)||0):(+l.addw||0);
+      if(l.left==='c'&&md==='food'){for(var i=0;i<its.length;i++){if((+l.lefts[i]||0)>its[i].amt){toast('剩下的份量比給的還多，請再確認');return}}}
+      var lf=l.left==='c'&&md!=='food'?'0':l.left,c=calcMeal(its,kin,aw,lf,l.lefts);
+      var out={auto:!!(ex&&ex.auto),id:l.id,petId:p.id,type:'food',custom:'',ts:ts,note:$('#fl-note',el).value.trim(),photos:(ex&&ex.photos)||[],meal:l.meal||'',items:its,kcalIn:kin,addw:aw,left:lf,kcal:c.kcal,wml:c.wml,fw:c.fw};
+      if(lf==='c')out.lefts=l.lefts.slice(0,its.length).map(function(x){return +x||0});
+      await saveLog(out);closeTop();render();if(!ex)stamp();toast(ex?'已儲存':'已記錄'+(l.meal||'餵食'));
+    };
+    var del=$('#fl-del',el);
+    if(del)del.onclick=async function(){if(!await confirmDlg('刪除這筆餵食紀錄？','刪除',true))return;await removeLog(l.id);closeTop();render();toast('已刪除')};
+  }});
+}
+function openHealthSheet(kind){
+  var p=curPet();if(!p)return;
+  var isW=kind==='water',type=isW?'water':'exercise',field=isW?'ml':'min',unit=isW?'ml':'分鐘',range=7,page=1,PER=4;
+  var body='<div class="seg" id="h-range" style="margin-bottom:8px"><button data-v="7" class="on">7 天</button><button data-v="30">30 天</button><button data-v="90">90 天</button></div><div id="h-body"></div>';
+  openSheet({title:(isW?'飲水量・':'運動量・')+p.name,body:body,footer:'<button class="btn" id="h-set">'+ico('gear',20)+'設定</button><button class="btn primary" id="h-add">'+ico('plus',20)+(isW?'記錄飲水':'記錄運動')+'</button>',
+    onClose:function(){sheetRefresh=null},
+    onMount:function(el){
+      var box=$('#h-body',el);
+      function paint(){
+        var days=isW?waterDays(p,range):dayTotals(p.id,type,field,range),tot=days.reduce(function(a,x){return a+x.v},0),rec=days.filter(function(x){return x.v>0}).length;
+        var o={label:(isW?'每日飲水量':'每日運動時間')+'長條圖'},info='',stats,stats0='';
+        if(isW){
+          var tg=waterTarget(p);if(tg){o.lo=tg.need[0];o.hi=tg.need[1]}o.stack=WSTACK;
+          var ok=tg?days.filter(function(x){return x.v>=tg.need[0]}).length:0,td=days[days.length-1];
+          info='<p class="about" style="margin:0 0 8px">'+waterTargetText(p)+'</p>';
+          stats0='<div class="actsum"><span><i class="dotc" style="background:'+WSTACK[0][2]+'"></i>水碗 <b>'+td.bowl+'</b> ml</span><span><i class="dotc" style="background:'+WSTACK[1][2]+'"></i>食物水分 <b>'+td.food+'</b> ml'+(td.est?'（估計）':'')+'</span><span><i class="dotc" style="background:'+WSTACK[2][2]+'"></i>主食加水 <b>'+td.add+'</b> ml</span></div>';
+          stats='<div class="wstats"><div><small>今天</small><b>'+days[days.length-1].v+'</b></div><div><small>平均／天</small><b>'+(rec?Math.round(tot/rec):0)+'</b></div><div><small>有紀錄</small><b>'+rec+' 天</b></div><div><small>達建議量</small><b>'+(tg?ok+' 天':'—')+'</b></div></div>';
+        }else{
+          var e=petEx(p);if(e.goal)o.goal=e.goal;o.color='var(--ex)';
+          var by={};S.logs.forEach(function(l){if(l.petId===p.id&&l.type==='exercise'&&+l.min>0&&new Date(l.ts)>=days[0].d){var a=l.act||'其他';by[a]=(by[a]||0)+(+l.min)}});
+          var acts=Object.keys(by).sort(function(a,b){return by[b]-by[a]});
+          info=acts.length?'<div class="actsum">'+acts.map(function(a){return '<span><b>'+esc(a)+'</b> '+by[a]+' 分</span>'}).join('')+'</div>':'';
+          stats='<div class="wstats"><div><small>今天</small><b>'+days[days.length-1].v+'</b></div><div><small>平均／天</small><b>'+Math.round(tot/range)+'</b></div><div><small>總計</small><b>'+tot+'</b></div><div><small>'+(e.goal?'達目標':'有運動')+'</small><b>'+(e.goal?days.filter(function(x){return x.v>=e.goal}).length:rec)+' 天</b></div></div>';
+        }
+        var legend=isW?'<small style="display:block;margin-bottom:8px">'+(o.lo!=null?'綠色區間：每日建議水分（ml）。':'')+'長條：水碗＋食物水分＋主食加水。下方是今天的來源。</small>'+stats0:(o.goal?'<small style="display:block;margin-bottom:8px">虛線：每日目標 '+o.goal+' 分鐘</small>':'');
+        box.innerHTML=info+barChart(days,o)+legend+stats+'<div class="sechead" id="h-listhead" style="margin:4px 2px 0">最近紀錄</div><div id="h-list"></div>';
+        bindBars($('.bchart',box),days,unit,isW);paintList();
+      }
+      function paintList(){
+        var list=S.logs.filter(function(l){return l.petId===p.id&&(l.type===type||(isW&&l.type==='food'&&petFeed(p).on&&(+l.wml>0||foodMoistWater(l)>=1)))}).sort(function(a,b){return b.ts-a.ts}),pages=Math.max(1,Math.ceil(list.length/PER));
+        if(page>pages)page=pages;var start=(page-1)*PER;
+        if(!list.length){$('#h-list',box).innerHTML='<p class="about">還沒有紀錄，按下方「'+(isW?'記錄飲水':'記錄運動')+'」新增。'+(isW?'在主食裡加水的話，記錄餵食時填「主食加水」就會自動算進來。':'')+'</p>';return}
+        $('#h-list',box).innerHTML='<div class="hist" style="border-top:0;margin-top:0">'+list.slice(start,start+PER).map(function(l){var d=new Date(l.ts);
+          return '<button class="hrow" data-lid="'+l.id+'"><span class="d">'+(d.getMonth()+1)+'/'+d.getDate()+' '+hhmm(l.ts)+'</span><span class="grow"><span class="wkg">'+(l.type==='food'?Math.round(foodMoistWater(l)+(+l.wml||0))+' ml':isW?l.ml+' ml':l.min+' 分鐘')+'</span><small style="display:block">'+(l.type==='food'?'餐點水分'+(l.meal?'（'+esc(l.meal)+'）':'')+'・食物 '+Math.round(foodMoistWater(l))+(+l.wml?'＋加水 '+l.wml:''):isW?(l.wmode==='diff'?'加水 '+l.add+'・剩 '+l.left:'直接填寫'):esc(l.act||'運動'))+(l.note?'・'+esc(l.note):'')+'</small></span>'+ico('cr',16)+'</button>'}).join('')+'</div>'+pagerHtml(page,pages,'data-hpg');
+      }
+      bindSeg($('#h-range',el),function(v){range=+v;paint()});
+      box.addEventListener('click',function(e){var pg=e.target.closest('[data-hpg]');if(pg){if(pg.disabled)return;page=+pg.getAttribute('data-hpg');paintList();return}var r=e.target.closest('[data-lid]');if(r)openLogSheet(r.dataset.lid)});
+      $('#h-add',el).onclick=function(){openLogSheet(null,type)};
+      $('#h-set',el).onclick=function(){openPetSheet(p.id,'health')};
+      sheetRefresh=paint;paint();
+    }});
+}
+function logMetricHtml(l,terms){
+  terms=terms||[];
+  if(l.type==='weight'&&l.weight)return '<p class="note"><span class="wkg" style="font-size:20px">'+hl(fmtKg(l.weight)+' kg',terms)+'</span>'+deltaHtml(weightDelta(l))+'</p>';
+  if(l.type==='water'&&l.ml!=null)return '<p class="note"><span class="wkg" style="font-size:20px">'+hl(l.ml+' ml',terms)+'</span>'+(l.wmode==='diff'?'<span class="delta">加水 '+l.add+'・剩 '+l.left+'</span>':'')+'</p>';
+  if(l.type==='food'&&l.kcal!=null){var lf=leftLabel(l);return '<p class="note"><span class="wkg" style="font-size:20px">'+hl(fmtKcal(l.kcal)+' kcal',terms)+'</span>'+(lf?'<span class="delta">'+lf+'</span>':'')+'</p><p class="note" style="color:var(--ink2)">'+hl(feedLabel(l),terms)+(l.addw?'・加水 '+l.addw+' ml':'')+(l.auto?'　<span class="autotag">'+ico('lock',13)+'餵食機</span>':'')+'</p>'}
+  if(l.type==='exercise'&&l.min)return '<p class="note"><span class="wkg" style="font-size:20px">'+hl(l.min+' 分鐘',terms)+'</span>'+(l.act?'<span class="delta">'+hl(l.act,terms)+'</span>':'')+'</p>';
+  return '';
 }
 function weightCardHtml(p){
   var pts=weightPoints(p.id);
-  if(!pts.length)return '<button class="wcard" data-act="weights"><span class="grow"><span class="lb">體重</span><span class="kg" style="font-size:17px">還沒有紀錄</span><span class="sub">點這裡記錄第一筆體重</span></span>'+ico('cr',18)+'</button>';
+  var cb='<button class="hc-chart" data-act="weights" aria-label="查看體重變化圖表">'+ico('chart',18)+'</button>';
+  if(!pts.length)return '<div class="wcard" role="button" tabindex="0" data-act="weightadd" aria-label="記錄體重"><span class="grow"><span class="lb">體重</span><span class="kg" style="font-size:17px">還沒有紀錄</span><span class="sub">點這裡記錄第一筆體重</span></span>'+cb+'</div>';
   var last=pts[pts.length-1],prev=pts.length>1?pts[pts.length-2]:null,d=new Date(last.t);
-  return '<button class="wcard" data-act="weights" aria-label="查看體重變化"><span class="grow"><span class="lb">體重</span><span class="kg">'+fmtKg(last.kg)+'<small>kg</small>'+(prev?deltaHtml(last.kg-prev.kg):'')+'</span><span class="sub">'+d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+(last.src==='vacc'?'・打預防針時量':'')+'　共 '+pts.length+' 筆</span></span>'+sparkSvg(pts,88,40)+ico('cr',18)+'</button>';
+  return '<div class="wcard" role="button" tabindex="0" data-act="weightadd" aria-label="記錄體重"><span class="grow"><span class="lb">體重</span><span class="kg">'+fmtKg(last.kg)+'<small>kg</small>'+(prev?deltaHtml(last.kg-prev.kg):'')+'</span><span class="sub">'+d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+(last.src==='vacc'?'・打預防針時量':'')+'　共 '+pts.length+' 筆</span></span>'+sparkSvg(pts,88,40)+cb+'</div>';
 }
 function pagerHtml(page,pages,attr){
   if(pages<=1)return '';
@@ -864,13 +1720,13 @@ function weightChart(pts){
   g+='<text x="'+L+'" y="'+(H-6)+'" font-size="10.5" fill="var(--ink2)">'+fd(pts[0].t)+'</text>';
   if(pts.length>1)g+='<text x="'+(W-R)+'" y="'+(H-6)+'" text-anchor="end" font-size="10.5" fill="var(--ink2)">'+fd(pts[pts.length-1].t)+'</text>';
   var line=pts.map(function(p,i){return (i?'L':'M')+X(p.t).toFixed(1)+' '+Y(p.kg).toFixed(1)}).join(' ');
-  var area=pts.length>1?'<path d="'+line+' L'+X(pts[pts.length-1].t).toFixed(1)+' '+(H-B)+' L'+X(pts[0].t).toFixed(1)+' '+(H-B)+' Z" fill="var(--primary)" opacity=".1"/>':'';
+  var area=pts.length>1?'<path d="'+line+' L'+X(pts[pts.length-1].t).toFixed(1)+' '+(H-B)+' L'+X(pts[0].t).toFixed(1)+' '+(H-B)+' Z" fill="var(--wt)" opacity=".1"/>':'';
   var many=pts.length>40;
-  var dots=pts.map(function(p,i){var last=i===pts.length-1;if(many&&!last)return '';return '<circle cx="'+X(p.t).toFixed(1)+'" cy="'+Y(p.kg).toFixed(1)+'" r="'+(last?5:4)+'" fill="'+(p.src==='vacc'?'var(--surface)':'var(--primary)')+'" stroke="var(--primary)" stroke-width="2"/>'}).join('');
+  var dots=pts.map(function(p,i){var last=i===pts.length-1;if(many&&!last)return '';return '<circle cx="'+X(p.t).toFixed(1)+'" cy="'+Y(p.kg).toFixed(1)+'" r="'+(last?5:4)+'" fill="'+(p.src==='vacc'?'var(--surface)':'var(--wt)')+'" stroke="var(--wt)" stroke-width="2"/>'}).join('');
   var lp=pts[pts.length-1];
   var lab='<text x="'+Math.min(X(lp.t),W-R).toFixed(1)+'" y="'+(Y(lp.kg)-12).toFixed(1)+'" text-anchor="end" font-size="12" font-weight="700" fill="var(--ink)">'+fmtKg(lp.kg)+' kg</text>';
   var json=JSON.stringify(pts.map(function(p){return [X(p.t),Y(p.kg)]}));
-  return '<div class="wchart" data-pts=\''+json+'\'><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="體重變化折線圖，最新 '+fmtKg(lp.kg)+' 公斤">'+g+area+(pts.length>1?'<path d="'+line+'" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>':'')+dots+lab+'<line class="xh" x1="0" x2="0" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--ink2)" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/></svg><div class="tip" hidden></div></div>';
+  return '<div class="wchart" data-pts=\''+json+'\'><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="體重變化折線圖，最新 '+fmtKg(lp.kg)+' 公斤">'+g+area+(pts.length>1?'<path d="'+line+'" fill="none" stroke="var(--wt)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>':'')+dots+lab+'<line class="xh" x1="0" x2="0" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--ink2)" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/></svg><div class="tip" hidden></div></div>';
 }
 function openWeights(){
   var p=curPet();if(!p)return;
@@ -924,29 +1780,40 @@ function openWeights(){
 }
 
 /* ================= 畫面：首頁 ================= */
+function heroChips(){
+  return S.pets.map(function(q){var pc=petColorOf(q),on=q.id===S.sel,ch=(q.name||'?').trim().charAt(0)||'?';
+    var av=q.photo?'<img class="hav" src="'+q.photo+'" alt="">':'<span class="hav" style="background:'+pc.l[0]+'">'+esc(ch)+'</span>';
+    return '<button class="hchip'+(on?' on':'')+'" data-act="selpet" data-id="'+q.id+'"'+(on?' aria-current="true"':'')+'>'+av+'<span>'+esc(q.name)+'</span></button>'}).join('')+
+    '<button class="hchip add" data-act="addpet" aria-label="新增寵物">'+ico('plus',20)+'</button>';
+}
+function nextEventCard(p,now){
+  var ev=[],bd=p.birthday?parseD(p.birthday):null,hd=p.homeDate?parseD(p.homeDate):null,n=esc(p.name);
+  if(bd&&p.showAge){var nb=nextAnn(bd,now);if(nb)ev.push({label:nb.years+' 歲生日',date:nb.date,bday:true})}
+  if(hd&&p.showAnniv&&dayDiff(now,hd)>=0)annEvents(hd,now).forEach(function(e){ev.push({label:e.label.replace('來家第 ','來家 ').replace(' 天',' 天'),date:e.date})});
+  ev=ev.filter(function(e){return dayDiff(e.date,now)>=0}).sort(function(x,y){return x.date-y.date});
+  if(!ev.length)return '';var e=ev[0],dd=dayDiff(e.date,now);
+  var gift='<svg class="gift" width="40" height="34" viewBox="0 0 40 34" aria-hidden="true"><rect x="4" y="14" width="32" height="18" rx="4" fill="var(--primary-soft)"/><rect x="4" y="14" width="32" height="6" rx="3" fill="var(--primary)"/><path d="M20 14v18" stroke="var(--primary)" stroke-width="2"/><path d="M20 14c-3-7-11-6-8-1M20 14c3-7 11-6 8-1" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="7" r="2" fill="#E07B39"/><circle cx="34" cy="6" r="1.6" fill="#3A86D8"/><circle cx="29" cy="2.5" r="1.3" fill="#2F9A5E"/><circle cx="11" cy="3" r="1.3" fill="#7A62C9"/></svg>';
+  if(dd===0)return '<div class="evcard today">'+confettiSvg()+gift+'<div><b>今天是'+n+(e.bday?'的 '+e.label:e.label)+'！</b><small>'+(e.bday?'生日快樂！':'謝謝你一直陪著牠')+'</small></div></div>';
+  return '<div class="evcard">'+gift+'<div><b>'+dd+' 天後是'+(e.bday?n+'的 ':'')+e.label+'</b><small>'+fmtD(ymd(e.date))+'・當天首頁會有慶祝動畫</small></div></div>';
+}
 function viewHome(){
   var p=curPet(),now=today(),out=[];
-  var ah=alertsHtml(now);if(ah)out.push(ah);
   var bd=p.birthday?parseD(p.birthday):null,hd=p.homeDate?parseD(p.homeDate):null;
-  var meta=[p.species,p.breed,p.gender&&p.gender!=='未知'?p.gender:''].filter(Boolean).map(esc).join('・');
-  var h='<section class="card pet"><div class="pet-top">'+avatar(p,72)+'<div class="grow"><h1>'+esc(p.name)+'</h1><div class="meta">'+meta+'</div></div><button class="iconbtn" data-act="editpet" aria-label="編輯寵物">'+ico('edit')+'</button></div>';
-  h+='<dl class="facts"><div><dt>生日</dt><dd>'+(p.birthday?fmtD(p.birthday):'未填寫')+'</dd></div><div><dt>來家日期</dt><dd>'+(p.homeDate?fmtD(p.homeDate):'未填寫')+'</dd></div></dl>';
-  if(p.showAge&&bd){
-    var a=ageParts(bd,now);
-    if(a){
-      var nums='';
-      if(a.y) nums+='<span><b>'+a.y+'</b>歲</span>';
-      if(a.y||a.m) nums+='<span><b>'+a.m+'</b>個月</span>';
-      nums+='<span><b>'+a.d+'</b>天</span>';
-      var nb=nextAnn(bd,now),sub='出生第 '+(dayDiff(now,bd)+1).toLocaleString('en-US')+' 天';
-      var party='';
-      if(nb){ if(dayDiff(nb.date,now)===0) party='<div class="party">今天滿 '+nb.years+' 歲，生日快樂！</div>'; else sub+='　距離 '+nb.years+' 歲生日還有 '+dayDiff(nb.date,now)+' 天'; }
-      h+='<div class="age"><div class="age-nums">'+nums+'</div><div class="sub">'+sub+'</div>'+party+'</div>';
-    }else h+='<div class="age"><div class="sub">生日設在未來，請確認日期。</div></div>';
-  }
-  h+=weightCardHtml(p);
-  h+='</section>';
-  out.push(h);
+  var meta=[p.species,p.breed,p.gender&&p.gender!=='未知'?p.gender:'',{yes:'已結紮',no:'未結紮'}[petNeut(p)]||''].filter(Boolean).map(esc).join('・');
+  var a=p.showAge&&bd?ageParts(bd,now):null,nb=bd?nextAnn(bd,now):null,days=hd?dayDiff(now,hd)+1:0;
+  var pills='';
+  if(p.showAge&&bd){if(a)pills+='<span class="hpill">'+(a.y?'<b>'+a.y+'</b> 歲 ':'')+(a.y||a.m?'<b>'+a.m+'</b> 個月':'<b>'+a.d+'</b> 天')+'</span>';else pills+='<span class="hpill">生日設在未來</span>'}
+  if(p.showAnniv&&hd&&days>0)pills+='<span class="hpill">來家第 <b>'+days.toLocaleString('en-US')+'</b> 天</span>';
+  if(!p.birthday&&!p.homeDate)pills+='<span class="hpill dim">點右邊的筆填生日和來家日期</span>';
+  var party=nb&&p.showAge&&dayDiff(nb.date,now)===0?'<div class="hparty">'+confettiSvg()+'今天滿 '+nb.years+' 歲，生日快樂！</div>':'';
+  var t=new Date();
+  var h='<section class="hero'+(p.photo?' ph':'')+'"'+(p.photo?' style="background-image:url(\''+p.photo+'\')"':'')+'>'+(p.photo?'':PAW_SVG('#FFFFFF',170,'','hwm')+PAW_SVG('#FFFFFF',70,'','hwm2'))+
+
+    '<div class="hbody"><div class="hname"><div class="grow"><h1>'+esc(p.name)+'</h1><div class="meta">'+(meta||'&nbsp;')+'</div></div><button class="hedit" data-act="editpet" aria-label="編輯寵物">'+ico('edit',20)+'</button></div>'+(pills?'<div class="hpills">'+pills+'</div>':'')+party+'</div></section>';
+  var fm=friendlyMsg(p);if(fm)out.push('<div class="hmsg"><span class="hmi">'+PAW_SVG('#FFFFFF',20)+'</span><span>'+fm+'</span></div>');
+  var ah=alertsHtml(now);if(ah)out.push(ah);
+  out.push(metricCards(p)+mealChecklist(p));
+  var evc=nextEventCard(p,now);if(evc)out.push(evc);
   out.push('<div class="actions"><button class="btn primary" data-act="addlog">'+ico('plus',20)+'記錄狀況</button><button class="btn" data-act="tab" data-tab="deworm">'+ico('cal',20)+'驅蟲紀錄</button></div>');
 
   if(p.showAnniv&&hd){
@@ -969,14 +1836,14 @@ function viewHome(){
   out.push(wormSummary(p,now));
   out.push(vaccSummary(p,now));
 
-  var rec=S.logs.filter(function(l){return l.petId===p.id}).sort(function(a,b){return b.ts-a.ts}).slice(0,3);
+  var rec=S.logs.filter(function(l){return l.petId===p.id&&l.type!=='water'&&l.type!=='exercise'&&l.type!=='food'}).sort(function(a,b){return b.ts-a.ts}).slice(0,3);
   var rh='<section class="card"><div class="cardhead"><h2>最近狀況</h2>'+(rec.length?'<button class="linkbtn" data-act="tab" data-tab="timeline">全部'+ico('cr',16)+'</button>':'')+'</div>';
   if(!rec.length) rh+='<small>還沒有紀錄。嘔吐、軟便、食慾不好都可以記下來，附上照片更清楚。</small>';
   else rh+=rec.map(function(l){var d=new Date(l.ts);
     return '<button class="recent" data-act="editlog" data-id="'+l.id+'"><span class="tag" style="--h:'+typeOf(l.type).h+'">'+esc(logLabel(l))+'</span><span class="tx"><time>'+(d.getMonth()+1)+'/'+d.getDate()+' '+hhmm(l.ts)+(l.photos&&l.photos.length?'　'+l.photos.length+' 張照片':'')+'</time>'+(l.type==='weight'&&l.weight?'<p><b>'+fmtKg(l.weight)+' kg</b></p>':'')+(l.note?'<p>'+esc(l.note)+'</p>':'')+'</span></button>'}).join('');
   rh+='</section>';
   out.push(rh);
-  return '<div class="stack">'+out.join('')+'</div>';
+  return '<div class="homewrap">'+h+'<div class="homesheet"><div class="stack">'+out.join('')+'</div></div></div>';
 }
 function wormSummary(p,now){
   var cm=ym(now),h='<section class="card"><div class="cardhead"><h2>'+(now.getMonth()+1)+' 月驅蟲</h2><button class="linkbtn" data-act="tab" data-tab="deworm">全部紀錄'+ico('cr',16)+'</button></div>';
@@ -1008,6 +1875,9 @@ function hl(text,terms){
 }
 function logHay(l){
   if(l.type==='weight'&&l.weight)return logHayBase(l)+'\n'+fmtKg(l.weight)+'kg\n'+fmtKg(l.weight)+' kg';
+  if(l.type==='food')return logHayBase(l)+'\n'+feedLabel(l)+'\n餵食\n'+(l.addw?'加水\n':'')+l.kcal+'kcal\n'+l.kcal+' kcal';
+  if(l.type==='water')return logHayBase(l)+'\n喝水\n'+l.ml+'ml\n'+l.ml+' ml';
+  if(l.type==='exercise')return logHayBase(l)+'\n'+(l.act||'')+'\n'+l.min+'分\n'+l.min+' 分鐘';
   return logHayBase(l);
 }
 function logHayBase(l){
@@ -1015,15 +1885,16 @@ function logHayBase(l){
   return [logLabel(l),typeOf(l.type).name,l.note||'',y+'/'+m+'/'+dd,y+'/'+pad(m)+'/'+pad(dd),y+'-'+pad(m)+'-'+pad(dd),y+'年'+m+'月'+dd+'日',m+'月'+dd+'日',m+'/'+dd,pet?pet.name:''].join('\n').toLowerCase();
 }
 var TL_KIND={worm:{name:'驅蟲',h:290},vacc:{name:'預防針',h:235}};
-var TL_OPTS=[['worm','顯示驅蟲紀錄','每次驅蟲打卡'],['vacc','顯示預防針紀錄','疫苗名稱、注射位置與備註'],['vw','顯示預防針體重紀錄','另外列成一筆「量體重」，篩選量體重時也會出現']];
-function tlShow(k){var v=lsGet('petnote.tl.'+k);if(v==null)return lsGet('petnote.tlMerge')!=='0';return v!=='0'}
-function tlMerge(){return TL_OPTS.some(function(o){return tlShow(o[0])})}
+var TL_OPTS=[['food','顯示餵食紀錄','每次餵食的食物與熱量'],['water','顯示飲水紀錄','每次記錄的飲水量'],['exercise','顯示運動紀錄','活動類型與時間'],['worm','顯示驅蟲紀錄','每次驅蟲打卡'],['vacc','顯示預防針紀錄','疫苗名稱、注射位置與備註'],['vw','顯示預防針體重紀錄','另外列成一筆「量體重」，篩選量體重時也會出現']];
+function tlShow(k){var v=lsGet('petnote.tl.'+k);if(v==null){if(k==='water'||k==='food')return false;if(k==='exercise')return true;return lsGet('petnote.tlMerge')!=='0'}return v!=='0'}
+function tlMerge(){return ['worm','vacc','vw'].some(function(k){return tlShow(k)})}
 function tlOptsHtml(){return TL_OPTS.map(function(o){return '<div class="swrow"><span><b>'+o[1]+'</b><small>'+o[2]+'</small></span><span class="sw"><input type="checkbox" data-tlk="'+o[0]+'" '+(tlShow(o[0])?'checked':'')+' aria-label="'+o[1]+'"><i></i></span></div>'}).join('')}
 function openTlOpts(){openSheet({title:'時間線顯示',body:tlOptsHtml(),footer:'<button class="btn primary" data-close>完成</button>'})}
 function dateHay(ds){var a=ds.split('-'),y=+a[0],m=+a[1],d=+a[2];return [y+'/'+m+'/'+d,a[0]+'/'+a[1]+'/'+a[2],ds,y+'年'+m+'月'+d+'日',m+'月'+d+'日',m+'/'+d].join('\n')}
 function petNameOf(id){var x=S.pets.filter(function(p){return p.id===id})[0];return x?x.name:''}
 function tlItems(pred){
-  var out=S.logs.filter(pred).map(function(l){return {k:'log',ts:l.ts,r:l}});
+  var sw=tlShow('water'),se=tlShow('exercise'),sf=tlShow('food');
+  var out=S.logs.filter(function(l){return pred(l)&&(sw||l.type!=='water')&&(se||l.type!=='exercise')&&(sf||l.type!=='food')}).map(function(l){return {k:'log',ts:l.ts,r:l}});
   if(tlMerge()){
     if(tlShow('worm'))S.worms.forEach(function(w){if(w.date&&pred(w)){var d=parseD(w.date);out.push({k:'worm',ts:new Date(d.getFullYear(),d.getMonth(),d.getDate(),12).getTime(),r:w})}});
     S.vaccs.forEach(function(v){if(v.date&&pred(v)){var d=parseD(v.date),t=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12).getTime();if(tlShow('vacc'))out.push({k:'vacc',ts:t,r:v});if(+v.weight>0&&tlShow('vw'))out.push({k:'vw',ts:t,r:v})}});
@@ -1038,9 +1909,14 @@ function itemHay(it){
   else{parts.push('預防針','疫苗');if(r.site)parts.push(siteLabel(r.site))}
   return parts.join('\n').toLowerCase();
 }
+function pbanner(o){
+  return '<section class="pban">'+PAW_SVG('currentColor',120,'','pbwm')+'<div class="pbtop"><span class="pbic">'+ico(o.icon,22)+'</span><div class="grow"><h2>'+o.title+'</h2>'+(o.sub?'<div class="pbsub">'+o.sub+'</div>':'')+'</div>'+(o.right||'')+'</div>'+(o.body||'')+'</section>';
+}
+function ringSvg(frac,size,col,track){var r=(size-8)/2,c=2*Math.PI*r,f=Math.max(0,Math.min(1,frac));return '<svg class="ring" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" aria-hidden="true"><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="'+track+'" stroke-width="6"/><circle class="ringv" cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+(c*f).toFixed(1)+' '+c.toFixed(1)+'" style="--c:'+c.toFixed(1)+'" transform="rotate(-90 '+size/2+' '+size/2+')"/></svg>'}
 function viewTimeline(){
   var p=curPet(),mine=tlItems(function(l){return l.petId===p.id});
-  var head='<div class="pagehead"><h2>'+esc(p.name)+' 的時間線</h2><span style="display:flex;align-items:center;gap:8px"><span class="pill cnt">'+mine.length+' 筆</span><button class="iconbtn" style="width:38px;height:38px;border-radius:12px" data-act="tlopts" aria-label="時間線顯示設定">'+ico('gear',20)+'</button></span></div>';
+  var lastLog=S.logs.filter(function(l){return l.petId===p.id&&l.type!=='water'&&l.type!=='food'&&l.type!=='exercise'}).sort(function(a,b){return b.ts-a.ts})[0],ago=lastLog?dayDiff(today(),new Date(new Date(lastLog.ts).setHours(0,0,0,0))):-1;
+  var head=pbanner({icon:'list',title:esc(p.name)+' 的時間線',sub:'共 <b>'+mine.length+'</b> 筆'+(lastLog?'・最近一筆是'+(ago===0?'今天':ago===1?'昨天':ago+' 天前')+'的「'+esc(logLabel(lastLog))+'」':''),right:'<button class="pbbtn" data-act="tlopts" aria-label="時間線顯示設定">'+ico('gear',20)+'</button>'});
   if(!mine.length&&!S.q) return head+'<div class="empty"><h3>還沒有狀況紀錄</h3><p>遇到嘔吐、軟便、受傷等狀況，點右下角記下時間、說明和照片。</p></div>';
   var box='<div class="search" role="search">'+ico('search',20)+'<input id="tl-q" type="search" enterkeyhint="search" autocomplete="off" placeholder="搜尋說明、狀況類型或日期，例如：軟便、2025/3" value="'+esc(S.q)+'" aria-label="搜尋時間線">'+(S.q?'<button class="clr" data-act="qclear" aria-label="清除搜尋">'+ico('x',18)+'</button>':'')+'</div>';
   return head+box+'<div id="tlBody">'+tlBody()+'</div>';
@@ -1079,8 +1955,8 @@ function tlBody(){
     if(it.k!=='log'){out+=recEntry(it,terms,showPet);return}
     var ph=(l.photos||[]).map(function(pid,i){var c=Photos.isId(pid)?Photos.cached(pid):pid;if(!Photos.isId(pid))return '<button data-act="photo" data-id="'+l.id+'" data-idx="'+i+'" aria-label="放大照片"><img decoding="async" loading="lazy" src="'+pid+'" alt=""></button>';return '<button data-act="photo" data-id="'+l.id+'" data-idx="'+i+'" aria-label="放大照片"><img decoding="async" data-ph="'+esc(pid)+'"'+(c?' src="'+c+'"':'')+' alt=""></button>'}).join('');
     var pet=showPet?S.pets.filter(function(x){return x.id===l.petId})[0]:null;
-    out+='<div class="entry" role="button" tabindex="0" data-act="editlog" data-id="'+l.id+'"><div class="rail"><i class="dot" style="--h:'+typeOf(l.type).h+'"></i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+typeOf(l.type).h+'">'+hl(logLabel(l),terms)+'</span>'+(pet?'<span class="pill">'+esc(pet.name)+'</span>':'')+'<time style="margin-left:auto">'+hhmm(l.ts)+'</time></div>'+
-      (l.type==='weight'&&l.weight?'<p class="note"><span class="wkg" style="font-size:20px">'+hl(fmtKg(l.weight)+' kg',terms)+'</span>'+deltaHtml(weightDelta(l))+'</p>':'')+
+    out+='<div class="entry" role="button" tabindex="0" data-act="editlog" data-id="'+l.id+'"><div class="rail"><i class="dot" style="--h:'+typeOf(l.type).h+';--pr:'+((hueOf(l.id)%5)*6-12)+'deg">'+PAW_SVG('currentColor',16)+'</i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+typeOf(l.type).h+'">'+hl(logLabel(l),terms)+'</span>'+(pet?'<span class="pill">'+esc(pet.name)+'</span>':'')+'<time style="margin-left:auto">'+hhmm(l.ts)+'</time></div>'+
+      logMetricHtml(l,terms)+
       (l.note?'<p class="note">'+hl(l.note,terms)+'</p>':'')+(ph?'<div class="thumbs">'+ph+'</div>':'')+'</div></div>';
   });
   if(open)out+='</div>';
@@ -1094,11 +1970,11 @@ function recEntry(it,terms,showPet){
     if(bits.length)info='<p class="note">'+bits.join('　')+'</p>';
   }
   var act=it.k==='worm'?'data-act="tlworm" data-pid="'+r.petId+'" data-item="'+esc(r.item)+'" data-month="'+r.month+'"':'data-act="tlvacc" data-pid="'+r.petId+'" data-id="'+r.id+'"';
-  return '<div class="entry rec" role="button" tabindex="0" '+act+'><div class="rail"><i class="dot" style="--h:'+K.h+'"></i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+K.h+'">'+hl(r.item,terms)+'</span>'+(pet?'<span class="pill">'+esc(pet.name)+'</span>':'')+'<small style="margin-left:auto;color:var(--muted)">'+K.name+'紀錄</small></div>'+info+(r.note?'<p class="note">'+hl(r.note,terms)+'</p>':'')+'</div></div>';
+  return '<div class="entry rec" role="button" tabindex="0" '+act+'><div class="rail"><i class="dot" style="--h:'+K.h+';--pr:'+((hueOf(r.id)%5)*6-12)+'deg">'+PAW_SVG('currentColor',16)+'</i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+K.h+'">'+hl(r.item,terms)+'</span>'+(pet?'<span class="pill">'+esc(pet.name)+'</span>':'')+'<small style="margin-left:auto;color:var(--muted)">'+K.name+'紀錄</small></div>'+info+(r.note?'<p class="note">'+hl(r.note,terms)+'</p>':'')+'</div></div>';
 }
 function vwEntry(it,terms,showPet){
   var r=it.r,h=typeOf('weight').h,pet=showPet?S.pets.filter(function(x){return x.id===r.petId})[0]:null;
-  return '<div class="entry rec" role="button" tabindex="0" data-act="tlvacc" data-pid="'+r.petId+'" data-id="'+r.id+'"><div class="rail"><i class="dot" style="--h:'+h+'"></i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+h+'">'+hl('量體重',terms)+'</span>'+(pet?'<span class="pill">'+esc(pet.name)+'</span>':'')+'<small style="margin-left:auto;color:var(--muted)">打疫苗時測量</small></div>'+
+  return '<div class="entry rec" role="button" tabindex="0" data-act="tlvacc" data-pid="'+r.petId+'" data-id="'+r.id+'"><div class="rail"><i class="dot" style="--h:'+h+';--pr:'+((hueOf(r.id)%5)*6-12)+'deg">'+PAW_SVG('currentColor',16)+'</i></div><div class="ebody"><div class="ehead"><span class="tag" style="--h:'+h+'">'+hl('量體重',terms)+'</span>'+(pet?'<span class="pill">'+esc(pet.name)+'</span>':'')+'<small style="margin-left:auto;color:var(--muted)">打疫苗時測量</small></div>'+
     '<p class="note"><span class="wkg" style="font-size:20px">'+hl(fmtKg(+r.weight)+' kg',terms)+'</span>'+deltaHtml(weightDelta(r,'vacc'))+'</p><p class="note" style="color:var(--muted)">施打 '+hl(r.item,terms)+'</p></div></div>';
 }
 function tlSwitchPet(pid){if(pid&&pid!==S.sel&&S.pets.some(function(p){return p.id===pid})){S.sel=pid;lsSet('petnote.sel',pid)}}
@@ -1107,8 +1983,9 @@ function refreshTl(){var b=$('#tlBody');if(!b){renderMain();return}b.innerHTML=t
 /* ================= 畫面：驅蟲 ================= */
 function viewDeworm(){
   var p=curPet(),now=today(),cm=ym(now),Y=S.year;
-  var h='<div class="pagehead"><h2>驅蟲紀錄</h2><div class="yearnav"><button data-act="year" data-d="-1" aria-label="前一年">'+ico('cl',18)+'</button><b>'+Y+'</b><button data-act="year" data-d="1" aria-label="後一年">'+ico('cr',18)+'</button></div></div>';
-  h+='<div class="remindline"><span>'+(p.wormRemind?'每月 '+p.wormDay+' 號開始提醒（首頁顯示待辦）':'提醒已關閉')+'</span><button class="btn" style="min-height:40px" data-act="wormset">設定</button></div>';
+  var wst=p.wormItems.map(function(it){return itemStatus(p,it,cm).state}),need=wst.filter(function(x){return x!=='wait'}).length,dn=wst.filter(function(x){return x==='done'}).length;
+  var wbody='<div class="pbrow">'+(need?'<div class="pbring">'+ringSvg(dn/need,64,'var(--primary)','color-mix(in srgb,var(--primary) 18%,transparent)')+'<span><b>'+dn+'</b>/'+need+'</span></div><div class="grow"><b class="pbbig">'+(dn>=need?'本月都完成了':'本月還有 '+(need-dn)+' 項')+'</b><small>'+(p.wormRemind?'每月 '+p.wormDay+' 號開始提醒':'提醒已關閉')+'</small></div>':'<div class="grow"><b class="pbbig">本月不用驅蟲</b><small>'+(p.wormRemind?'每月 '+p.wormDay+' 號開始提醒':'提醒已關閉')+'</small></div>')+'<button class="pbbtn" data-act="wormset" aria-label="驅蟲設定">'+ico('gear',20)+'</button></div>';
+  var h=pbanner({icon:'cal',title:'驅蟲紀錄',sub:esc(p.name),right:'<div class="yearnav"><button data-act="year" data-d="-1" aria-label="前一年">'+ico('cl',18)+'</button><b>'+Y+'</b><button data-act="year" data-d="1" aria-label="後一年">'+ico('cr',18)+'</button></div>',body:p.wormItems.length&&Y===now.getFullYear()?wbody:''});
   if(!p.wormItems.length) return h+'<div class="empty"><h3>還沒有驅蟲項目</h3><p>新增體外、體內驅蟲或心絲蟲預防，之後每月蓋章打卡。</p><button class="btn primary" data-act="wormset">設定驅蟲項目</button></div>';
   h+='<div class="stack">';
   p.wormItems.forEach(function(it){
@@ -1121,7 +1998,7 @@ function viewDeworm(){
     var st='';
     for(var m=1;m<=12;m++){
       var mk=Y+'-'+pad(m),rec=S.worms.filter(function(w){return w.id===wid(p.id,mk,it.name)})[0],cls='stamp',inner='<span>'+m+'月</span>';
-      if(rec){cls+=' done';var rot=((hueOf(rec.id)%9)-4);inner='<span>'+m+'月</span><small>'+(rec.date?(+rec.date.slice(8)):'')+'日</small>';st+='<button class="'+cls+'" style="--rot:'+rot+'deg" data-act="wormdone" data-item="'+esc(it.name)+'" data-month="'+mk+'" aria-label="'+m+'月已驅蟲，點擊編輯">'+inner+'</button>';continue}
+      if(rec){cls+=' done';var rot=((hueOf(rec.id)%9)-4);inner=PAW_SVG('currentColor',18)+'<small>'+m+'/'+(rec.date?(+rec.date.slice(8)):'')+'</small>';st+='<button class="'+cls+'" style="--rot:'+rot+'deg" data-act="wormdone" data-item="'+esc(it.name)+'" data-month="'+mk+'" aria-label="'+m+'月已驅蟲，點擊編輯">'+inner+'</button>';continue}
       if(mk===cm)cls+=' now';else if(mk===pm)cls+=' plan';else if(mk>cm)cls+=' future';
       st+='<button class="'+cls+'" data-act="wormdone" data-item="'+esc(it.name)+'" data-month="'+mk+'" aria-label="'+m+'月，點擊打卡">'+inner+'</button>';
     }
@@ -1223,9 +2100,17 @@ function vaccRecMeta(r,showName){
   var meta=bits.join('・');
   return (showName?'<b>'+esc(r.item)+'</b>':'')+(meta?(showName?'<small style="display:block">'+meta+'</small>':meta):(showName?'':'<small>無備註</small>'));
 }
+function vprog(st,now){
+  if(!st.last||!st.due)return '';var a=parseD(st.last.date),tot=Math.max(1,dayDiff(st.due,a)),el=dayDiff(now,a),f=Math.max(0,Math.min(1,el/tot)),dd=dayDiff(st.due,now);
+  var cls=dd<0?'bad':(st.state==='soon'?'warn':'ok');
+  return '<div class="vprog '+cls+'"><span class="vtrack"><i style="width:'+(f*100).toFixed(1)+'%"></i><b style="left:'+(f*100).toFixed(1)+'%">'+PAW_SVG('currentColor',14)+'</b></span><span class="vleft">'+(dd<0?'逾期 '+(-dd)+' 天':dd===0?'今天到期':'還有 '+dd+' 天')+'</span></div>';
+}
 function viewVaccine(){
   var p=curPet(),now=today(),tracked=vItems(p);
-  var h='<div class="pagehead"><h2>預防針</h2><button class="btn" style="min-height:40px" data-act="vaccset">追蹤項目</button></div>';
+  var sts=tracked.map(function(it){return {it:it,st:vaccStatus(p,it,now)}}).filter(function(x){return x.st.due}).sort(function(a,b){return a.st.due-b.st.due});
+  var nx=sts[0],vbody='';
+  if(nx){var dd=dayDiff(nx.st.due,now);vbody='<div class="pbrow"><div class="pbcount '+(dd<0?'bad':dd<=30?'warn':'')+'"><b>'+Math.abs(dd)+'</b><small>'+(dd<0?'天前到期':dd===0?'今天':'天後')+'</small></div><div class="grow"><b class="pbbig">'+(dd<0?'已逾期：':'下一劑：')+esc(nx.it.name)+'</b><small>'+fmtD(ymd(nx.st.due))+(sts.length>1?'・共追蹤 '+tracked.length+' 項':'')+'</small></div></div>'}
+  var h=pbanner({icon:'syringe',title:'預防針',sub:esc(p.name),right:'<button class="pbbtn wide" data-act="vaccset">追蹤項目</button>',body:vbody});
   var covered={};tracked.forEach(function(u){u.members.forEach(function(m){covered[m]=1})});
   var orphan=[],seen={};
   S.vaccs.filter(function(v){return v.petId===p.id&&!covered[v.item]}).forEach(function(v){
@@ -1241,7 +2126,7 @@ function viewVaccine(){
     var sub=grp?'<div class="grpline">群組：'+it.members.map(esc).join('、')+'，任一劑都算</div>':'';
     if(it.orphan)next='<small>這隻寵物目前沒有追蹤這個項目，所以不會計算下次日期或提醒。點右上「追蹤項目」可以重新加入。</small>';
     else if(st.state==='none')next='<small>還沒有施打紀錄。補登上一次施打日期後，會自動算出下次日期。</small>';
-    else next='<div class="vnext"><span>下次施打</span><b>'+fmtD(ymd(st.due))+'</b></div><small>上次 '+fmtD(st.last.date)+(grp?'（'+esc(st.last.item)+'）':'')+'　'+(st.last.next?'依獸醫指示的日期':everyLabel(it.every))+'　'+remindLabel(it.remind)+'</small>';
+    else next='<div class="vnext"><span>下次施打</span><b>'+fmtD(ymd(st.due))+'</b></div>'+vprog(st,now)+'<small>上次 '+fmtD(st.last.date)+(grp?'（'+esc(st.last.item)+'）':'')+'　'+(st.last.next?'依獸醫指示的日期':everyLabel(it.every))+'　'+remindLabel(it.remind)+'</small>';
     var openAll=!!S.vOpen[it.key],shown=openAll?st.recs:st.recs.slice(0,3),more=st.recs.length-shown.length;
     if(st.recs.length)rows='<div class="hist">'+shown.map(function(r,i){return '<button class="hrow" data-act="vaccedit" data-id="'+r.id+'"><span class="d">'+fmtD(r.date)+'</span><span class="grow">'+vaccRecMeta(r,grp)+'</span>'+(i===0&&!it.orphan?'<span class="pill cnt">最近一次</span>':'')+ico('cr',16)+'</button>'}).join('')+
       (more>0?'<button class="linkbtn" data-act="vmore" data-item="'+esc(it.key)+'" style="margin-top:6px">顯示全部 '+st.recs.length+' 筆'+ico('cr',16)+'</button>':(openAll&&st.recs.length>3?'<button class="linkbtn" data-act="vmore" data-item="'+esc(it.key)+'" style="margin-top:6px">只顯示最近 3 筆</button>':''))+'</div>';
@@ -1259,6 +2144,7 @@ function viewMore(){
   var th=lsGet('petnote.theme')||'system';
   h+='<div class="sechead">外觀</div><div class="card"><div class="seg" id="themeSeg">'+[['system','跟隨手機'],['light','淺色'],['dark','深色']].map(function(t){return '<button data-v="'+t[0]+'" class="'+(th===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</div></div>';
   h+='<div class="sechead">時間線</div><div class="card"><p class="about" style="margin:0">選擇要和狀況紀錄一起排進時間線的項目，方便對照前後狀況。</p>'+tlOptsHtml()+'</div>';
+  h+='<div class="sechead">餵食</div><div class="card"><div class="list"><button class="lrow" data-act="foods"><span class="grow"><b>我的食物</b><small style="display:block">'+(S.foods.length?S.foods.length+' 種：'+S.foods.slice(0,4).map(function(f){return esc(f.name)}).join('、')+(S.foods.length>4?'…':''):'常吃的飼料、罐頭、零食與熱量')+'</small></span>'+ico('cr',18)+'</button></div></div>';
   h+='<div class="sechead">疫苗群組</div><div class="card"><p class="about" style="margin:0 0 4px">同一群組的疫苗可以互相替代（例如三合一、四合一、五合一），任一劑都算「最近一次」，只會提醒一次。</p><div class="list">'+S.groups.map(function(g){
     var ms=groupMembers(g.id),users=S.pets.filter(function(p){return (p.vaccItems||[]).indexOf('g:'+g.id)>=0}).map(function(p){return p.name});
     return '<button class="lrow" data-act="grpedit" data-id="'+esc(g.id)+'"><span class="grow"><b>'+esc(g.name)+'</b><small style="display:block">'+everyLabel(g.every)+'・'+remindLabel(g.remind)+'　'+(ms.length?ms.map(esc).join('、'):'還沒有疫苗')+(users.length?'<br>追蹤：'+users.map(esc).join('、'):'')+'</small></span>'+ico('cr',18)+'</button>';
@@ -1275,33 +2161,65 @@ function viewMore(){
     h+='<div class="sechead">在其他手機使用</div><div class="card"><p class="about" style="margin:0"><b>iPhone</b>：用 Safari 打開這個網址，點下方「分享」→「加入主畫面」，就會像 App 一樣有圖示。<br><b>Android</b>：用 Chrome 打開，點右上角選單 →「加到主畫面」。'+(au?'也可以安裝 App 版，會在早上跳出提醒通知。':'')+'</p>'+
       (au?'<a class="btn block" style="margin-top:12px;text-decoration:none" href="'+esc(au)+'" target="_blank" rel="noopener">下載 Android App（APK）</a>':'')+'</div>';
   }
-  h+='<div class="sechead">關於</div><div class="about">貓貓筆記 '+APP_VERSION+(isNative()?'（Android App）':'（網頁版）')+'<span id="buildTxt"></span><br>記錄每隻寵物的年齡、紀念日、身體狀況、每月驅蟲與預防針。</div>'+(isNative()?'<div class="card" style="margin-top:8px"><div class="swrow" style="border-top:0;padding:0"><span><b>App 更新</b><small id="updTxt">開啟 App 時會自動檢查新版本</small></span><button class="btn" data-act="updcheck" style="min-height:40px">檢查更新</button></div></div>':'');
+  h+='<div class="sechead">關於</div><div class="about">伴獸筆記 '+APP_VERSION+(isNative()?'（Android App）':'（網頁版）')+'<span id="buildTxt"></span><br>記錄每隻寵物的年齡、紀念日、身體狀況、每月驅蟲與預防針。<br><a href="'+PRIVACY_URL+'" target="_blank" rel="noopener" style="color:var(--primary)">隱私權政策</a>'+(IS_PLAY?'<br>App 會透過 Google Play 自動更新。':'')+'</div>'+(isNative()&&!IS_PLAY?'<div class="card" style="margin-top:8px"><div class="swrow" style="border-top:0;padding:0"><span><b>App 更新</b><small id="updTxt">開啟 App 時會自動檢查新版本</small></span><button class="btn" data-act="updcheck" style="min-height:40px">檢查更新</button></div></div>':'');
   return h;
 }
 
 /* ================= 表單：寵物 ================= */
-function openPetSheet(id){
+function openPetSheet(id,focus){
   var isNew=!id,src=id&&S.pets.filter(function(x){return x.id===id})[0];
   var p=isNew?newPet():JSON.parse(JSON.stringify(src));
+  var pw=petWater(p),pe=petEx(p),pf=petFeed(p),pn=petNeut(p);
   var segs=function(arr,val){return arr.map(function(v){return '<button type="button" data-v="'+v+'" class="'+(val===v?'on':'')+'">'+v+'</button>'}).join('')};
   var body='<div class="av-pick"><button type="button" class="av-btn" id="pf-av" aria-label="選擇頭像">'+avatar(p,88)+'<span class="av-cam">'+ico('cam',16)+'</span></button><input id="pf-file" class="vh" type="file" accept="image/*" tabindex="-1" aria-hidden="true"><div class="hint">點頭像可選擇照片</div></div>'+
     '<div class="field"><label for="pf-name">名字</label><input id="pf-name" type="text" maxlength="20" autocomplete="off" placeholder="例如：麻糬" value="'+esc(p.name)+'"></div>'+
     '<div class="field"><label>種類</label><div class="seg" id="pf-species">'+segs(['貓','狗','其他'],p.species)+'</div></div>'+
     '<div class="field"><label for="pf-breed">品種（選填）</label><input id="pf-breed" type="text" maxlength="20" autocomplete="off" placeholder="例如：米克斯" value="'+esc(p.breed)+'"></div>'+
     '<div class="field"><label>性別</label><div class="seg" id="pf-gender">'+segs(['男生','女生','未知'],p.gender||'未知')+'</div></div>'+
+    '<div class="field"><span class="lbl">代表色</span><div class="swatches" id="pf-color">'+PET_COLORS.map(function(c){return '<button type="button" data-v="'+c.id+'" class="'+(petColorId(p)===c.id?'on':'')+'" style="--sw:'+c.l[0]+'" aria-label="'+c.n+'"><i></i><span>'+c.n+'</span></button>'}).join('')+'</div><div class="hint" id="pf-colorhint">首頁和按鈕會換成這個顏色。選照片時會自動配色。</div></div>'+
+    '<div class="field"><label>結紮</label><div class="seg" id="pf-neut"><button type="button" data-v="yes" class="'+(pn==='yes'?'on':'')+'">已結紮</button><button type="button" data-v="no" class="'+(pn==='no'?'on':'')+'">未結紮</button><button type="button" data-v="" class="'+(pn===''?'on':'')+'">不確定</button></div><div class="hint">會影響每日建議熱量（已結紮的貓狗代謝較低）。</div></div>'+
     '<div class="row2"><div class="field"><label for="pf-bd">生日</label><input id="pf-bd" type="date" value="'+esc(p.birthday)+'"></div><div class="field"><label for="pf-hd">來家日期</label><input id="pf-hd" type="date" value="'+esc(p.homeDate)+'"></div></div>'+
     '<div class="swrow"><span><b>顯示年齡</b><small>依生日自動算出歲、月、天</small></span><span class="sw"><input type="checkbox" id="pf-age" '+(p.showAge?'checked':'')+' aria-label="顯示年齡"><i></i></span></div>'+
-    '<div class="swrow"><span><b>來家紀念日</b><small>依來家日期顯示天數與週年倒數</small></span><span class="sw"><input type="checkbox" id="pf-ann" '+(p.showAnniv?'checked':'')+' aria-label="顯示來家紀念日"><i></i></span></div>';
+    '<div class="swrow"><span><b>來家紀念日</b><small>依來家日期顯示天數與週年倒數</small></span><span class="sw"><input type="checkbox" id="pf-ann" '+(p.showAnniv?'checked':'')+' aria-label="顯示來家紀念日"><i></i></span></div>'+
+    '<h3 class="subh" id="pf-health">餵食、飲水與運動</h3>'+
+    '<div class="swrow"><span><b>記錄餵食</b><small>首頁顯示今日熱量與建議量</small></span><span class="sw"><input type="checkbox" id="pf-feedon" '+(pf.on?'checked':'')+' aria-label="記錄餵食"><i></i></span></div>'+
+    '<div id="pf-fset" '+(pf.on?'':'hidden')+'><div><div class="field"><span class="lbl">目標</span><div class="seg" id="pf-goalw"><button type="button" data-v="keep" class="'+(pf.goal==='keep'?'on':'')+'">維持</button><button type="button" data-v="lose" class="'+(pf.goal==='lose'?'on':'')+'">減重</button><button type="button" data-v="gain" class="'+(pf.goal==='gain'?'on':'')+'">增重</button></div></div></div>'+
+    '<p class="about" id="pf-kcal" style="margin:0 0 6px"></p><small style="display:block;margin-bottom:6px">計算方式：靜息需求 RER = 70 × 體重<sup>0.75</sup>，再依年齡、結紮與目標乘上係數（成貓已結紮 1.2、未結紮 1.4、幼貓 2.5、熟齡貓 1.1、減重 0.8；成犬已結紮 1.6、未結紮 1.8、幼犬 2.0–3.0、熟齡犬 1.4、減重 1.0）。僅供參考，實際需求請依獸醫建議。</small></div>'+
+    '<div class="swrow"><span><b>記錄飲水量</b><small>首頁顯示今日飲水與建議量</small></span><span class="sw"><input type="checkbox" id="pf-water" '+(pw.on?'checked':'')+' aria-label="記錄飲水量"><i></i></span></div>'+
+    '<div id="pf-wset" '+(pw.on?'':'hidden')+'><div class="field"><label>餵食習慣</label><div class="seg" id="pf-feed">'+FEEDS.map(function(f){return '<button type="button" data-v="'+f[0]+'" class="'+(pw.feed===f[0]?'on':'')+'">'+f[1]+'</button>'}).join('')+'</div></div>'+
+    '<div class="row3"><div class="field" data-food="dry"><label for="pf-dry">乾飼料 g／天</label><input id="pf-dry" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 60" value="'+(pw.dry||'')+'"></div><div class="field" data-food="wet"><label for="pf-wet">濕食 g／天</label><input id="pf-wet" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 85" value="'+(pw.wet||'')+'"></div><div class="field" data-food="fresh"><label for="pf-fresh">鮮食 g／天</label><input id="pf-fresh" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 150" value="'+(pw.fresh||'')+'"></div></div>'+
+    '<p class="about" id="pf-wcalc" style="margin:0 0 6px"></p><small style="display:block;margin-bottom:6px">有開「記錄餵食」時，會直接用每一餐實際吃的食物計算水分；這裡的食量只在沒開記錄餵食時用來估算。</small><small style="display:block;margin-bottom:6px">計算方式：每日需水量 = 體重 × '+(p.species==='狗'?'50–60':'40–60')+' ml；食物含水量以乾飼料 10%、濕食 75%、鮮食 70% 估算並扣除。僅供參考，實際需求請詢問獸醫。</small></div>'+
+    '<div class="swrow"><span><b>記錄運動</b><small>首頁顯示今日運動時間</small></span><span class="sw"><input type="checkbox" id="pf-ex" '+(pe.on?'checked':'')+' aria-label="記錄運動"><i></i></span></div>'+
+    '<div class="field" id="pf-exset" '+(pe.on?'':'hidden')+'><label for="pf-goal">每日運動目標（分鐘，選填）</label><input id="pf-goal" type="text" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="例如 30" value="'+(pe.goal||'')+'"></div>';
   var footer=(isNew?'':'<button class="btn danger" id="pf-del">刪除</button>')+'<button class="btn primary" id="pf-save">'+(isNew?'新增寵物':'儲存')+'</button>';
   openSheet({title:isNew?'新增寵物':'編輯寵物',body:body,footer:footer,onMount:function(el){
     var file=$('#pf-file',el);
     $('#pf-av',el).onclick=function(){file.click()};
     file.onchange=async function(){
       var f=file.files&&file.files[0];if(!f)return;
-      try{p.photo=await readImage(f,480,.85);$('#pf-av',el).innerHTML=avatar(p,88)+'<span class="av-cam">'+ico('cam',16)+'</span>'}catch(e){toast('無法讀取這張圖片，請換一張')}
+      try{p.photo=await readImage(f,480,.85);if(!colorTouched){var pcid=await photoColor(p.photo);if(pcid){$$('#pf-color button',el).forEach(function(b){b.classList.toggle('on',b.dataset.v===pcid)});$('#pf-colorhint',el).textContent='已依照片自動配成「'+PET_COLORS.filter(function(c){return c.id===pcid})[0].n+'」，也可以自己換。'}}$('#pf-av',el).innerHTML=avatar(p,88)+'<span class="av-cam">'+ico('cam',16)+'</span>'}catch(e){toast('無法讀取這張圖片，請換一張')}
       file.value='';
     };
-    bindSeg($('#pf-species',el));bindSeg($('#pf-gender',el));
+    var colorTouched=false;bindSeg($('#pf-color',el),function(){colorTouched=true});
+    bindSeg($('#pf-species',el),function(){paintW()});bindSeg($('#pf-gender',el));
+    function readF(){var o=Object.assign(petFeed(p),{on:$('#pf-feedon',el).checked,goal:segVal($('#pf-goalw',el))||'keep'});delete o.neutered;return o}
+    function readW(){var n=function(id){var v=parseInt(($('#'+id,el).value||'').replace(/[^0-9]/g,''),10);return v>0?v:0};return {on:$('#pf-water',el).checked,feed:segVal($('#pf-feed',el))||'dry',dry:n('pf-dry'),wet:n('pf-wet'),fresh:n('pf-fresh')}}
+    function paintW(){
+      var w=readW(),show={dry:w.feed==='dry'||w.feed==='mixed',wet:w.feed==='wet'||w.feed==='mixed',fresh:w.feed==='fresh'};
+      $$('[data-food]',el).forEach(function(f){f.hidden=!show[f.dataset.food]});
+      $('#pf-wset',el).hidden=!w.on;$('#pf-exset',el).hidden=!$('#pf-ex',el).checked;
+      var tmp=Object.assign({},p,{species:segVal($('#pf-species',el))||p.species});
+      $('#pf-wcalc',el).innerHTML=isNew?'新增寵物並記錄體重後，就會算出建議飲水量。':waterTargetText(p,{tmp:tmp})+(readF().on?'':'<br>沒有記錄餵食，會用下面的每天食量估算食物水分：約 '+foodWater(w)+' ml／天。');
+      var fo=readF();$('#pf-fset',el).hidden=!fo.on;
+      var tmp2=Object.assign({},tmp,{birthday:$('#pf-bd',el).value,neutered:segVal($('#pf-neut',el)),feeding:null});
+      $('#pf-kcal',el).innerHTML=isNew?'新增寵物並記錄體重後，就會算出每日建議熱量。':energyText(tmp2,fo);
+    }
+    bindSeg($('#pf-feed',el),paintW);bindSeg($('#pf-neut',el),paintW);bindSeg($('#pf-goalw',el),paintW);
+    $('#pf-feedon',el).addEventListener('change',paintW);$('#pf-bd',el).addEventListener('change',paintW);
+    ['pf-water','pf-ex'].forEach(function(id){$('#'+id,el).addEventListener('change',paintW)});
+    ['pf-dry','pf-wet','pf-fresh'].forEach(function(id){$('#'+id,el).addEventListener('input',paintW)});
+    paintW();
+    if(focus==='health')setTimeout(function(){var h=$('#pf-health',el);if(h)h.scrollIntoView({block:'start'})},250);
     $('#pf-name',el).oninput=function(){if(!p.photo)$('#pf-av',el).innerHTML=avatar({name:this.value},88)+'<span class="av-cam">'+ico('cam',16)+'</span>'};
     $('#pf-save',el).onclick=async function(){
       var name=$('#pf-name',el).value.trim(),bd=$('#pf-bd',el).value,hd=$('#pf-hd',el).value,t=ymd(today());
@@ -1311,6 +2229,7 @@ function openPetSheet(id){
       if(bd&&hd&&hd<bd){toast('來家日期不能早於生日');return}
       p.name=name;p.species=segVal($('#pf-species',el))||'貓';p.breed=$('#pf-breed',el).value.trim();p.gender=segVal($('#pf-gender',el))||'未知';
       p.birthday=bd;p.homeDate=hd;p.showAge=$('#pf-age',el).checked;p.showAnniv=$('#pf-ann',el).checked;
+      p.water=readW();p.feeding=readF();p.neutered=segVal($('#pf-neut',el));p.color=segVal($('#pf-color',el))||petColorId(p);var gv=parseInt(($('#pf-goal',el).value||'').replace(/[^0-9]/g,''),10);p.exercise={on:$('#pf-ex',el).checked,goal:gv>0?Math.min(gv,600):0};
       if(isNew)p.vaccItems=speciesDefault(p.species);
       await savePet(p);S.sel=p.id;lsSet('petnote.sel',p.id);closeTop();render();toast(isNew?'已新增 '+name:'已儲存');
     };
@@ -1327,18 +2246,27 @@ function openPetSheet(id){
 /* ================= 表單：狀況紀錄 ================= */
 function openLogSheet(id,presetType){
   var ex=id&&S.logs.filter(function(l){return l.id===id})[0];
+  if((ex&&ex.type==='food')||(!ex&&presetType==='food'))return openFeedLog(id);
   var p=ex?(S.pets.filter(function(x){return x.id===ex.petId})[0]||curPet()):curPet();if(!p)return;
   var l=ex?JSON.parse(JSON.stringify(ex)):{id:uid(),petId:p.id,type:presetType||'vomit',custom:'',ts:Date.now(),note:'',photos:[]};
   var lastW=weightPoints(p.id).slice(-1)[0];
-  var tg=TYPES.map(function(t){return '<button type="button" data-v="'+t.id+'" class="'+(l.type===t.id?'on':'')+'" style="--h:'+t.h+'">'+t.name+'</button>'}).join('');
+  var hf=petFeed(p).on||l.type==='food',hw=petWater(p).on||l.type==='water',he=petEx(p).on||l.type==='exercise',acts=exActs(p);
+  if(l.type==='exercise'&&l.act&&acts.indexOf(l.act)<0)acts.push(l.act);
+  var tg=TYPES.filter(function(t){return (t.id!=='food'||hf)&&(t.id!=='water'||hw)&&(t.id!=='exercise'||he)}).map(function(t){return '<button type="button" data-v="'+t.id+'" class="'+(l.type===t.id?'on':'')+'" style="--h:'+t.h+'">'+t.name+'</button>'}).join('');
   var body='<div class="field"><span class="lbl">狀況類型</span><div class="typegrid" id="lf-type">'+tg+'</div></div>'+
     '<div class="field" id="lf-customwrap" '+(l.type==='other'?'':'hidden')+'><label for="lf-custom">自訂名稱（選填）</label><input id="lf-custom" type="text" maxlength="12" placeholder="例如：打噴嚏、跛腳" value="'+esc(l.custom)+'"></div>'+
     '<div class="field" id="lf-wwrap" '+(l.type==='weight'?'':'hidden')+'><label for="lf-weight">體重（公斤）</label><input id="lf-weight" type="text" inputmode="decimal" autocomplete="off" placeholder="'+(lastW?'上次 '+fmtKg(lastW.kg):'例如 4.25')+'" value="'+(l.weight?fmtKg(l.weight):'')+'"><div class="hint">會自動更新到首頁的體重，並加入體重變化表。</div></div>'+
+    '<div id="lf-wawrap" '+(l.type==='water'?'':'hidden')+'><div class="field"><span class="lbl">記錄方式</span><div class="seg" id="lf-wmode"><button type="button" data-v="direct" class="'+(l.wmode!=='diff'?'on':'')+'">直接填寫</button><button type="button" data-v="diff" class="'+(l.wmode==='diff'?'on':'')+'">加水 − 剩水</button></div></div>'+
+      '<div class="field" id="lf-wdirect" '+(l.wmode==='diff'?'hidden':'')+'><label for="lf-ml">喝了多少（ml）</label><input id="lf-ml" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 80" value="'+(l.wmode!=='diff'&&l.ml!=null?l.ml:'')+'"></div>'+
+      '<div id="lf-wdiff" '+(l.wmode==='diff'?'':'hidden')+'><div class="row2"><div class="field"><label for="lf-add">加了多少水（ml）</label><input id="lf-add" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 200" value="'+(l.wmode==='diff'?l.add:'')+'"></div><div class="field"><label for="lf-left">剩下多少（ml）</label><input id="lf-left" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="例如 120" value="'+(l.wmode==='diff'?l.left:'')+'"></div></div><div class="hint" id="lf-wcalc">輸入後會自動算出喝掉多少。</div></div>'+
+      '<div class="hint" style="margin:0 0 14px;padding:8px 10px;border-radius:10px;background:var(--surface2)">'+waterTargetText(p,{today:true})+'</div></div>'+
+    '<div id="lf-exwrap" '+(l.type==='exercise'?'':'hidden')+'><div class="field"><span class="lbl">活動</span><div class="typegrid" id="lf-act">'+acts.map(function(a){return '<button type="button" data-v="'+esc(a)+'" class="'+(l.act===a?'on':'')+'" style="--h:75">'+esc(a)+'</button>'}).join('')+'</div><input id="lf-actc" type="text" maxlength="12" autocomplete="off" placeholder="或自己輸入活動名稱" style="margin-top:8px" value=""></div>'+
+      '<div class="field"><label for="lf-min">時間（分鐘）</label><input id="lf-min" type="text" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="例如 15" value="'+(l.min||'')+'"></div></div>'+
     '<div class="field"><label for="lf-time">發生時間</label><input id="lf-time" type="datetime-local" value="'+toLocalInput(l.ts)+'"></div>'+
     '<div class="field"><label for="lf-note">說明</label><textarea id="lf-note" placeholder="次數、顏色、當時在做什麼、吃了什麼…">'+esc(l.note)+'</textarea></div>'+
     '<div class="field"><span class="lbl">照片（最多 6 張）</span><div class="pickrow" id="lf-photos"></div><input id="lf-file" class="vh" type="file" accept="image/*" multiple tabindex="-1" aria-hidden="true"></div>';
   var footer=(ex?'<button class="btn danger" id="lf-del">刪除</button>':'')+'<button class="btn primary" id="lf-save">'+(ex?'儲存':'新增紀錄')+'</button>';
-  openSheet({title:(ex?'編輯':'記錄')+(l.type==='weight'?'體重':'狀況')+'・'+p.name,body:body,footer:footer,onMount:function(el){
+  openSheet({title:(ex?'編輯':'記錄')+({weight:'體重',water:'飲水',exercise:'運動',food:'餵食'}[l.type]||'狀況')+'・'+p.name,body:body,footer:footer,onMount:function(el){
     var file=$('#lf-file',el),grid=$('#lf-photos',el),origIds=(ex&&ex.photos||[]).slice(),busy=false;
     function paint(){
       grid.innerHTML=l.photos.map(function(it,i){
@@ -1362,7 +2290,14 @@ function openLogSheet(id,presetType){
       else if(fs.length>l.photos.length-before)toast('照片最多 6 張，多的已略過');
       file.value='';paint();
     };
-    bindSeg($('#lf-type',el),function(v){$('#lf-customwrap',el).hidden=v!=='other';$('#lf-wwrap',el).hidden=v!=='weight';if(v==='weight')setTimeout(function(){$('#lf-weight',el).focus()},50)});
+    bindSeg($('#lf-type',el),function(v){$('#lf-customwrap',el).hidden=v!=='other';$('#lf-wwrap',el).hidden=v!=='weight';$('#lf-wawrap',el).hidden=v!=='water';$('#lf-exwrap',el).hidden=v!=='exercise';if(v==='food'){closeTop();setTimeout(function(){openFeedLog(null)},350);return}if(v==='weight')setTimeout(function(){$('#lf-weight',el).focus()},50)});
+    var numv=function(id){var v=parseInt(($('#'+id,el).value||'').replace(/[^0-9]/g,''),10);return isNaN(v)?null:v};
+    bindSeg($('#lf-wmode',el),function(v){$('#lf-wdirect',el).hidden=v==='diff';$('#lf-wdiff',el).hidden=v!=='diff'});
+    function wcalc(){var a=numv('lf-add'),b=numv('lf-left'),h=$('#lf-wcalc',el);if(a==null||b==null){h.textContent='輸入後會自動算出喝掉多少。';return}h.innerHTML=a>=b?'喝掉 <b>'+(a-b)+' ml</b>':'剩水比加水多，請再確認一下。'}
+    ['lf-add','lf-left'].forEach(function(id){$('#'+id,el).addEventListener('input',wcalc)});wcalc();
+    bindSeg($('#lf-act',el),function(){$('#lf-actc',el).value=''});
+    $('#lf-actc',el).addEventListener('input',function(){if(this.value.trim())$$('#lf-act button',el).forEach(function(b){b.classList.remove('on')})});
+    if(!ex&&(l.type==='water'||l.type==='exercise'))setTimeout(function(){var w=$(l.type==='water'?'#lf-ml':'#lf-min',el);if(w)w.focus()},300);
     if(l.type==='weight'&&!ex)setTimeout(function(){var w=$('#lf-weight',el);if(w)w.focus()},300);
     $('#lf-save',el).onclick=async function(){
       var v=$('#lf-time',el).value,ts=v?new Date(v).getTime():Date.now();
@@ -1374,6 +2309,16 @@ function openLogSheet(id,presetType){
         if(!(wv>0)||wv>150){toast('請輸入體重公斤數，例如 4.25');$('#lf-weight',el).focus();return}
         l.weight=wv;
       }else delete l.weight;
+      ['ml','wmode','add','left','min','act','food','fname','amt','unit','pcn','kcal','g'].forEach(function(k){delete l[k]});
+      if(l.type==='water'){
+        var md=segVal($('#lf-wmode',el))||'direct';
+        if(md==='diff'){var ad=numv('lf-add'),lf=numv('lf-left');if(!(ad>0)||lf==null){toast('請輸入加了多少水和剩下多少');return}if(lf>ad){toast('剩水比加水多，請再確認一下');return}l.wmode='diff';l.add=ad;l.left=lf;l.ml=ad-lf}
+        else{var mv=numv('lf-ml');if(mv==null||mv>5000){toast('請輸入喝了多少 ml，例如 80');$('#lf-ml',el).focus();return}l.wmode='direct';l.ml=mv}
+      }
+      if(l.type==='exercise'){
+        var mn=numv('lf-min');if(!(mn>0)||mn>600){toast('請輸入運動幾分鐘，例如 15');$('#lf-min',el).focus();return}
+        l.min=mn;l.act=$('#lf-actc',el).value.trim()||segVal($('#lf-act',el))||'運動';
+      }
       l.ts=ts;l.note=$('#lf-note',el).value.trim();
       var ids=[],added=[];
       for(var k=0;k<l.photos.length;k++){
@@ -1390,7 +2335,7 @@ function openLogSheet(id,presetType){
     };
     var del=$('#lf-del',el);
     if(del)del.onclick=async function(){
-      var ok=await confirmDlg('刪除這筆狀況紀錄？','刪除',true);if(!ok)return;
+      var ok=await confirmDlg('刪除這筆紀錄？','刪除',true);if(!ok)return;
       await removeLog(l.id);closeTop();render();toast('已刪除');
     };
   }});
@@ -1428,7 +2373,7 @@ function openWormSheet(itemName,month){
       var d=$('#wf-date',el).value;
       if(!d||d<first||d>last){toast('日期要在 '+parts[1]+' 月內');return}
       await saveWorm({id:id,petId:p.id,month:month,item:itemName,date:d,note:$('#wf-note',el).value.trim()});
-      closeTop();render();toast('已蓋章');
+      closeTop();render();if(!ex)stamp();toast(ex?'已儲存':'已蓋章');
     };
     var del=$('#wf-del',el);
     if(del)del.onclick=async function(){await removeWorm(id);closeTop();render();toast('已取消打卡')};
@@ -1712,9 +2657,9 @@ function openWormBackfill(){
 async function exportData(){
   if(exportData.busy)return;exportData.busy=true;
   try{
-    var name='貓貓筆記備份-'+ymd(new Date())+'.json';
+    var name='伴獸筆記備份-'+ymd(new Date())+'.json';
     var ids=[];S.logs.forEach(function(l){(l.photos||[]).forEach(function(p){if(Photos.isId(p))ids.push(p)})});
-    var head=JSON.stringify({app:'petnote',version:4,exported:new Date().toISOString(),vaccLib:S.lib,vaccGroups:S.groups,pets:S.pets,logs:S.logs,worms:S.worms,vaccines:S.vaccs});
+    var head=JSON.stringify({app:'petnote',version:4,exported:new Date().toISOString(),vaccLib:S.lib,vaccGroups:S.groups,foods:S.foods,pets:S.pets,logs:S.logs,worms:S.worms,vaccines:S.vaccs});
     head=head.slice(0,-1)+',"photos":{';
     var cap=window.Capacitor,P=cap&&cap.Plugins,native=isNative()&&P&&P.Filesystem&&P.Share;
     var blob=native?null:new Blob([head],{type:'application/json'}),parts=[],first=true;
@@ -1749,9 +2694,9 @@ async function importData(file){
   var d;
   Busy.show('正在讀取「'+file.name+'」…');
   try{d=JSON.parse(await file.text())}
-  catch(e){Busy.hide();await infoDlg('這個檔案無法讀取。\n請選擇從「設定 → 匯出備份」產生的檔案，檔名像「貓貓筆記備份-2026-10-15.json」。\n\n如果是從 LINE 或雲端下載的，請確認已經下載完整。');return}
+  catch(e){Busy.hide();await infoDlg('這個檔案無法讀取。\n請選擇從「設定 → 匯出備份」產生的檔案，檔名像「伴獸筆記備份-2026-10-15.json」。\n\n如果是從 LINE 或雲端下載的，請確認已經下載完整。');return}
   Busy.hide();
-  if(!d||d.app!=='petnote'||!Array.isArray(d.pets)){await infoDlg('這不是貓貓筆記的備份檔。\n請選擇從「設定 → 匯出備份」產生的檔案。');return}
+  if(!d||d.app!=='petnote'||!Array.isArray(d.pets)){await infoDlg('這不是伴獸筆記的備份檔。\n請選擇從「設定 → 匯出備份」產生的檔案。');return}
   var photoCount=Object.keys(d.photos||{}).length;(d.logs||[]).forEach(function(l){(l.photos||[]).forEach(function(p){if(typeof p==='string'&&p.indexOf('data:')===0)photoCount++})});
   var when=d.exported?new Date(d.exported):null;
   var summary='備份檔內容'+(when&&!isNaN(when)?'（'+when.getFullYear()+'/'+(when.getMonth()+1)+'/'+when.getDate()+' 匯出）':'')+'：\n'+
@@ -1763,6 +2708,7 @@ async function importData(file){
     var np=0,nl=0,nw=0,nv=0,nph=0,bad=0,i,j,photos=d.photos||{};
     (d.vaccGroups||[]).forEach(function(g){if(g&&g.id&&g.name&&!groupGet(g.id)){S.groups.push({id:g.id,name:g.name,every:+g.every||12,remind:g.remind==null?14:+g.remind});libDirty=true}});
     (d.vaccLib||[]).forEach(function(l){if(l&&l.name){var g=libGet(l.name);if(!g)libAdd(l.name,+l.every||12,l.remind==null?14:+l.remind,l.group&&groupGet(l.group)?l.group:'')}});
+    if(Array.isArray(d.foods)&&d.foods.length){d.foods.forEach(function(f){if(f&&f.id&&f.name)upsert(S.foods,f)});await saveFoods()}
     for(i=0;i<d.pets.length;i++){if(d.pets[i]&&d.pets[i].id&&d.pets[i].name){await savePet(ensurePet(d.pets[i]));np++}}
     if(libDirty)await saveLib();
     var logs=d.logs||[];
@@ -1841,7 +2787,7 @@ var Notif=(function(){
     if(S.pets.length&&S.backup.every){
       var bd=backupDue(),bt=bd?at(bd):null;
       if(bt&&bt<=now)bt=at(addDays(td,1));
-      if(bt)out.push({t:bt,title:'貓貓筆記：該備份資料了',body:'已經一段時間沒匯出備份，打開 App 到「設定 → 匯出備份」存一份到雲端硬碟。'});
+      if(bt)out.push({t:bt,title:'伴獸筆記：該備份資料了',body:'已經一段時間沒匯出備份，打開 App 到「設定 → 匯出備份」存一份到雲端硬碟。'});
     }
     out.sort(function(a,b){return a.t-b.t});
     return out.slice(0,60).map(function(o,i){return {id:i+1,title:o.title,body:o.body,schedule:{at:o.t,allowWhileIdle:true}}});
@@ -1866,7 +2812,7 @@ var Notif=(function(){
   }
   async function test(){
     var P=plug();if(!P)return false;
-    try{await P.schedule({notifications:[{id:9999,title:'貓貓筆記',body:'這是測試通知，看到這則代表提醒功能正常。',schedule:{at:new Date(Date.now()+5000),allowWhileIdle:true}}]});return true}catch(e){return false}
+    try{await P.schedule({notifications:[{id:9999,title:'伴獸筆記',body:'這是測試通知，看到這則代表提醒功能正常。',schedule:{at:new Date(Date.now()+5000),allowWhileIdle:true}}]});return true}catch(e){return false}
   }
   return {status:status,ask:ask,ensure:ensure,test:test,sync:queue};
 })();
@@ -1888,7 +2834,7 @@ async function updateNotifCard(){
   var msg={
     web:'網頁版不會跳出手機通知，快到期的預防針與本月驅蟲會顯示在首頁最上方。Android 手機安裝 App 版，才會在早上 9:00 跳通知。',
     granted:'通知已開啟。預防針與驅蟲會依你設定的提醒時間，在早上 9:00 通知你。',
-    denied:'通知被關閉了。請到手機「設定 → 應用程式 → 貓貓筆記 → 通知」開啟。',
+    denied:'通知被關閉了。請到手機「設定 → 應用程式 → 伴獸筆記 → 通知」開啟。',
     error:'暫時無法確認通知狀態。'
   };
   t.textContent=msg[st]||'尚未允許通知，開啟後才能收到提醒。';
@@ -1901,8 +2847,8 @@ document.addEventListener('click',function(e){
   if(tp){if(tp.disabled)return;S.tlPage=+tp.getAttribute('data-tlpg');refreshTl();var sb=$('.search')||$('#tlBody');if(sb)sb.scrollIntoView({block:'start'});return}
   var t=e.target.closest('[data-act]');if(!t)return;
   var a=t.dataset.act;
-  if(a==='tab'){S.tab=t.dataset.tab;$('#main').scrollTop=0;render()}
-  else if(a==='selpet'){S.sel=t.dataset.id;lsSet('petnote.sel',S.sel);S.filter='all';S.tlLimit=30;S.tlPage=1;S.vOpen={};render()}
+  if(a==='tab'){S.tab=t.dataset.tab;$('#main').scrollTop=0;render();animEnter()}
+  else if(a==='selpet'){S.sel=t.dataset.id;lsSet('petnote.sel',S.sel);S.filter='all';S.tlLimit=30;S.tlPage=1;S.vOpen={};render();animEnter()}
   else if(a==='addpet')openPetSheet();
   else if(a==='editpet')openPetSheet(t.dataset.id||S.sel);
   else if(a==='addlog')openLogSheet();
@@ -1912,6 +2858,17 @@ document.addEventListener('click',function(e){
   else if(a==='updnow'){if(Updater.last)Updater.prompt(Updater.last)}
   else if(a==='editlog')openLogSheet(t.dataset.id);
   else if(a==='tlopts')openTlOpts();
+  else if(a==='water')openHealthSheet('water');
+  else if(a==='feed')openFeedSheet();
+  else if(a==='feedadd')openFeedLog(null);
+  else if(a==='meals')openFeedSheet();
+  else if(a==='wateradd')openLogSheet(null,'water');
+  else if(a==='exadd')openLogSheet(null,'exercise');
+  else if(a==='weightadd')openLogSheet(null,'weight');
+  else if(a==='autowait'){var cp2=curPet(),mm=cp2&&petFeed(cp2).meals[+t.dataset.i];if(mm)toast(mm.label+'會在 '+mm.time+' 由餵食機自動記錄；額外餵的請按「加餐」')}
+  else if(a==='eatmeal'){var cp=curPet();if(cp)eatMeal(cp,+t.dataset.i)}
+  else if(a==='foods')openFoodList();
+  else if(a==='exercise')openHealthSheet('exercise');
   else if(a==='tlworm'){tlSwitchPet(t.dataset.pid);openWormSheet(t.dataset.item,t.dataset.month)}
   else if(a==='tlvacc'){tlSwitchPet(t.dataset.pid);openVaccSheet(null,t.dataset.id)}
   else if(a==='filter'){S.filter=t.dataset.f;S.tlLimit=30;S.tlPage=1;refreshTl()}
@@ -1938,10 +2895,16 @@ document.addEventListener('click',function(e){
 });
 document.addEventListener('keydown',function(e){
   if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('label[for=importFile]')){e.preventDefault();var fi=$('#importFile');if(fi)fi.click();return}
-  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.entry[data-act]')){e.preventDefault();e.target.click()}
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.entry[data-act],.hcard[data-act],.wcard[data-act]')){e.preventDefault();e.target.click()}
   if(e.key==='Escape'&&Layers.length)closeTop();
 });
 var qTimer=null;
+document.addEventListener('input',function(e){
+  var t=e.target;if(!t||t.tagName!=='INPUT')return;var im=t.getAttribute('inputmode');if(im!=='decimal'&&im!=='numeric')return;
+  var v=t.value,o=v.replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-65248)}).replace(/[．。，,]/g,'.');
+  if(im==='numeric')o=o.replace(/[^0-9]/g,'');else{o=o.replace(/[^0-9.]/g,'');var di=o.indexOf('.');if(di>=0)o=o.slice(0,di+1)+o.slice(di+1).replace(/\./g,'')}
+  if(o!==v){var pos=t.selectionStart-(v.length-o.length);t.value=o;try{t.setSelectionRange(Math.max(0,pos),Math.max(0,pos))}catch(err){}}
+},true);
 document.addEventListener('input',function(e){
   if(e.target.id!=='tl-q')return;
   var v=e.target.value;clearTimeout(qTimer);
@@ -1971,11 +2934,12 @@ document.addEventListener('click',function(e){if(e.target.closest('label[for=imp
 document.addEventListener('visibilitychange',function(){
   if(document.hidden||Layers.length||Busy.el)return;
   if(pickingFile&&Date.now()-pickingFile<120000){pickingFile=0;return}
-  render();Updater.check(false);
+  render();Updater.check(false);feederTick();
 });
 function applyTheme(){
   var v=lsGet('petnote.theme'),r=document.documentElement;
   if(v==='light'||v==='dark')r.setAttribute('data-theme',v);else if(v==='system')r.removeAttribute('data-theme');
+  if(typeof applyPetTheme==='function')applyPetTheme();
 }
 
 /* ================= 啟動 ================= */
@@ -1987,6 +2951,7 @@ function applyTheme(){
   var metas=await DB.all('meta');
   var bm=metas.filter(function(m){return m.id==='backup'})[0];
   if(bm){S.backup={since:bm.since||Date.now(),last:bm.last||0,every:bm.every==null?30:bm.every}}else{S.backup={since:Date.now(),last:0,every:30};await DB.put('meta',Object.assign({id:'backup'},S.backup))}
+  var fm=metas.filter(function(m){return m.id==='foods'})[0];S.foods=fm&&Array.isArray(fm.items)?fm.items:[];
   var meta=metas.filter(function(m){return m.id==='vaccLib'})[0],gmeta=metas.filter(function(m){return m.id==='vaccGroups'})[0];
   if(meta&&Array.isArray(meta.items)){
     S.lib=meta.items;
@@ -1997,7 +2962,8 @@ function applyTheme(){
   for(var mi=0;mi<S.pets.length;mi++){if(S.pets[mi]._mig)await savePet(S.pets[mi])}
   var s=lsGet('petnote.sel');S.sel=(S.pets.filter(function(p){return p.id===s})[0]||S.pets[0]||{}).id||null;
   if(S.logs.some(function(l){return (l.photos||[]).some(function(p){return !Photos.isId(p)})})){S.tab='timeline';await migratePhotos();S.tab='home'}
-  render();Notif.sync();
+  render();Notif.sync();animEnter();
+  feederTick();
   setTimeout(function(){Updater.check(false)},2500);
   if(!DB.ok)toast('目前無法永久儲存資料');
   else{var lv=lsGet('petnote.ver');if(lv&&lv!==APP_VERSION)toast('已更新到 '+APP_VERSION+' 版，資料都還在');lsSet('petnote.ver',APP_VERSION)}
