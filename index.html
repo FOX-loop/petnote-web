@@ -336,6 +336,11 @@ mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px
 .list{display:flex;flex-direction:column}
 .lrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);width:100%;text-align:left}
 .lrow:first-child{border-top:0}
+.shrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.helpbtn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink2);font-weight:800;font-size:14px;line-height:1;display:grid;place-items:center;margin-right:2px}
+.ell{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.libhead .ic{transform:rotate(90deg);transition:transform .2s}.libhead.open .ic{transform:rotate(-90deg)}
+#libList{border-top:1px solid var(--line)}
 .lrow .grow{flex:1;min-width:0}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
 .seg button{min-height:42px;padding:0 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:600}
@@ -551,7 +556,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--primary);outline:none
 .pbtop{position:relative;display:flex;align-items:center;gap:12px}
 .pbtop .grow{flex:1;min-width:0}
 .pbic{width:42px;height:42px;border-radius:14px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;flex:none}
-.pban h2{margin:0;font-size:20px;font-weight:900;line-height:1.25;overflow-wrap:anywhere}
+.pban h2{margin:0;font-size:20px;font-weight:900;line-height:1.25;overflow-wrap:anywhere;word-break:keep-all}
+@media (max-width:380px){.pban h2{font-size:18px}.yearnav b{min-width:52px}}
 .pbsub{font-size:13px;color:var(--ink2);margin-top:2px}
 .pbsub b{color:var(--ink)}
 .pbbtn{flex:none;width:42px;height:42px;border-radius:14px;background:var(--surface);color:var(--pet-ink,var(--primary));display:grid;place-items:center;box-shadow:0 1px 2px rgba(0,0,0,.06)}
@@ -2200,24 +2206,25 @@ function viewMore(){
   var h='<div class="pagehead"><h2>設定</h2></div><div class="sechead">寵物</div><div class="card"><div class="list">';
   h+=S.pets.map(function(p){return '<button class="lrow" data-act="editpet" data-id="'+p.id+'">'+avatar(p,44)+'<span class="grow"><b>'+esc(p.name)+'</b><small style="display:block">'+[p.species,p.breed].filter(Boolean).map(esc).join('・')+'　年齡'+(p.showAge?'顯示':'隱藏')+'・紀念日'+(p.showAnniv?'顯示':'隱藏')+'</small></span>'+ico('cr',18)+'</button>'}).join('');
   h+='<button class="lrow" data-act="addpet"><span class="av" style="--s:44px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增寵物</b></span></button></div></div>';
-  var th=lsGet('petnote.theme')||'system';
-  h+='<div class="sechead">外觀</div><div class="card"><div class="seg" id="themeSeg">'+[['system','跟隨手機'],['light','淺色'],['dark','深色']].map(function(t){return '<button data-v="'+t[0]+'" class="'+(th===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</div></div>';
-  h+='<div class="sechead">時間線</div><div class="card"><p class="about" style="margin:0">選擇要和狀況紀錄一起排進時間線的項目，方便對照前後狀況。</p>'+tlOptsHtml()+'</div>';
-  h+='<div class="sechead">餵食</div><div class="card"><div class="list"><button class="lrow" data-act="foods"><span class="grow"><b>我的食物</b><small style="display:block">'+(S.foods.length?S.foods.length+' 種：'+S.foods.slice(0,4).map(function(f){return esc(f.name)}).join('、')+(S.foods.length>4?'…':''):'常吃的飼料、罐頭、零食與熱量')+'</small></span>'+ico('cr',18)+'</button></div></div>';
-  h+='<div class="sechead">疫苗群組</div><div class="card"><p class="about" style="margin:0 0 4px">同一群組的疫苗可以互相替代（例如三合一、四合一、五合一），任一劑都算「最近一次」，只會提醒一次。</p><div class="list">'+S.groups.map(function(g){
-    var ms=groupMembers(g.id),users=S.pets.filter(function(p){return (p.vaccItems||[]).indexOf('g:'+g.id)>=0}).map(function(p){return p.name});
-    return '<button class="lrow" data-act="grpedit" data-id="'+esc(g.id)+'"><span class="grow"><b>'+esc(g.name)+'</b><small style="display:block">'+everyLabel(g.every)+'・'+remindLabel(g.remind)+'　'+(ms.length?ms.map(esc).join('、'):'還沒有疫苗')+(users.length?'<br>追蹤：'+users.map(esc).join('、'):'')+'</small></span>'+ico('cr',18)+'</button>';
-  }).join('')+'<button class="lrow" data-act="grpedit"><span class="av" style="--s:40px;--h:30">'+ico('plus')+'</span><span class="grow"><b>新增群組</b><small style="display:block">例如：貓綜合疫苗、補強針</small></span></button></div></div>';
-  h+='<div class="sechead">疫苗清單</div><div class="card"><div class="list">'+S.lib.map(function(l){
-    var g=l.group&&groupGet(l.group);
-    var users=S.pets.filter(function(p){return (p.vaccItems||[]).indexOf(l.name)>=0}).map(function(p){return p.name});
-    return '<button class="lrow" data-act="libedit" data-name="'+esc(l.name)+'"><span class="grow"><b>'+esc(l.name)+'</b><small style="display:block">'+(g?'群組：'+esc(g.name):'獨立・'+everyLabel(l.every)+'・'+remindLabel(l.remind)+(users.length?'　'+users.map(esc).join('、'):''))+'</small></span>'+ico('cr',18)+'</button>';
-  }).join('')+'<button class="lrow" data-act="libedit"><span class="av" style="--s:40px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增疫苗</b><small style="display:block">建立後，新增施打紀錄時直接點選</small></span></button></div></div>';
-  h+='<div class="sechead">手機通知</div><div class="card"><p class="about" id="notifTxt" style="margin:0">檢查中…</p><div id="notifBtns"></div></div>';
   var cloudOn=GDrive.syncOn();
   h+='<div class="sechead">資料備份與同步</div><div class="card" id="cloudBox" hidden style="margin-bottom:12px"></div>';
   if(cloudOn)h+='<div class="card"><div class="cardhead" style="margin-bottom:6px"><h2>備份檔案</h2></div><p class="about" style="margin:0 0 10px">資料已經會自動同步到 Google 雲端硬碟。想另外留一份檔案長期保存（例如存在電腦），可以在這裡匯出；匯入時會和現有資料合併。</p><div class="actions"><button class="btn" data-act="export">匯出備份</button><label class="btn" for="importFile" role="button" tabindex="0" style="cursor:pointer">匯入備份</label></div><p class="about" id="storeTxt" style="margin-bottom:0"></p></div>';
   else h+='<div class="card"><p class="about" id="bkTxt" style="margin:0 0 10px;font-weight:600;color:var(--ink)"></p><div class="actions"><button class="btn" data-act="export">匯出備份</button><label class="btn" for="importFile" role="button" tabindex="0" style="cursor:pointer">匯入備份</label></div><p class="about" id="storeTxt" style="margin-bottom:0"></p><div class="field" style="margin:12px 0 0"><label for="bk-every">備份提醒</label><select id="bk-every">'+bkOptsHtml()+'</select><div id="bkCustom" style="display:'+(bkIsCustom()?'flex':'none')+';align-items:center;gap:8px;margin-top:8px">每<input id="bk-days" type="text" inputmode="numeric" maxlength="3" autocomplete="off" value="'+(S.backup.every||30)+'" style="width:90px;text-align:center">天提醒一次</div><div class="hint">超過這段時間沒匯出，首頁會出現提醒'+(isNative()?'，並在早上 9:00 跳通知':'')+'。</div></div><p class="about">資料只存在這支手機（或這個瀏覽器）裡。換手機、重新安裝或清除瀏覽器資料前，請先匯出備份檔並存到雲端硬碟。匯入時會與現有資料合併。</p></div>';
+  h+='<div class="sechead">時間線</div><div class="card"><p class="about" style="margin:0">選擇要和狀況紀錄一起排進時間線的項目，方便對照前後狀況。</p>'+tlOptsHtml()+'</div>';
+  h+='<div class="sechead">餵食</div><div class="card"><div class="list"><button class="lrow" data-act="foods"><span class="grow"><b>我的食物</b><small style="display:block">'+(S.foods.length?'已設定 '+S.foods.length+' 種':'常吃的飼料、罐頭、零食與熱量')+'</small>'+(S.foods.length?'<small class="ell">'+FOOD_TYPES.map(function(t){var n=S.foods.filter(function(f){return (f.type||'other')===t[0]}).length;return n?t[1]+' '+n:''}).filter(Boolean).join('・')+'</small>':'')+'</span>'+ico('cr',18)+'</button></div></div>';
+  h+='<div class="sechead shrow"><span>疫苗群組</span><button class="helpbtn" data-act="grphelp" aria-label="什麼是疫苗群組">?</button></div><div class="card"><div class="list">'+S.groups.map(function(g){
+    var ms=groupMembers(g.id),users=S.pets.filter(function(p){return (p.vaccItems||[]).indexOf('g:'+g.id)>=0}).map(function(p){return p.name});
+    return '<button class="lrow" data-act="grpedit" data-id="'+esc(g.id)+'"><span class="grow"><b>'+esc(g.name)+'</b><small style="display:block">'+everyLabel(g.every)+'・'+remindLabel(g.remind)+'</small><small class="ell">'+(ms.length?ms.map(esc).join('、'):'還沒有疫苗')+'</small>'+(users.length?'<small style="display:block">追蹤：'+users.map(esc).join('、')+'</small>':'')+'</span>'+ico('cr',18)+'</button>';
+  }).join('')+'<button class="lrow" data-act="grpedit"><span class="av" style="--s:40px;--h:30">'+ico('plus')+'</span><span class="grow"><b>新增群組</b><small style="display:block">例如：貓綜合疫苗、補強針</small></span></button></div></div>';
+  var libOpen=lsGet('petnote.libOpen')==='1';
+  h+='<div class="sechead">疫苗清單</div><div class="card"><button class="lrow libhead'+(libOpen?' open':'')+'" data-act="libtoggle" aria-expanded="'+libOpen+'" style="padding-top:0"><span class="grow"><b>全部疫苗</b><small style="display:block">共 '+S.lib.length+' 種，點這裡'+(libOpen?'收合':'展開')+'</small></span>'+ico('cr',18)+'</button><div class="list" id="libList"'+(libOpen?'':' hidden')+'>'+S.lib.map(function(l){
+    var g=l.group&&groupGet(l.group);
+    var users=S.pets.filter(function(p){return (p.vaccItems||[]).indexOf(l.name)>=0}).map(function(p){return p.name});
+    return '<button class="lrow" data-act="libedit" data-name="'+esc(l.name)+'"><span class="grow"><b>'+esc(l.name)+'</b><small style="display:block">'+(g?'群組：'+esc(g.name):'獨立・'+everyLabel(l.every)+'・'+remindLabel(l.remind)+(users.length?'　'+users.map(esc).join('、'):''))+'</small></span>'+ico('cr',18)+'</button>';
+  }).join('')+'</div><button class="lrow" data-act="libedit"><span class="av" style="--s:40px;--h:200">'+ico('plus')+'</span><span class="grow"><b>新增疫苗</b><small style="display:block">建立後，新增施打紀錄時直接點選</small></span></button></div>';
+  h+='<div class="sechead">手機通知</div><div class="card"><p class="about" id="notifTxt" style="margin:0">檢查中…</p><div id="notifBtns"></div></div>';
+  var th=lsGet('petnote.theme')||'system';
+  h+='<div class="sechead">外觀</div><div class="card"><div class="seg" id="themeSeg">'+[['system','跟隨手機'],['light','淺色'],['dark','深色']].map(function(t){return '<button data-v="'+t[0]+'" class="'+(th===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</div></div>';
   if(!isNative()){
     var au=apkUrl();
     h+='<div class="sechead">在其他手機使用</div><div class="card"><p class="about" style="margin:0"><b>iPhone</b>：用 Safari 打開這個網址，點下方「分享」→「加入主畫面」，就會像 App 一樣有圖示。<br><b>Android</b>：用 Chrome 打開，點右上角選單 →「加到主畫面」。'+(au?'也可以安裝 App 版，會在早上跳出提醒通知。':'')+'</p>'+
@@ -3294,6 +3301,8 @@ document.addEventListener('click',function(e){
   else if(a==='gdlink')gdAction('link');
   else if(a==='gdbackup')gdAction('backup');
   else if(a==='gdsync')gdAction('sync');
+  else if(a==='grphelp')infoDlg('什麼是疫苗群組？\n\n可以互相替代的疫苗放在同一個群組，例如貓三合一、四合一、五合一。\n\n打了群組裡任何一種，都算完成這一劑，下次到期只會提醒一次。');
+  else if(a==='libtoggle'){var op=lsGet('petnote.libOpen')!=='1';lsSet('petnote.libOpen',op?'1':'0');var ll=$('#libList');if(ll)ll.hidden=!op;t.classList.toggle('open',op);t.setAttribute('aria-expanded',String(op));var sm=t.querySelector('small');if(sm)sm.textContent='共 '+S.lib.length+' 種，點這裡'+(op?'收合':'展開')}
   else if(a==='gdrestore')gdAction('restore');
   else if(a==='gdunlink'){confirmDlg('取消連結 Google 帳號？\n這支手機上的資料會保留，但不再和其他裝置同步；雲端硬碟裡的資料也會保留，之後重新連結就會繼續同步。','取消連結').then(async function(ok){if(!ok)return;await GDrive.unlink();render();toast('已取消連結')})}
   else if(a==='vaccadd')openVaccSheet(t.dataset.item);
