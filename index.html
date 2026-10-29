@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0F6E7E">
+<meta name="theme-color" content="#1F6F5C">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -16,16 +16,17 @@
 <style>
 /* 版面：單欄手機 App。上方寵物切換、中間內容、下方四個分頁。招牌元素是驅蟲「集章」格，像寵物健康手冊蓋章。 */
 :root{
-  --bg:#F6F5F2; --surface:#FFFFFF; --surface2:#F0EEEA; --ink:#1E2326; --ink2:#5E676B; --line:#E2DFD9;
+  --bg:#FAF6EF; --surface:#FFFFFF; --surface2:#F3EDE3; --ink:#1C2724; --ink2:#5A6762; --line:#E7DFD3;
+  --brand:#1F6F5C; --brand-soft:#DCEDE6; --brand-ac:#E8833F; --cream:#FFF4E6;
   --k:#E07B39; --k-bg:#FDF0E6; --k-tr:#F6D5BE; --k-fg:#9A4A15;
   --wa:#3A86D8; --wa-bg:#EAF3FC; --wa-tr:#C9DEF5; --wa-fg:#1E5797;
   --ex:#2F9A5E; --ex-bg:#E8F5EE; --ex-tr:#C5E6D2; --ex-fg:#1D6B3F;
   --wt:#7A62C9; --wt-bg:#F1EEFB; --wt-tr:#D9D1F3; --wt-fg:#4F3A9A;
-  --pet-hi:#2A8C9C; --round:"Nunito","SF Pro Rounded",ui-rounded,system-ui,-apple-system,"Noto Sans TC",sans-serif;
-  --primary:#0F6E7E; --on-primary:#FFFFFF; --primary-soft:#D5EBEE;
-  --accent:#D9691F; --accent-soft:#FBE5D2;
+  --pet-hi:#4FA58A; --round:"Nunito","SF Pro Rounded",ui-rounded,system-ui,-apple-system,"Noto Sans TC",sans-serif;
+  --primary:#1F6F5C; --on-primary:#FFFFFF; --primary-soft:#DCEDE6;
+  --accent:#E8833F; --accent-soft:#FCE6D3;
   --ok:#277D50; --ok-soft:#D6EFE1; --bad:#B93B35; --bad-soft:#F8DCD9;
-  --shadow:0 1px 2px rgba(20,38,43,.06),0 6px 18px rgba(20,38,43,.06);
+  --shadow:0 1px 2px rgba(31,58,51,.06),0 6px 18px rgba(31,58,51,.07);
   --scrim:rgba(10,20,22,.5);
   --ts:55%; --tl:34%; --bs:62%; --bl:91%;
   --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px); --navpad:0px;
@@ -33,13 +34,14 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#121516; --surface:#1B1F21; --surface2:#252A2D; --ink:#E9ECEC; --ink2:#A3ADB0; --line:#333A3D;
+    --bg:#0F1513; --surface:#17201D; --surface2:#202B27; --ink:#EAEFEC; --ink2:#A2B0AA; --line:#2E3A36;
+    --brand:#7FD1B4; --brand-soft:#17332B; --brand-ac:#F2994A; --cream:#FFF4E6;
     --k:#F2A061; --k-bg:#2E2219; --k-tr:#4A3423; --k-fg:#F7C193;
     --wa:#7DB5F0; --wa-bg:#1A2635; --wa-tr:#2A3D55; --wa-fg:#A9CDF5;
     --ex:#6CCB94; --ex-bg:#18291F; --ex-tr:#26402F; --ex-fg:#9BDDB6;
     --wt:#AE9CF0; --wt-bg:#231F35; --wt-tr:#3A3254; --wt-fg:#C9BDF6;
-    --primary:#5CC1D0; --on-primary:#06262B; --primary-soft:#173B41;
-    --accent:#F29A5B; --accent-soft:#41291A;
+    --primary:#7FD1B4; --on-primary:#0B231C; --primary-soft:#17332B;
+    --accent:#F2994A; --accent-soft:#41291A;
     --ok:#5CCB93; --ok-soft:#173528; --bad:#F27D75; --bad-soft:#401E1C;
     --shadow:0 1px 2px rgba(0,0,0,.45); --scrim:rgba(0,0,0,.62);
     --ts:68%; --tl:74%; --bs:32%; --bl:21%;
@@ -47,13 +49,14 @@
   }
 }
 :root[data-theme="dark"]{
-  --bg:#121516; --surface:#1B1F21; --surface2:#252A2D; --ink:#E9ECEC; --ink2:#A3ADB0; --line:#333A3D;
+  --bg:#0F1513; --surface:#17201D; --surface2:#202B27; --ink:#EAEFEC; --ink2:#A2B0AA; --line:#2E3A36;
+    --brand:#7FD1B4; --brand-soft:#17332B; --brand-ac:#F2994A; --cream:#FFF4E6;
   --k:#F2A061; --k-bg:#2E2219; --k-tr:#4A3423; --k-fg:#F7C193;
   --wa:#7DB5F0; --wa-bg:#1A2635; --wa-tr:#2A3D55; --wa-fg:#A9CDF5;
   --ex:#6CCB94; --ex-bg:#18291F; --ex-tr:#26402F; --ex-fg:#9BDDB6;
   --wt:#AE9CF0; --wt-bg:#231F35; --wt-tr:#3A3254; --wt-fg:#C9BDF6;
-  --primary:#5CC1D0; --on-primary:#06262B; --primary-soft:#173B41;
-  --accent:#F29A5B; --accent-soft:#41291A;
+  --primary:#7FD1B4; --on-primary:#0B231C; --primary-soft:#17332B;
+  --accent:#F2994A; --accent-soft:#41291A;
   --ok:#5CCB93; --ok-soft:#173528; --bad:#F27D75; --bad-soft:#401E1C;
   --shadow:0 1px 2px rgba(0,0,0,.45); --scrim:rgba(0,0,0,.62);
   --ts:68%; --tl:74%; --bs:32%; --bl:21%;
@@ -78,7 +81,11 @@ small{font-size:12.5px;color:var(--ink2)}
 #app{height:100%;display:flex;flex-direction:column;min-height:0}
 #top{flex:none;padding-top:10px;padding-bottom:6px}
 .toprow{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
-.brand{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:17px;letter-spacing:.04em;color:var(--primary)}
+.brand{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:17px;letter-spacing:.04em;color:var(--brand)}
+.mascot{display:inline-block;flex:none;overflow:hidden;background:#1F6F5C;line-height:0}.mascot svg{width:100%;height:100%;display:block}
+.brand .mascot{width:26px;height:26px;border-radius:8px}
+.hmsg .mascot{width:36px;height:36px;border-radius:11px}
+.empty .mascot{width:112px;height:112px;border-radius:30px;margin:0 auto 14px;box-shadow:var(--shadow)}
 .today{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
 .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .chips::-webkit-scrollbar{display:none}
@@ -714,6 +721,8 @@ var IC={
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',
   bell:'<path d="M6 17h12l-1.5-2v-4a4.5 4.5 0 0 0-9 0v4z"/><path d="M10 20a2 2 0 0 0 4 0"/>'
 };
+var MASCOT_ART='<g fill="#F2994A" stroke="#F2994A" stroke-width="12" stroke-linejoin="round"> <path d="M186 210 L136 226 L182 252Z"/><path d="M180 258 L122 284 L172 306Z"/><path d="M168 312 L110 346 L158 364Z"/> </g> <path d="M146 760 L148 400 Q150 340 172 300 L182 214 L188 124 L230 152 Q276 130 320 106 L332 56 L366 100 Q424 150 434 214 Q440 272 402 304 L406 400 L414 760 L146 760 Z" fill="#FFF4E6" stroke="#FFF4E6" stroke-width="16" stroke-linejoin="round"/> <circle cx="262" cy="202" r="11" fill="#1F3A33"/><circle cx="336" cy="182" r="11" fill="#1F3A33"/> <ellipse cx="328" cy="226" rx="13" ry="8" transform="rotate(-14 328 226)" fill="#1F3A33"/> <path d="M312 262 q-2 30 16 32 q18 0 14-36z" fill="#FF8C98"/> <path d="M302 266 L348 255" stroke="#1F3A33" stroke-width="6" stroke-linecap="round"/> <path d="M328 266 l3 14" stroke="#E2596A" stroke-width="4" stroke-linecap="round"/>';
+function MASCOT(){return '<span class="mascot" aria-hidden="true"><svg viewBox="0 0 512 512">'+MASCOT_ART+'</svg></span>'}
 var PAW_D='M7,16.2 a5,4 0 1,0 10,0 a5,4 0 1,0 -10,0 Z M3.5,10.5 a2,2.4 0 1,0 4,0 a2,2.4 0 1,0 -4,0 Z M7.4,6.5 a2.1,2.6 0 1,0 4.2,0 a2.1,2.6 0 1,0 -4.2,0 Z M12.4,6.5 a2.1,2.6 0 1,0 4.2,0 a2.1,2.6 0 1,0 -4.2,0 Z M16.5,10.5 a2,2.4 0 1,0 4,0 a2,2.4 0 1,0 -4,0 Z';
 function PAW_SVG(fill,size,stroke,cls){return '<svg class="paw'+(cls?' '+cls:'')+'" width="'+size+'" height="'+size+'" viewBox="0 0 24 24" aria-hidden="true"><path d="'+PAW_D+'" fill="'+fill+'"'+(stroke?' stroke="'+stroke+'" stroke-width="1.5"':'')+'/></svg>'}
 var ico=function(n,s){s=s||22;return '<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'};
@@ -953,6 +962,7 @@ async function migratePhotos(){
   if(failed)setTimeout(function(){toast('手機空間不足，部分照片尚未整理完成，原照片都保留著。清出空間後重新開啟 App 會繼續。')},600);
 }
 var PET_COLORS=[
+  {id:'forest',n:'森林',l:['#1F6F5C','#DCEDE6','#17574A','#4FA58A'],d:['#7FD1B4','#17332B','#B0E6D2','#3E9C80']},
   {id:'apricot',n:'杏桃',l:['#B35A17','#FCE8D6','#8A4512','#F0A868'],d:['#F2A15E','#3B2A1C','#F7C493','#C8783A']},
   {id:'ocean',n:'海藍',l:['#2F62B8','#E1EAF8','#244C8F','#6C94DA'],d:['#8DB2F0','#1E2D47','#B8CEF5','#4F78C2']},
   {id:'teal',n:'青綠',l:['#0F6E7E','#D5EBEE','#0B5562','#3FA3B2'],d:['#5CC1D0','#173B41','#93D9E3','#2A8C9C']},
@@ -970,13 +980,13 @@ function applyPetTheme(){
   if(!p){['--primary','--primary-soft','--on-primary','--pet-hi','--pet-ink','--hero-a','--hero-b','--hero-ink'].forEach(function(k){r.removeProperty(k)});return}
   var c=petColorOf(p),v=isDark()?c.d:c.l;
   r.setProperty('--primary',v[0]);r.setProperty('--primary-soft',v[1]);r.setProperty('--pet-ink',v[2]);r.setProperty('--pet-hi',v[3]);r.setProperty('--on-primary',isDark()?'#101416':'#FFFFFF');r.setProperty('--hero-a',c.l[0]);r.setProperty('--hero-b',c.l[3]);r.setProperty('--hero-ink',c.l[2]);
-  var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',isDark()?'#121516':v[0]);
+  var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',isDark()?'#0F1513':v[0]);
 }
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){applyPetTheme()})}catch(e){}
 function photoColor(url){return new Promise(function(res){var im=new Image();im.onload=function(){try{var cv=document.createElement('canvas');cv.width=cv.height=24;var x=cv.getContext('2d');x.drawImage(im,0,0,24,24);var d=x.getImageData(0,0,24,24).data,best=null,bs=-1;
   var hs={};for(var i=0;i<d.length;i+=4){var r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,sat=mx===mn?0:(mx-mn)/(1-Math.abs(2*l-1));if(sat<.18||l<.12||l>.92)continue;var h=mx===r?((g-b)/(mx-mn)+6)%6:mx===g?(b-r)/(mx-mn)+2:(r-g)/(mx-mn)+4;h=Math.round(h*60/30)%12;hs[h]=(hs[h]||0)+sat}
   Object.keys(hs).forEach(function(k){if(hs[k]>bs){bs=hs[k];best=+k*30+15}});
-  if(best==null)return res('slate');var map=[['apricot',28],['ocean',218],['teal',188],['berry',335],['grape',262],['olive',85],['cocoa',20]],pick='slate',dd=999;
+  if(best==null)return res('slate');var map=[['forest',158],['apricot',28],['ocean',218],['teal',188],['berry',335],['grape',262],['olive',85],['cocoa',20]],pick='slate',dd=999;
   map.forEach(function(m){var df=Math.min(Math.abs(m[1]-best),360-Math.abs(m[1]-best));if(df<dd){dd=df;pick=m[0]}});res(bs<1.2&&pick==='apricot'?'cocoa':pick)}catch(e){res(null)}};im.onerror=function(){res(null)};im.src=url})}
 function hueOf(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
 function avatar(p,size){
@@ -1074,7 +1084,7 @@ var sheetRefresh=null;
 function render(){applyPetTheme();renderTop();renderNav();renderMain();renderFab();if(sheetRefresh)sheetRefresh()}
 function renderTop(){
   var t=new Date();
-  var row='<div class="toprow"><span class="brand">'+PAW_SVG('var(--primary)',20)+'伴獸筆記</span><span class="today">'+(t.getMonth()+1)+'月'+t.getDate()+'日 週'+WD[t.getDay()]+'</span></div>';
+  var row='<div class="toprow"><span class="brand">'+MASCOT()+'伴獸筆記</span><span class="today">'+(t.getMonth()+1)+'月'+t.getDate()+'日 週'+WD[t.getDay()]+'</span></div>';
   if(!S.pets.length){$('#top').innerHTML=row;return}
   $('#top').innerHTML=row+'<div class="chips">'+S.pets.map(function(p){
     var pc=petColorOf(p),pv=isDark()?pc.d:pc.l;
@@ -1104,7 +1114,7 @@ function renderMain(){
   Photos.hydrate(m);
 }
 function viewEmpty(){
-  return '<div class="empty"><h3>先新增第一隻寵物</h3><p>記下生日、來家日期，之後的狀況和驅蟲都會跟著這隻寵物。</p>'+
+  return '<div class="empty">'+MASCOT()+'<h3>先新增第一隻寵物</h3><p>記下生日、來家日期，之後的狀況和驅蟲都會跟著這隻寵物。</p>'+
     '<button class="btn primary" data-act="addpet">'+ico('plus')+'新增寵物</button><br><button class="btn" data-act="sample">先看看範例資料</button></div>';
 }
 
@@ -1810,7 +1820,7 @@ function viewHome(){
   var h='<section class="hero'+(p.photo?' ph':'')+'"'+(p.photo?' style="background-image:url(\''+p.photo+'\')"':'')+'>'+(p.photo?'':PAW_SVG('#FFFFFF',170,'','hwm')+PAW_SVG('#FFFFFF',70,'','hwm2'))+
 
     '<div class="hbody"><div class="hname"><div class="grow"><h1>'+esc(p.name)+'</h1><div class="meta">'+(meta||'&nbsp;')+'</div></div><button class="hedit" data-act="editpet" aria-label="編輯寵物">'+ico('edit',20)+'</button></div>'+(pills?'<div class="hpills">'+pills+'</div>':'')+party+'</div></section>';
-  var fm=friendlyMsg(p);if(fm)out.push('<div class="hmsg"><span class="hmi">'+PAW_SVG('#FFFFFF',20)+'</span><span>'+fm+'</span></div>');
+  var fm=friendlyMsg(p);if(fm)out.push('<div class="hmsg">'+MASCOT()+'<span>'+fm+'</span></div>');
   var ah=alertsHtml(now);if(ah)out.push(ah);
   out.push(metricCards(p)+mealChecklist(p));
   var evc=nextEventCard(p,now);if(evc)out.push(evc);
