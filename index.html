@@ -2840,13 +2840,7 @@ var WebPush=(function(){
   async function enable(){
     var perm=await Notification.requestPermission();
     if(perm!=='granted')return perm;
-    var srv=await config();if(!srv)throw new Error('no server');
-    var reg=await navigator.serviceWorker.ready;
-    var key=(await (await fetch(srv+'/vapid')).json()).publicKey;
-    var sub=await reg.pushManager.getSubscription();
-    if(sub){var cur=sub.options&&sub.options.applicationServerKey;if(cur){var a=new Uint8Array(cur),b=keyBytes(key);if(a.length!==b.length||a.some(function(x,i){return x!==b[i]})){await sub.unsubscribe();sub=null}}}
-    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:keyBytes(key)});
-    await post('/subscribe',{subscription:sub.toJSON()});
+    await ensureSub();
     lsSet('petnote.push','on');await sync();return 'granted';
   }
   async function disable(){
@@ -2858,11 +2852,30 @@ var WebPush=(function(){
     if(!on()||!supported())return;
     try{var items=Notif.build().map(function(n){return {t:n.schedule.at.getTime(),title:n.title,body:n.body}});await post('/schedule',{items:items});lsSet('petnote.pushSynced',String(Date.now()))}catch(e){}
   }
+  async function ensureSub(){
+    var srv=await config();if(!srv)throw new Error('no server');
+    var reg=await navigator.serviceWorker.ready;
+    var key=(await (await fetch(srv+'/vapid')).json()).publicKey;
+    var sub=await reg.pushManager.getSubscription();
+    if(sub){var cur=sub.options&&sub.options.applicationServerKey;if(cur){var a=new Uint8Array(cur),b=keyBytes(key);if(a.length!==b.length||a.some(function(x,i){return x!==b[i]})){await sub.unsubscribe();sub=null}}}
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:keyBytes(key)});
+    await post('/subscribe',{subscription:sub.toJSON()});
+    return sub;
+  }
   async function refresh(){
     if(!on()||!supported()||Notification.permission!=='granted')return;
-    try{var reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(!sub){lsSet('petnote.push','off');return}await post('/subscribe',{subscription:sub.toJSON()});await sync()}catch(e){}
+    // 訂閱遺失時（例如瀏覽器更新、Service Worker 重裝）自動重新訂閱，不要直接變回「未開啟」
+    try{await ensureSub();await sync()}catch(e){lsSet('petnote.pushErr',String(e&&e.message||e))}
   }
-  async function test(){return post('/test')}
+  async function test(){
+    if(Notification.permission!=='granted')return {ok:false,why:'perm'};
+    try{await ensureSub()}catch(e){return {ok:false,why:'sub',detail:String(e&&e.message||e)}}
+    var srv=await config();
+    var r=await fetch(srv+'/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({device:device()})});
+    var j=await r.json().catch(function(){return {}});
+    if(!r.ok&&!j.status)j.status=r.status;
+    return j;
+  }
   function queue(){if(!on())return;clearTimeout(timer);timer=setTimeout(sync,1500)}
   return {state:state,enable:enable,disable:disable,sync:sync,queue:queue,refresh:refresh,test:test,isIOS:isIOS};
 })();
@@ -2892,7 +2905,7 @@ async function updateNotifCard(){
       off:'開啟後，預防針、驅蟲與備份提醒會在早上 9:00 送到這支手機。'
     };
     t.style.whiteSpace='pre-line';t.textContent=wm[ws]||'';
-    b.innerHTML=ws==='on'?'<div class="row" style="margin-top:12px"><button class="btn" data-act="wpushtest">傳送測試通知</button><button class="btn" data-act="wpushoff">關閉通知</button></div><small style="display:block;margin-top:8px">開啟通知時，提醒的標題與時間會存到通知伺服器，只用來在時間到時送出通知，關閉後就會刪除。</small>':(ws==='off'?'<button class="btn primary block" data-act="wpushon" style="margin-top:12px">'+ico('bell',20)+'開啟通知</button><small style="display:block;margin-top:8px">開啟後，提醒的標題與時間會存到通知伺服器，只用來在時間到時送出通知。</small>':'');
+    b.innerHTML=ws==='on'?'<div class="row" style="margin-top:12px"><button class="btn" data-act="wpushtest">傳送測試通知</button><button class="btn" data-act="wpushoff">關閉通知</button></div><small id="wpushDiag" style="display:block;margin-top:8px;color:var(--bad);word-break:break-all"></small><small style="display:block;margin-top:8px">開啟通知時，提醒的標題與時間會存到通知伺服器，只用來在時間到時送出通知，關閉後就會刪除。</small>':(ws==='off'?'<button class="btn primary block" data-act="wpushon" style="margin-top:12px">'+ico('bell',20)+'開啟通知</button><small style="display:block;margin-top:8px">開啟後，提醒的標題與時間會存到通知伺服器，只用來在時間到時送出通知。</small>':'');
     return;
   }
   var msg={
@@ -2956,7 +2969,7 @@ document.addEventListener('click',function(e){
   else if(a==='alertgo'){S.sel=t.dataset.pid;lsSet('petnote.sel',S.sel);S.tab=t.dataset.tab;$('#main').scrollTop=0;render()}
   else if(a==='wpushon'){t.disabled=true;WebPush.enable().then(function(r){toast(r==='granted'?'已開啟通知':'沒有允許通知');updateNotifCard()}).catch(function(){t.disabled=false;toast('開啟失敗，請確認網路後再試一次')})}
   else if(a==='wpushoff'){WebPush.disable().then(function(){toast('已關閉通知');updateNotifCard()})}
-  else if(a==='wpushtest'){WebPush.test().then(function(r){toast(r&&r.ok?'測試通知已送出，幾秒內會收到':'送出失敗，請關閉後重新開啟通知')}).catch(function(){toast('送出失敗，請確認網路')})}
+  else if(a==='wpushtest'){t.disabled=true;WebPush.test().then(function(r){t.disabled=false;var m;if(r&&r.ok)m='測試通知已送出，幾秒內會收到';else if(r&&r.why==='perm')m='通知權限被關閉了，請到瀏覽器設定允許通知';else if(r&&r.why==='sub')m='無法建立推播訂閱（'+(r.detail||'')+'）';else m='推播服務拒絕（代碼 '+((r&&r.status)||'?')+'）';toast(m);var d=$('#wpushDiag');if(d)d.textContent=r&&r.ok?'':'診斷：'+m+(r&&r.detail&&r.why!=='sub'?'｜'+String(r.detail).slice(0,160):'')}).catch(function(e){t.disabled=false;toast('連不到通知伺服器，請確認網路');var d=$('#wpushDiag');if(d)d.textContent='診斷：連不到通知伺服器（'+String(e&&e.message||e)+'）'})}
   else if(a==='notifask'){Notif.ask().then(function(){Notif.sync();updateNotifCard()})}
   else if(a==='notiftest'){Notif.test().then(function(ok){toast(ok?'5 秒後會收到測試通知':'無法傳送測試通知')})}
 });
