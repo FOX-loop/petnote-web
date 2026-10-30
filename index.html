@@ -85,7 +85,13 @@ small{font-size:12.5px;color:var(--ink2)}
 .brand{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:17px;letter-spacing:.04em;color:var(--brand)}
 .mascot{display:inline-block;flex:none;overflow:hidden;background:#1F6F5C;line-height:0}.mascot svg{width:100%;height:100%;display:block}
 .brand .mascot{width:26px;height:26px;border-radius:8px}
-.hmsg .mascot{width:36px;height:36px;border-radius:11px}
+.evcard .mascot.evm{width:54px;height:54px;border-radius:16px;flex:none}
+.evcard.today .mascot.evm{animation:mhop .8s ease-out 2}
+.hmsg .mascot{width:42px;height:42px;border-radius:13px}
+.hmsg .mascot.mood-roar,.hmsg .mascot.mood-surprised{animation:mshake .5s ease-in-out 2}.hmsg .mascot.mood-happy{animation:mhop .7s ease-out}
+@keyframes mshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}@keyframes mhop{0%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.hmsg.roar{background:var(--bad-soft)}
+@media (prefers-reduced-motion:reduce){.hmsg .mascot{animation:none!important}}
 .empty .mascot{width:112px;height:112px;border-radius:30px;margin:0 auto 14px;box-shadow:var(--shadow)}
 .today{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
 .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-right:calc(-1 * var(--gr));padding-right:var(--gr)}
@@ -124,7 +130,10 @@ main{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;paddi
 .age .sub{margin-top:6px;font-size:13.5px;color:var(--ink2)}
 .age .party{margin-top:8px;display:inline-block;padding:3px 10px;border-radius:99px;background:var(--accent);color:var(--surface);font-weight:700;font-size:13.5px}
 
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.actions+.swrow,.actions+.field,.actions+.hint{margin-top:14px}
+.swrow+.actions{margin-top:6px}
+.seg+.swrow{margin-top:14px}
 .btn{min-height:46px;padding:0 18px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--surface2);color:var(--ink)}
 .btn.primary{background:var(--primary);color:var(--on-primary)}
 .btn.danger{background:var(--bad-soft);color:var(--bad)}
@@ -338,6 +347,52 @@ mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px
 .lrow:first-child{border-top:0}
 .shrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .helpbtn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink2);font-weight:800;font-size:14px;line-height:1;display:grid;place-items:center;margin-right:2px}
+
+/* ---- 照護 ---- */
+.caretop{display:flex;gap:8px;align-items:center;margin:0 0 12px}.caretop .seg.caretabs{flex:1;min-width:0;margin:0}
+.caregear{flex:none;width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink2);display:grid;place-items:center}
+.seg.caretabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0 0 12px}.seg.caretabs button{padding:0 6px;white-space:nowrap}
+.chipwrap{display:flex;flex-wrap:wrap;gap:8px}
+.dose{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.dose:first-child,.yrh+.dose{border-top:0}
+.dose .dt{flex:none;min-width:48px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--primary);display:flex;align-items:center}
+.dose .grow{flex:1;min-width:0}.dose .grow small{display:block;color:var(--ink2)}
+.dose.late .dt,.dose .lt{color:var(--bad)}.dose.did{opacity:.75}
+.dosechk{flex:none;width:42px;height:42px;border-radius:50%;border:2px solid var(--primary);color:var(--primary);display:grid;place-items:center;background:var(--surface)}
+.dose.late .dosechk{border-color:var(--bad);color:var(--bad)}
+.dosechk:active{background:var(--primary);color:var(--on-primary)}
+.mtiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mtile{position:relative;display:flex;flex-direction:column;gap:2px;padding:12px;border-radius:18px;background:var(--surface2);cursor:pointer;min-width:0}
+.mtile .mlb{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--ink2)}
+.mtile .mv b{font-size:24px;font-weight:900}.mtile .mv small{margin-left:3px}
+.mtile .msub{font-size:12px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mtadd{position:absolute;right:8px;top:8px;width:30px;height:30px;border-radius:10px;background:var(--surface);color:var(--primary);display:grid;place-items:center}
+.labs{display:flex;flex-direction:column}
+.labrow{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}.labrow:first-child{border-top:0}
+.labrow .grow{flex:1;min-width:0}.labrow .grow small{display:block;color:var(--ink2)}
+.labrow .lv{text-align:right;white-space:nowrap}.labrow .lv b{font-size:17px}
+.labrow .up,.labrow .dn,.labrow .lv>span{display:block;font-size:11.5px;font-weight:700}.labrow .up{color:var(--bad)}.labrow .dn{color:var(--ok)}
+.lspark{flex:none;width:70px;color:var(--primary)}
+.labin{display:grid;grid-template-columns:1fr;gap:6px}
+.labi{display:flex;align-items:center;gap:10px}.labi span{flex:1;min-width:0}.labi small{display:block;color:var(--ink2);font-size:12px}.labi input{width:110px;flex:none;text-align:right}
+.counter{display:grid;place-items:center;margin:0 0 14px}
+.counter .ctrbtn{width:200px;height:200px;max-width:60vw;max-height:60vw;flex:none;border-radius:50%;background:var(--primary-soft);color:var(--primary);border:3px solid var(--primary);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;text-align:center}
+.ctrbtn b{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums}.ctrbtn small{color:inherit;font-weight:600;line-height:1.35}
+.ctrbtn:active{transform:scale(.97)}.ctrbtn.sw.run{background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
+.qol{display:flex;flex-direction:column;gap:12px}
+.qrow .qh{display:flex;justify-content:space-between;align-items:baseline}.qrow small{display:block;color:var(--ink2)}
+.qrow .qv{font-size:20px;font-weight:900;color:var(--primary);min-width:2ch;text-align:right}
+.qrow input[type=range]{width:100%;accent-color:var(--primary);margin-top:4px}
+.qtot{margin:14px 0 4px;text-align:center;font-size:15px}.qtot b{font-size:26px;color:var(--primary)}
+.qchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.qchips .fchip{display:inline-flex;align-items:center;gap:5px}
+.carecard .dose:first-of-type{border-top:0}
+.ecard{border:2px solid var(--primary);border-radius:20px;padding:14px;margin-bottom:10px;background:var(--surface)}
+.ech{display:flex;gap:12px;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:6px}.ech b{font-size:20px}.ech small{display:block;color:var(--ink2)}
+.ecr{padding:7px 0;border-bottom:1px dashed var(--line)}.ecr:last-child{border-bottom:0}.ecr>small{display:block;color:var(--ink2);font-size:12px}.ecr b{font-weight:700}.ecr b small{color:var(--ink2);font-weight:500}
+.report{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);font-size:14px}
+.report .rph{border-bottom:3px solid var(--primary);padding-bottom:8px;margin-bottom:4px}.report .rph div{font-size:17px}.report .rph b{font-size:20px}.report .rph small{color:var(--ink2)}
+.report .rps{border-bottom:1px solid var(--line);padding:6px 0}.report h4{margin:6px 0 4px;color:var(--primary);font-size:15px}.report p{margin:3px 0}.report ul{margin:3px 0;padding-left:1.2em}
+.report .rpw{color:var(--accent);font-weight:700}.report .rpf{color:var(--ink2);font-size:12px;margin:10px 0 0}.rpspark{color:var(--primary)}
 .ell{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .libhead .ic{transform:rotate(90deg);transition:transform .2s}.libhead.open .ic{transform:rotate(-90deg)}
 #libList{border-top:1px solid var(--line)}
@@ -546,8 +601,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--primary);outline:none
 .evcard b{display:block;font-size:15px}
 .evcard small{display:block;font-size:12.5px;color:var(--ink2)}
 .evcard .gift{flex:none}
-.evcard.today{background:var(--primary-soft)}
+.evcard.today{background:var(--primary-soft);color:var(--ink);font-size:15px;font-variant-numeric:normal}
 .evcard.today .confetti{position:absolute;right:4px;top:0}
+.evcard.today .confetti{opacity:.85;z-index:0}.evcard>div{position:relative;z-index:1}
 .ms-btn:not(.primary){background:var(--primary-soft);color:var(--pet-ink,var(--primary));box-shadow:none}
 
 /* ===== 1.13 分頁橫幅與動畫 ===== */
@@ -674,7 +730,7 @@ var toLocalInput=function(ts){var d=new Date(ts);return ymd(d)+'T'+pad(d.getHour
 var hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 var lsGet=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var lsSet=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
-var APP_VERSION='1.11.0';
+var APP_VERSION='1.12.0';
 function isNative(){try{var c=window.Capacitor;return !!(c&&c.isNativePlatform&&c.isNativePlatform())}catch(e){return false}}
 /* ---- App 版：檢查 GitHub 上的新版本 ---- */
 var UPDATE_REPO='FOX-loop/petnote-web';
@@ -732,8 +788,8 @@ var TYPES=[
   {id:'energy',name:'精神不佳',h:100},{id:'cough',name:'咳嗽／打噴嚏',h:165},{id:'skin',name:'皮膚／毛髮',h:195},
   {id:'injury',name:'受傷／外傷',h:350},{id:'vet',name:'就醫／看診',h:300},{id:'weight',name:'量體重',h:256},{id:'water',name:'飲水',h:210},{id:'food',name:'餵食',h:24},{id:'exercise',name:'運動',h:145},{id:'other',name:'其他',h:215}
 ];
-var typeOf=function(id){return TYPES.filter(function(t){return t.id===id})[0]||TYPES[TYPES.length-1]};
-var logLabel=function(l){return (l.type==='other'&&l.custom)?l.custom:typeOf(l.type).name};
+var typeOf=function(id){return TYPES.filter(function(t){return t.id===id})[0]||TYPES.filter(function(t){return t.id==='other'})[0]};
+var logLabel=function(l){var c=typeof careLabel==='function'&&careLabel(l);if(c)return c;return (l.type==='other'&&l.custom)?l.custom:typeOf(l.type).name};
 var IC={
   check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   home:'<path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
@@ -756,8 +812,11 @@ var IC={
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',
   bell:'<path d="M6 17h12l-1.5-2v-4a4.5 4.5 0 0 0-9 0v4z"/><path d="M10 20a2 2 0 0 0 4 0"/>'
 };
-var MASCOT_ART='<g fill="#F2994A" stroke="#F2994A" stroke-width="12" stroke-linejoin="round"> <path d="M186 210 L136 226 L182 252Z"/><path d="M180 258 L122 284 L172 306Z"/><path d="M168 312 L110 346 L158 364Z"/> </g> <path d="M146 760 L148 400 Q150 340 172 300 L182 214 L188 124 L230 152 Q276 130 320 106 L332 56 L366 100 Q424 150 434 214 Q440 272 402 304 L406 400 L414 760 L146 760 Z" fill="#FFF4E6" stroke="#FFF4E6" stroke-width="16" stroke-linejoin="round"/> <circle cx="262" cy="202" r="11" fill="#1F3A33"/><circle cx="336" cy="182" r="11" fill="#1F3A33"/> <ellipse cx="328" cy="226" rx="13" ry="8" transform="rotate(-14 328 226)" fill="#1F3A33"/> <path d="M312 262 q-2 30 16 32 q18 0 14-36z" fill="#FF8C98"/> <path d="M302 266 L348 255" stroke="#1F3A33" stroke-width="6" stroke-linecap="round"/> <path d="M328 266 l3 14" stroke="#E2596A" stroke-width="4" stroke-linecap="round"/>';
-function MASCOT(){return '<span class="mascot" aria-hidden="true"><svg viewBox="0 0 512 512">'+MASCOT_ART+'</svg></span>'}
+var MASCOT_ART='<g fill="#F2994A" stroke="#F2994A" stroke-width="14" stroke-linejoin="round"><path d="M162 246 L94 262 L150 292Z"/><path d="M146 298 L74 324 L134 352Z"/><path d="M130 356 L60 390 L118 410Z"/></g><path d="M96 760 Q98 470 132 360 Q140 290 152 240 Q156 206 164 186 L172 166 L232 202 Q286 174 334 172 L348 126 L392 176 Q466 214 474 286 Q480 350 432 378 Q464 450 474 540 L480 760 Z" fill="#FFF4E6" stroke="#FFF4E6" stroke-width="18" stroke-linejoin="round"/><g transform="translate(6 58)"><circle cx="262" cy="202" r="11" fill="#1F3A33"/><circle cx="336" cy="182" r="11" fill="#1F3A33"/><ellipse cx="328" cy="226" rx="13" ry="8" transform="rotate(-14 328 226)" fill="#1F3A33"/><path d="M312 262 q-2 30 16 32 q18 0 14-36z" fill="#FF8C98"/><path d="M328 266 l3 14" stroke="#E2596A" stroke-width="4" stroke-linecap="round"/><path d="M302 266 L348 255" stroke="#1F3A33" stroke-width="6" stroke-linecap="round"/></g>';
+var MASCOT_FACE={"normal": "<g transform=\"translate(6 58)\"><circle cx=\"262\" cy=\"202\" r=\"11\" fill=\"#1F3A33\"/><circle cx=\"336\" cy=\"182\" r=\"11\" fill=\"#1F3A33\"/><ellipse cx=\"328\" cy=\"226\" rx=\"13\" ry=\"8\" transform=\"rotate(-14 328 226)\" fill=\"#1F3A33\"/><path d=\"M312 262 q-2 30 16 32 q18 0 14-36z\" fill=\"#FF8C98\"/><path d=\"M328 266 l3 14\" stroke=\"#E2596A\" stroke-width=\"4\" stroke-linecap=\"round\"/><path d=\"M302 266 L348 255\" stroke=\"#1F3A33\" stroke-width=\"6\" stroke-linecap=\"round\"/></g>", "happy": "<g transform=\"translate(6 58)\"><path d=\"M248 206 Q262 188 276 206\" fill=\"none\" stroke=\"#1F3A33\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M322 186 Q336 168 350 186\" fill=\"none\" stroke=\"#1F3A33\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><ellipse cx=\"236\" cy=\"236\" rx=\"20\" ry=\"11\" fill=\"#FF8C98\" opacity=\".5\"/><ellipse cx=\"380\" cy=\"214\" rx=\"17\" ry=\"10\" fill=\"#FF8C98\" opacity=\".5\"/><ellipse cx=\"328\" cy=\"226\" rx=\"13\" ry=\"8\" transform=\"rotate(-14 328 226)\" fill=\"#1F3A33\"/><path d=\"M303 258 Q327 300 352 248 Z\" fill=\"#1F3A33\"/><path d=\"M312 268 q2 22 16 22 q14 0 16-28 z\" fill=\"#FF8C98\"/></g><g><circle cx=\"98\" cy=\"104\" r=\"80\" fill=\"#F2994A\" stroke=\"#FFF4E6\" stroke-width=\"10\"/><path d=\"M98 146 C54 116 52 84 74 75 C87 70 96 79 98 87 C100 79 109 70 122 75 C144 84 142 116 98 146Z\" fill=\"#FFFFFF\"/></g>", "alert": "<g transform=\"translate(6 58)\"><path d=\"M249 199 L275 195 A13 13 0 0 1 249 199Z\" fill=\"#1F3A33\" transform=\"rotate(-8 262 200)\"/><path d=\"M323 181 L349 177 A13 13 0 0 1 323 181Z\" fill=\"#1F3A33\" transform=\"rotate(-8 336 180)\"/><ellipse cx=\"328\" cy=\"226\" rx=\"13\" ry=\"8\" transform=\"rotate(-14 328 226)\" fill=\"#1F3A33\"/><path d=\"M305 264 L347 254\" fill=\"none\" stroke=\"#1F3A33\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></g><g><circle cx=\"98\" cy=\"104\" r=\"80\" fill=\"#F2994A\" stroke=\"#FFF4E6\" stroke-width=\"10\"/><text x=\"98\" y=\"104\" text-anchor=\"middle\" dominant-baseline=\"central\" font-family=\"Arial Black,Arial,sans-serif\" font-weight=\"900\" font-size=\"140\" fill=\"#FFFFFF\">!</text></g>", "surprised": "<g transform=\"translate(6 58)\"><circle cx=\"262\" cy=\"202\" r=\"16\" fill=\"#1F3A33\"/><circle cx=\"336\" cy=\"182\" r=\"16\" fill=\"#1F3A33\"/><circle cx=\"267\" cy=\"196\" r=\"5\" fill=\"#fff\"/><circle cx=\"341\" cy=\"176\" r=\"5\" fill=\"#fff\"/><ellipse cx=\"328\" cy=\"226\" rx=\"13\" ry=\"8\" transform=\"rotate(-14 328 226)\" fill=\"#1F3A33\"/><ellipse cx=\"326\" cy=\"266\" rx=\"10\" ry=\"13\" fill=\"#1F3A33\"/></g><g><circle cx=\"98\" cy=\"104\" r=\"80\" fill=\"#F2994A\" stroke=\"#FFF4E6\" stroke-width=\"10\"/><text x=\"98\" y=\"104\" text-anchor=\"middle\" dominant-baseline=\"central\" font-family=\"Arial Black,Arial,sans-serif\" font-weight=\"900\" font-size=\"110\" fill=\"#FFFFFF\">!?</text></g>", "question": "<g transform=\"translate(6 58)\"><circle cx=\"262\" cy=\"202\" r=\"12\" fill=\"#1F3A33\"/><path d=\"M323 182 L349 178 A13 13 0 0 1 323 182Z\" fill=\"#1F3A33\" transform=\"rotate(10 336 180)\"/><ellipse cx=\"328\" cy=\"226\" rx=\"13\" ry=\"8\" transform=\"rotate(-14 328 226)\" fill=\"#1F3A33\"/><ellipse cx=\"322\" cy=\"264\" rx=\"7\" ry=\"8\" fill=\"#1F3A33\"/></g><g><circle cx=\"98\" cy=\"104\" r=\"80\" fill=\"#F2994A\" stroke=\"#FFF4E6\" stroke-width=\"10\"/><text x=\"98\" y=\"104\" text-anchor=\"middle\" dominant-baseline=\"central\" font-family=\"Arial Black,Arial,sans-serif\" font-weight=\"900\" font-size=\"140\" fill=\"#FFFFFF\">?</text></g>", "roar": "<g transform=\"translate(6 58)\"><path d=\"M250 192 L272 202 L250 212\" fill=\"none\" stroke=\"#1F3A33\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M348 172 L326 182 L348 192\" fill=\"none\" stroke=\"#1F3A33\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><ellipse cx=\"328\" cy=\"226\" rx=\"13\" ry=\"8\" transform=\"rotate(-14 328 226)\" fill=\"#1F3A33\"/><path d=\"M294 250 Q330 318 366 236 Z\" fill=\"#1F3A33\" stroke=\"#1F3A33\" stroke-width=\"6\" stroke-linejoin=\"round\"/><path d=\"M300 250 l8 12 l8 -14 M352 240 l-4 14 l-10 -10\" fill=\"#FFF4E6\"/><path d=\"M316 284 q12 14 30 -6 q-12 -8 -30 6z\" fill=\"#FF8C98\"/></g><g><circle cx=\"98\" cy=\"104\" r=\"80\" fill=\"#E0603A\" stroke=\"#FFF4E6\" stroke-width=\"10\"/><text x=\"98\" y=\"104\" text-anchor=\"middle\" dominant-baseline=\"central\" font-family=\"Arial Black,Arial,sans-serif\" font-weight=\"900\" font-size=\"116\" fill=\"#FFFFFF\">!!</text></g>"};
+var MASCOT_GIFT="<g><path d=\"M40 70 q30 -30 60 0 t60 0\" fill=\"none\" stroke=\"#FFD166\" stroke-width=\"12\" stroke-linecap=\"round\"/><path d=\"M372 40 q24 26 52 6 t52 10\" fill=\"none\" stroke=\"#FF8C98\" stroke-width=\"12\" stroke-linecap=\"round\"/><rect x=\"60\" y=\"150\" width=\"26\" height=\"14\" rx=\"4\" fill=\"#F2994A\" transform=\"rotate(30 73 157)\"/><rect x=\"190\" y=\"40\" width=\"24\" height=\"13\" rx=\"4\" fill=\"#FFF4E6\" transform=\"rotate(-25 202 46)\"/><rect x=\"430\" y=\"120\" width=\"26\" height=\"14\" rx=\"4\" fill=\"#FFD166\" transform=\"rotate(40 443 127)\"/><circle cx=\"270\" cy=\"70\" r=\"9\" fill=\"#FF8C98\"/><circle cx=\"455\" cy=\"230\" r=\"8\" fill=\"#FFF4E6\"/><circle cx=\"40\" cy=\"250\" r=\"8\" fill=\"#FFD166\"/><rect x=\"20\" y=\"380\" width=\"24\" height=\"13\" rx=\"4\" fill=\"#FF8C98\" transform=\"rotate(-30 32 386)\"/><rect x=\"470\" y=\"330\" width=\"22\" height=\"12\" rx=\"4\" fill=\"#F2994A\" transform=\"rotate(25 481 336)\"/></g><g fill=\"#F2994A\" stroke=\"#F2994A\" stroke-width=\"14\" stroke-linejoin=\"round\"><path d=\"M162 246 L94 262 L150 292Z\"/><path d=\"M146 298 L74 324 L134 352Z\"/><path d=\"M130 356 L60 390 L118 410Z\"/></g><path d=\"M96 760 Q98 470 132 360 Q140 290 152 240 Q156 206 164 186 L172 166 L232 202 Q286 174 334 172 L348 126 L392 176 Q466 214 474 286 Q480 350 432 378 Q464 450 474 540 L480 760 Z\" fill=\"#FFF4E6\" stroke=\"#FFF4E6\" stroke-width=\"18\" stroke-linejoin=\"round\"/><g transform=\"translate(6 58)\"><circle cx=\"262\" cy=\"202\" r=\"11\" fill=\"#1F3A33\"/><circle cx=\"336\" cy=\"182\" r=\"11\" fill=\"#1F3A33\"/><ellipse cx=\"328\" cy=\"226\" rx=\"13\" ry=\"8\" transform=\"rotate(-14 328 226)\" fill=\"#1F3A33\"/><path d=\"M312 262 q-2 30 16 32 q18 0 14-36z\" fill=\"#FF8C98\"/><path d=\"M328 266 l3 14\" stroke=\"#E2596A\" stroke-width=\"4\" stroke-linecap=\"round\"/><path d=\"M302 266 L348 255\" stroke=\"#1F3A33\" stroke-width=\"6\" stroke-linecap=\"round\"/></g><rect x=\"232\" y=\"414\" width=\"146\" height=\"110\" rx=\"14\" fill=\"#F2994A\"/><rect x=\"222\" y=\"390\" width=\"166\" height=\"36\" rx=\"11\" fill=\"#F7B27A\"/><rect x=\"294\" y=\"390\" width=\"22\" height=\"134\" fill=\"#FF8C98\"/><path d=\"M305 390 C278 352 248 366 270 388 Z M305 390 C332 352 362 366 340 388 Z\" fill=\"#FF8C98\" stroke=\"#FF8C98\" stroke-width=\"8\" stroke-linejoin=\"round\"/><circle cx=\"305\" cy=\"388\" r=\"11\" fill=\"#E2596A\"/><ellipse cx=\"226\" cy=\"468\" rx=\"34\" ry=\"30\" fill=\"#FFF4E6\" stroke=\"#E7D9C4\" stroke-width=\"5\"/><ellipse cx=\"386\" cy=\"462\" rx=\"34\" ry=\"30\" fill=\"#FFF4E6\" stroke=\"#E7D9C4\" stroke-width=\"5\"/>";
+var MASCOT_BASE="<g fill=\"#F2994A\" stroke=\"#F2994A\" stroke-width=\"14\" stroke-linejoin=\"round\"><path d=\"M162 246 L94 262 L150 292Z\"/><path d=\"M146 298 L74 324 L134 352Z\"/><path d=\"M130 356 L60 390 L118 410Z\"/></g><path d=\"M96 760 Q98 470 132 360 Q140 290 152 240 Q156 206 164 186 L172 166 L232 202 Q286 174 334 172 L348 126 L392 176 Q466 214 474 286 Q480 350 432 378 Q464 450 474 540 L480 760 Z\" fill=\"#FFF4E6\" stroke=\"#FFF4E6\" stroke-width=\"18\" stroke-linejoin=\"round\"/>";
+function MASCOT(mood){var f=mood&&MASCOT_FACE[mood];return '<span class="mascot'+(f&&mood!=='normal'?' mood-'+mood:'')+'" aria-hidden="true"><svg viewBox="0 0 512 512">'+(f?MASCOT_BASE+f:MASCOT_ART)+'</svg></span>'}
 var PAW_D='M7,16.2 a5,4 0 1,0 10,0 a5,4 0 1,0 -10,0 Z M3.5,10.5 a2,2.4 0 1,0 4,0 a2,2.4 0 1,0 -4,0 Z M7.4,6.5 a2.1,2.6 0 1,0 4.2,0 a2.1,2.6 0 1,0 -4.2,0 Z M12.4,6.5 a2.1,2.6 0 1,0 4.2,0 a2.1,2.6 0 1,0 -4.2,0 Z M16.5,10.5 a2,2.4 0 1,0 4,0 a2,2.4 0 1,0 -4,0 Z';
 function PAW_SVG(fill,size,stroke,cls){return '<svg class="paw'+(cls?' '+cls:'')+'" width="'+size+'" height="'+size+'" viewBox="0 0 24 24" aria-hidden="true"><path d="'+PAW_D+'" fill="'+fill+'"'+(stroke?' stroke="'+stroke+'" stroke-width="1.5"':'')+'/></svg>'}
 var ico=function(n,s){s=s||22;return '<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'};
@@ -1131,7 +1190,7 @@ function renderTop(){
   }).join('')+'<button class="pchip add" data-act="addpet" aria-label="新增寵物">'+ico('plus')+'</button></div>';
 }
 function renderNav(){
-  var tabs=[['home','首頁','home'],['timeline','時間線','list'],['deworm','驅蟲','cal'],['vaccine','預防針','syringe'],['more','設定','gear']];
+  var tabs=[['home','首頁','home'],['timeline','時間線','list'],['deworm','照護','heart'],['vaccine','預防針','syringe'],['more','設定','gear']];
   $('#nav').innerHTML=tabs.map(function(t){
     return '<button class="'+(S.tab===t[0]?'on':'')+'" data-act="tab" data-tab="'+t[0]+'" '+(S.tab===t[0]?'aria-current="page"':'')+'><span class="ico">'+ico(t[2])+'</span>'+t[1]+'</button>';
   }).join('');
@@ -1147,7 +1206,7 @@ function renderMain(){
   else if(S.tab==='home') html=viewHome();
   else if(S.tab==='timeline') html=viewTimeline();
   else if(S.tab==='vaccine') html=viewVaccine();
-  else html=viewDeworm();
+  else html=viewCare();
   m.innerHTML=html;m.scrollTop=st;
   if(S.tab==='more'){updateNotifCard();paintCloud()}
   Photos.hydrate(m);
@@ -1298,16 +1357,24 @@ function calcMeal(items,kcalIn,addw,left,lefts){
   var ratio=wsum?wr/wsum:(left==='c'?1:1-(+left||0));
   return {given:Math.round(given),kcal:Math.round(eaten),fw:Math.round(fw),wml:Math.round((+addw||0)*ratio),ratio:ratio};
 }
-function confettiSvg(){return '<svg class="confetti" width="120" height="44" viewBox="0 0 120 44" aria-hidden="true"><rect x="8" y="6" width="6" height="12" rx="2" fill="#3A86D8" transform="rotate(25 11 12)"/><rect x="40" y="24" width="6" height="12" rx="2" fill="#2F9A5E" transform="rotate(-30 43 30)"/><rect x="74" y="4" width="6" height="12" rx="2" fill="#7A62C9" transform="rotate(50 77 10)"/><circle cx="100" cy="10" r="3" fill="#E07B39"/><circle cx="26" cy="34" r="2.5" fill="#F2A15E"/><circle cx="62" cy="38" r="2.5" fill="#3A86D8"/><rect x="104" y="26" width="6" height="12" rx="2" fill="#E07B39" transform="rotate(-20 107 32)"/></svg>'}
+function confettiSvg(){return '<svg class="confetti" width="120" height="44" viewBox="0 0 120 44" aria-hidden="true"><rect x="8" y="6" width="6" height="12" rx="2" fill="#FF8C98" transform="rotate(25 11 12)"/><rect x="40" y="24" width="6" height="12" rx="2" fill="#FFD166" transform="rotate(-30 43 30)"/><rect x="74" y="4" width="6" height="12" rx="2" fill="#7FD1B4" transform="rotate(50 77 10)"/><circle cx="100" cy="10" r="3" fill="#F2994A"/><circle cx="26" cy="34" r="2.5" fill="#FFD166"/><circle cx="62" cy="38" r="2.5" fill="#FF8C98"/><rect x="104" y="26" width="6" height="12" rx="2" fill="#F2994A" transform="rotate(-20 107 32)"/></svg>'}
 function wNeedLbl(p,tg){return tg?(tg.custom?'目標 '+tg.need[0]+' ml':'建議 '+tg.need[0]+'–'+tg.need[1]+' ml'):(isOtherSp(p)?'可在寵物資料設定目標':'先記錄體重')}
 function kNoLbl(p){return isOtherSp(p)?'可在寵物資料設定目標':'先記錄體重'}
 function friendlyMsg(p){
-  var n=esc(p.name),w=petWater(p),fd=petFeed(p),e=petEx(p);
-  if(w.on){var tg=waterTarget(p),wd=waterDays(p,1)[0];if(tg){var r=tg.need[0]-wd.v;if(wd.v<=0)return n+'今天還沒有喝水紀錄，記得幫牠記一下';if(r>0)return n+'今天喝了 <b>'+wd.v+' ml</b>，再 <b>'+r+' ml</b> 就達標囉';}}
-  if(fd.on){var en=petEnergy(p,fd);if(en){var tk=dayTotals(p.id,'food','kcal',1)[0].v,d=en.target-tk;if(tk>0&&d>0)return n+'今天吃了 <b>'+fmtKcal(tk)+' kcal</b>，還可以再吃約 <b>'+d+' kcal</b>';if(tk>0&&d<=0)return n+'今天的熱量已經吃夠了'}}
-  if(e.on&&e.goal){var te=dayTotals(p.id,'exercise','min',1)[0].v;if(te<e.goal)return '陪'+n+'再玩 <b>'+(e.goal-te)+' 分鐘</b>就達成今天的運動目標';}
-  if(w.on){var tg2=waterTarget(p);if(tg2)return n+'今天的喝水量已經達標，很棒！'}
-  return '';
+  var n=esc(p.name),w=petWater(p),fd=petFeed(p),e=petEx(p),now=today(),R=function(t,m){return {t:t,m:m}};
+  if(typeof careOn==='function'&&careOn(p)){
+    var late=dosesOn(p,now).filter(function(x){return !x.log&&slotTs(x.key)<Date.now()-60*6e4});
+    if(late.length)return R(n+'的 <b>'+late[0].t+' '+esc(late[0].m.name)+'</b> 還沒給！'+(late.length>1?'（還有 '+(late.length-1)+' 次）':''),'roar');
+    var wa=weightAlert(p);if(wa)return R(n+'的體重 '+wa.days+' 天內'+(wa.down?'掉了':'多了')+' <b>'+wa.pct+'%</b>，記得告訴獸醫','surprised');
+    var sr=mLogs(p,'srr')[0];if(sr&&sr.bpm>30&&Date.now()-sr.ts<36e5*24)return R(n+'剛剛的睡眠呼吸是 <b>'+sr.bpm+' 次/分</b>，偏高，再觀察一下','alert');
+  }
+  if(typeof petGroom==='function'&&groomRemindOn(p)){var gd=petGroom(p).filter(function(it){var s=groomStatus(p,it,now);return s.state==='today'||s.state==='overdue'})[0];if(gd)return R('今天該幫'+n+'<b>'+esc(gd.name)+'</b>了','alert')}
+  if(p.birthday){var b=parseD(p.birthday);if(b.getMonth()===now.getMonth()&&b.getDate()===now.getDate())return R('今天是'+n+'的生日，生日快樂！','happy')}
+  if(w.on){var tg=waterTarget(p),wd=waterDays(p,1)[0];if(tg){var r=tg.need[0]-wd.v;if(wd.v<=0)return R(n+'今天還沒有喝水紀錄，喝了嗎？','question');if(r>0)return R(n+'今天喝了 <b>'+wd.v+' ml</b>，再 <b>'+r+' ml</b> 就達標囉','normal');}}
+  if(fd.on){var en=petEnergy(p,fd);if(en){var tk=dayTotals(p.id,'food','kcal',1)[0].v,d=en.target-tk;if(tk>0&&d>0)return R(n+'今天吃了 <b>'+fmtKcal(tk)+' kcal</b>，還可以再吃約 <b>'+d+' kcal</b>','normal');if(tk>0&&d<=0)return R(n+'今天的熱量已經吃夠了，零食先忍一下','alert')}}
+  if(e.on&&e.goal){var te=dayTotals(p.id,'exercise','min',1)[0].v;if(te<e.goal)return R('陪'+n+'再玩 <b>'+(e.goal-te)+' 分鐘</b>就達成今天的運動目標','happy');}
+  if(w.on){var tg2=waterTarget(p);if(tg2)return R(n+'今天的喝水量已經達標，很棒！','happy')}
+  return null;
 }
 function metricCards(p){
   var w=petWater(p),e=petEx(p),fd=petFeed(p),cards=[];
@@ -1743,6 +1810,7 @@ function openHealthSheet(kind){
 }
 function logMetricHtml(l,terms){
   terms=terms||[];
+  var cm=careMetricHtml(l,terms);if(cm)return cm;
   if(l.type==='weight'&&l.weight)return '<p class="note"><span class="wkg" style="font-size:20px">'+hl(fmtKg(l.weight)+' kg',terms)+'</span>'+deltaHtml(weightDelta(l))+'</p>';
   if(l.type==='water'&&l.ml!=null)return '<p class="note"><span class="wkg" style="font-size:20px">'+hl(l.ml+' ml',terms)+'</span>'+(l.wmode==='diff'?'<span class="delta">加水 '+l.add+'・剩 '+l.left+'</span>':'')+'</p>';
   if(l.type==='food'&&l.kcal!=null){var lf=leftLabel(l);return '<p class="note"><span class="wkg" style="font-size:20px">'+hl(fmtKcal(l.kcal)+' kcal',terms)+'</span>'+(lf?'<span class="delta">'+lf+'</span>':'')+'</p><p class="note" style="color:var(--ink2)">'+hl(feedLabel(l),terms)+(l.addw?'・加水 '+l.addw+' ml':'')+(l.auto?'　<span class="autotag">'+ico('lock',13)+'餵食機</span>':'')+'</p>'}
@@ -1855,7 +1923,7 @@ function nextEventCard(p,now){
   if(hd&&p.showAnniv&&dayDiff(now,hd)>=0)annEvents(hd,now).forEach(function(e){ev.push({label:e.label.replace('來家第 ','來家 ').replace(' 天',' 天'),date:e.date})});
   ev=ev.filter(function(e){return dayDiff(e.date,now)>=0}).sort(function(x,y){return x.date-y.date});
   if(!ev.length)return '';var e=ev[0],dd=dayDiff(e.date,now);
-  var gift='<svg class="gift" width="40" height="34" viewBox="0 0 40 34" aria-hidden="true"><rect x="4" y="14" width="32" height="18" rx="4" fill="var(--primary-soft)"/><rect x="4" y="14" width="32" height="6" rx="3" fill="var(--primary)"/><path d="M20 14v18" stroke="var(--primary)" stroke-width="2"/><path d="M20 14c-3-7-11-6-8-1M20 14c3-7 11-6 8-1" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="7" r="2" fill="#E07B39"/><circle cx="34" cy="6" r="1.6" fill="#3A86D8"/><circle cx="29" cy="2.5" r="1.3" fill="#2F9A5E"/><circle cx="11" cy="3" r="1.3" fill="#7A62C9"/></svg>';
+  var gift='<span class="mascot evm" aria-hidden="true"><svg viewBox="0 0 512 512">'+MASCOT_GIFT+'</svg></span>';
   if(dd===0)return '<div class="evcard today">'+confettiSvg()+gift+'<div><b>今天是'+n+(e.bday?'的 '+e.label:e.label)+'！</b><small>'+(e.bday?'生日快樂！':'謝謝你一直陪著牠')+'</small></div></div>';
   return '<div class="evcard">'+gift+'<div><b>'+dd+' 天後是'+(e.bday?n+'的 ':'')+e.label+'</b></div></div>';
 }
@@ -1873,11 +1941,12 @@ function viewHome(){
   var h='<section class="hero'+(p.photo?' ph':'')+'"'+(p.photo?' style="background-image:url(\''+p.photo+'\')"':'')+'>'+(p.photo?'':PAW_SVG('#FFFFFF',170,'','hwm')+PAW_SVG('#FFFFFF',70,'','hwm2'))+
 
     '<div class="hbody"><div class="hname"><div class="grow"><h1>'+esc(p.name)+'</h1><div class="meta">'+(meta||'&nbsp;')+'</div></div><button class="hedit" data-act="editpet" aria-label="編輯寵物">'+ico('edit',20)+'</button></div>'+(pills?'<div class="hpills">'+pills+'</div>':'')+party+'</div></section>';
-  var fm=friendlyMsg(p);if(fm)out.push('<div class="hmsg">'+MASCOT()+'<span>'+fm+'</span></div>');
-  var ah=alertsHtml(now);if(ah)out.push(ah);
+  var fm=friendlyMsg(p);if(fm)out.push('<div class="hmsg'+(fm.m==='roar'?' roar':'')+'">'+MASCOT(fm.m)+'<span>'+fm.t+'</span></div>');
+  var ah=alertsHtml(now,fm&&fm.m==='roar'?{kind:'medlate',pid:p.id}:(fm&&fm.m==='surprised'?{kind:'weight',pid:p.id}:null));if(ah)out.push(ah);
+  var chc=careHomeCard(p);if(chc)out.push(chc);
   out.push(metricCards(p)+mealChecklist(p));
   var evc=nextEventCard(p,now);if(evc)out.push(evc);
-  out.push('<div class="actions"><button class="btn primary" data-act="addlog">'+ico('plus',20)+'記錄狀況</button><button class="btn" data-act="tab" data-tab="deworm">'+ico('cal',20)+'驅蟲紀錄</button></div>');
+  out.push('<div class="actions"><button class="btn primary" data-act="addlog">'+ico('plus',20)+'記錄狀況</button><button class="btn" data-act="tab" data-tab="deworm">'+ico('heart',20)+'照護紀錄</button></div>');
 
   if(p.showAnniv&&hd){
     var days=dayDiff(now,hd)+1,ap=ageParts(hd,now),ev=annEvents(hd,now),parts=[];
@@ -1899,7 +1968,7 @@ function viewHome(){
   out.push(wormSummary(p,now));
   out.push(vaccSummary(p,now));
 
-  var rec=S.logs.filter(function(l){return l.petId===p.id&&l.type!=='water'&&l.type!=='exercise'&&l.type!=='food'}).sort(function(a,b){return b.ts-a.ts}).slice(0,3);
+  var rec=S.logs.filter(function(l){return l.petId===p.id&&l.type!=='water'&&l.type!=='exercise'&&l.type!=='food'&&l.type!=='med'}).sort(function(a,b){return b.ts-a.ts}).slice(0,3);
   var rh='<section class="card"><div class="cardhead"><h2>最近狀況</h2>'+(rec.length?'<button class="linkbtn" data-act="tab" data-tab="timeline">全部'+ico('cr',16)+'</button>':'')+'</div>';
   if(!rec.length) rh+='<small>還沒有紀錄。嘔吐、軟便、食慾不好都可以記下來，附上照片更清楚。</small>';
   else rh+=rec.map(function(l){var d=new Date(l.ts);
@@ -1910,7 +1979,7 @@ function viewHome(){
 }
 function wormSummary(p,now){
   var cm=ym(now),h='<section class="card"><div class="cardhead"><h2>'+(now.getMonth()+1)+' 月驅蟲</h2><button class="linkbtn" data-act="tab" data-tab="deworm">全部紀錄'+ico('cr',16)+'</button></div>';
-  if(!p.wormItems.length) return h+'<small>還沒有驅蟲項目，到「驅蟲」分頁設定。</small></section>';
+  if(!p.wormItems.length) return h+'<small>還沒有驅蟲項目，到「照護」分頁設定。</small></section>';
   h+=p.wormItems.map(function(it){
     var s=itemStatus(p,it,cm),right='',sub=it.every===1?'每月':'每 '+it.every+' 個月';
     if(s.state==='done') right='<span class="pill ok">已完成 '+(s.rec.date?s.rec.date.slice(5).replace('-','/'):'')+'</span>';
@@ -1937,6 +2006,7 @@ function hl(text,terms){
   return out+esc(text.slice(pos));
 }
 function logHay(l){
+  var ch=careHay(l);if(ch)return logHayBase(l)+ch;
   if(l.type==='weight'&&l.weight)return logHayBase(l)+'\n'+fmtKg(l.weight)+'kg\n'+fmtKg(l.weight)+' kg';
   if(l.type==='food')return logHayBase(l)+'\n'+feedLabel(l)+'\n餵食\n'+(l.addw?'加水\n':'')+l.kcal+'kcal\n'+l.kcal+' kcal';
   if(l.type==='water')return logHayBase(l)+'\n喝水\n'+l.ml+'ml\n'+l.ml+' ml';
@@ -1948,16 +2018,16 @@ function logHayBase(l){
   return [logLabel(l),typeOf(l.type).name,l.note||'',y+'/'+m+'/'+dd,y+'/'+pad(m)+'/'+pad(dd),y+'-'+pad(m)+'-'+pad(dd),y+'年'+m+'月'+dd+'日',m+'月'+dd+'日',m+'/'+dd,pet?pet.name:''].join('\n').toLowerCase();
 }
 var TL_KIND={worm:{name:'驅蟲',h:290},vacc:{name:'預防針',h:235}};
-var TL_OPTS=[['food','顯示餵食紀錄','每次餵食的食物與熱量'],['water','顯示飲水紀錄','每次記錄的飲水量'],['exercise','顯示運動紀錄','活動類型與時間'],['worm','顯示驅蟲紀錄','每次驅蟲打卡'],['vacc','顯示預防針紀錄','疫苗名稱、注射位置與備註'],['vw','顯示預防針體重紀錄','另外列成一筆「量體重」，篩選量體重時也會出現']];
-function tlShow(k){var v=lsGet('petnote.tl.'+k);if(v==null){if(k==='water'||k==='food')return false;if(k==='exercise')return true;return lsGet('petnote.tlMerge')!=='0'}return v!=='0'}
+var TL_OPTS=[['food','顯示餵食紀錄','每次餵食的食物與熱量'],['water','顯示飲水紀錄','每次記錄的飲水量'],['exercise','顯示運動紀錄','活動類型與時間'],['worm','顯示驅蟲紀錄','每次驅蟲打卡'],['vacc','顯示預防針紀錄','疫苗名稱、注射位置與備註'],['vw','顯示預防針體重紀錄','另外列成一筆「量體重」，篩選量體重時也會出現'],['groom','顯示美容清潔紀錄','洗澡、剪指甲等'],['med','顯示用藥紀錄','每次給藥（次數多時會很長）'],['care','顯示居家測量紀錄','呼吸、血糖、異常事件、檢驗、生活品質']];
+function tlShow(k){var v=lsGet('petnote.tl.'+k);if(v==null){if(k==='water'||k==='food'||k==='med')return false;if(k==='exercise'||k==='groom'||k==='care')return true;return lsGet('petnote.tlMerge')!=='0'}return v!=='0'}
 function tlMerge(){return ['worm','vacc','vw'].some(function(k){return tlShow(k)})}
 function tlOptsHtml(){return TL_OPTS.map(function(o){return '<div class="swrow"><span><b>'+o[1]+'</b><small>'+o[2]+'</small></span><span class="sw"><input type="checkbox" data-tlk="'+o[0]+'" '+(tlShow(o[0])?'checked':'')+' aria-label="'+o[1]+'"><i></i></span></div>'}).join('')}
 function openTlOpts(){openSheet({title:'時間線顯示',body:tlOptsHtml(),footer:'<button class="btn primary" data-close>完成</button>'})}
 function dateHay(ds){var a=ds.split('-'),y=+a[0],m=+a[1],d=+a[2];return [y+'/'+m+'/'+d,a[0]+'/'+a[1]+'/'+a[2],ds,y+'年'+m+'月'+d+'日',m+'月'+d+'日',m+'/'+d].join('\n')}
 function petNameOf(id){var x=S.pets.filter(function(p){return p.id===id})[0];return x?x.name:''}
 function tlItems(pred){
-  var sw=tlShow('water'),se=tlShow('exercise'),sf=tlShow('food');
-  var out=S.logs.filter(function(l){return pred(l)&&(sw||l.type!=='water')&&(se||l.type!=='exercise')&&(sf||l.type!=='food')}).map(function(l){return {k:'log',ts:l.ts,r:l}});
+  var sw=tlShow('water'),se=tlShow('exercise'),sf=tlShow('food'),sg=tlShow('groom'),sm=tlShow('med'),sc=tlShow('care'),CM={srr:1,glucose:1,seizure:1,qol:1,lab:1};
+  var out=S.logs.filter(function(l){return pred(l)&&(sw||l.type!=='water')&&(se||l.type!=='exercise')&&(sf||l.type!=='food')&&(sg||l.type!=='groom')&&(sm||l.type!=='med')&&(sc||!CM[l.type])}).map(function(l){return {k:'log',ts:l.ts,r:l}});
   if(tlMerge()){
     if(tlShow('worm'))S.worms.forEach(function(w){if(w.date&&pred(w)){var d=parseD(w.date);out.push({k:'worm',ts:new Date(d.getFullYear(),d.getMonth(),d.getDate(),12).getTime(),r:w})}});
     S.vaccs.forEach(function(v){if(v.date&&pred(v)){var d=parseD(v.date),t=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12).getTime();if(tlShow('vacc'))out.push({k:'vacc',ts:t,r:v});if(+v.weight>0&&tlShow('vw'))out.push({k:'vw',ts:t,r:v})}});
@@ -1978,7 +2048,7 @@ function pbanner(o){
 function ringSvg(frac,size,col,track){var r=(size-8)/2,c=2*Math.PI*r,f=Math.max(0,Math.min(1,frac));return '<svg class="ring" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" aria-hidden="true"><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="'+track+'" stroke-width="6"/><circle class="ringv" cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+(c*f).toFixed(1)+' '+c.toFixed(1)+'" style="--c:'+c.toFixed(1)+'" transform="rotate(-90 '+size/2+' '+size/2+')"/></svg>'}
 function viewTimeline(){
   var p=curPet(),mine=tlItems(function(l){return l.petId===p.id});
-  var lastLog=S.logs.filter(function(l){return l.petId===p.id&&l.type!=='water'&&l.type!=='food'&&l.type!=='exercise'}).sort(function(a,b){return b.ts-a.ts})[0],ago=lastLog?dayDiff(today(),new Date(new Date(lastLog.ts).setHours(0,0,0,0))):-1;
+  var lastLog=S.logs.filter(function(l){return l.petId===p.id&&l.type!=='water'&&l.type!=='food'&&l.type!=='exercise'&&l.type!=='med'}).sort(function(a,b){return b.ts-a.ts})[0],ago=lastLog?dayDiff(today(),new Date(new Date(lastLog.ts).setHours(0,0,0,0))):-1;
   var head=pbanner({icon:'list',title:esc(p.name)+' 的時間線',sub:'共 <b>'+mine.length+'</b> 筆'+(lastLog?'・最近一筆是'+(ago===0?'今天':ago===1?'昨天':ago+' 天前')+'的「'+esc(logLabel(lastLog))+'」':''),right:'<button class="pbbtn" data-act="tlopts" aria-label="時間線顯示設定">'+ico('gear',20)+'</button>'});
   if(!mine.length&&!S.q) return head+'<div class="empty"><h3>還沒有狀況紀錄</h3><p>遇到嘔吐、軟便、受傷等狀況，點右下角記下時間、說明和照片。</p></div>';
   var box='<div class="search" role="search">'+ico('search',20)+'<input id="tl-q" type="search" enterkeyhint="search" autocomplete="off" placeholder="搜尋說明、狀況類型或日期，例如：軟便、2025/3" value="'+esc(S.q)+'" aria-label="搜尋時間線">'+(S.q?'<button class="clr" data-act="qclear" aria-label="清除搜尋">'+ico('x',18)+'</button>':'')+'</div>';
@@ -2128,8 +2198,9 @@ function alertsAll(now){
     });
     if(p.wormRemind&&now.getDate()>=p.wormDay){
       var cm=ym(now),names=(p.wormItems||[]).filter(function(it){return itemStatus(p,it,cm).state==='due'}).map(function(it){return it.name});
-      if(names.length)out.push({tone:'warn',pid:p.id,tab:'deworm',text:p.name+'・本月驅蟲待辦：'+names.join('、')});
+      if(names.length)out.push({tone:'warn',pid:p.id,tab:'deworm',seg:'worm',text:p.name+'・本月驅蟲待辦：'+names.join('、')});
     }
+    careAlerts(p,now,out);
   });
   if(typeof GDrive!=='undefined'&&GDrive.needsTap())out.push({tone:'warn',act:'gdsync',text:'雲端同步暫停中（Google 登入已過期），點這裡繼續同步'});
   else if(S.pets.length&&S.backup.every){
@@ -2140,10 +2211,10 @@ function alertsAll(now){
   }
   return out;
 }
-function alertsHtml(now){
-  var al=alertsAll(now);if(!al.length)return '';
+function alertsHtml(now,skip){
+  var al=alertsAll(now);if(skip)al=al.filter(function(a){return !(a.kind===skip.kind&&a.pid===skip.pid)});if(!al.length)return '';
   al.sort(function(a,b){return (a.tone==='bad'?0:1)-(b.tone==='bad'?0:1)});
-  return '<div class="alerts">'+al.slice(0,4).map(function(a){return '<button class="alert '+a.tone+'" '+(a.act?'data-act="'+a.act+'"':'data-act="alertgo" data-pid="'+a.pid+'" data-tab="'+a.tab+'"')+'>'+ico('bell',20)+'<span>'+esc(a.text)+'</span>'+ico('cr',16)+'</button>'}).join('')+'</div>';
+  return '<div class="alerts">'+al.slice(0,5).map(function(a){return '<button class="alert '+a.tone+'" '+(a.act?'data-act="'+a.act+'"':'data-act="alertgo" data-pid="'+a.pid+'" data-tab="'+a.tab+'"'+(a.seg?' data-seg="'+a.seg+'"':''))+'>'+ico('bell',20)+'<span>'+esc(a.text)+'</span>'+ico('cr',16)+'</button>'}).join('')+'</div>';
 }
 function vaccSummary(p,now){
   var h='<section class="card"><div class="cardhead"><h2>預防針</h2><button class="linkbtn" data-act="tab" data-tab="vaccine">全部紀錄'+ico('cr',16)+'</button></div>';
@@ -2250,6 +2321,8 @@ function openPetSheet(id,focus){
     '<div class="row2"><div class="field"><label for="pf-bd">生日</label><input id="pf-bd" type="date" value="'+esc(p.birthday)+'"></div><div class="field"><label for="pf-hd">來家日期</label><input id="pf-hd" type="date" value="'+esc(p.homeDate)+'"></div></div>'+
     '<div class="swrow"><span><b>顯示年齡</b><small>依生日自動算出歲、月、天</small></span><span class="sw"><input type="checkbox" id="pf-age" '+(p.showAge?'checked':'')+' aria-label="顯示年齡"><i></i></span></div>'+
     '<div class="swrow"><span><b>來家紀念日</b><small>依來家日期顯示天數與週年倒數</small></span><span class="sw"><input type="checkbox" id="pf-ann" '+(p.showAnniv?'checked':'')+' aria-label="顯示來家紀念日"><i></i></span></div>'+
+    '<h3 class="subh">高齡／特殊照護</h3>'+
+    '<div class="swrow"><span><b>開啟高齡／特殊照護</b><small>用藥提醒、居家測量、檢驗數值、看診報告（在「照護 → 醫療照護」）</small></span><span class="sw"><input type="checkbox" id="pf-care" '+(careOn(p)?'checked':'')+' aria-label="開啟高齡／特殊照護"><i></i></span></div>'+
     '<h3 class="subh" id="pf-health">餵食、飲水與運動</h3>'+
     '<div class="swrow"><span><b>記錄餵食</b><small>首頁顯示今日熱量與建議量</small></span><span class="sw"><input type="checkbox" id="pf-feedon" '+(pf.on?'checked':'')+' aria-label="記錄餵食"><i></i></span></div>'+
     '<div id="pf-fset" '+(pf.on?'':'hidden')+'><div id="pf-goalwrap"><div class="field"><span class="lbl">目標</span><div class="seg" id="pf-goalw"><button type="button" data-v="keep" class="'+(pf.goal==='keep'?'on':'')+'">維持</button><button type="button" data-v="lose" class="'+(pf.goal==='lose'?'on':'')+'">減重</button><button type="button" data-v="gain" class="'+(pf.goal==='gain'?'on':'')+'">增重</button></div></div></div>'+
@@ -2306,7 +2379,7 @@ function openPetSheet(id,focus){
       if(bd&&hd&&hd<bd){toast('來家日期不能早於生日');return}
       p.name=name;p.species=segVal($('#pf-species',el))||'貓';p.breed=$('#pf-breed',el).value.trim();p.gender=segVal($('#pf-gender',el))||'未知';
       p.birthday=bd;p.homeDate=hd;p.showAge=$('#pf-age',el).checked;p.showAnniv=$('#pf-ann',el).checked;
-      p.water=readW();p.feeding=readF();p.neutered=segVal($('#pf-neut',el));p.color=segVal($('#pf-color',el))||petColorId(p);var gv=parseInt(($('#pf-goal',el).value||'').replace(/[^0-9]/g,''),10);p.exercise={on:$('#pf-ex',el).checked,goal:gv>0?Math.min(gv,600):0};
+      p.water=readW();p.feeding=readF();p.neutered=segVal($('#pf-neut',el));p.color=segVal($('#pf-color',el))||petColorId(p);var gv=parseInt(($('#pf-goal',el).value||'').replace(/[^0-9]/g,''),10);p.exercise={on:$('#pf-ex',el).checked,goal:gv>0?Math.min(gv,600):0};p.care=Object.assign(petCare(p),{on:$('#pf-care',el).checked});
       if(isNew)p.vaccItems=speciesDefault(p.species);
       await savePet(p);S.sel=p.id;lsSet('petnote.sel',p.id);closeTop();render();toast(isNew?'已新增 '+name:'已儲存');
     };
@@ -2324,12 +2397,15 @@ function openPetSheet(id,focus){
 function openLogSheet(id,presetType){
   var ex=id&&S.logs.filter(function(l){return l.id===id})[0];
   if((ex&&ex.type==='food')||(!ex&&presetType==='food'))return openFeedLog(id);
+  if(ex&&ex.type==='groom')return openGroomLog(id);
+  if(ex&&['srr','glucose','seizure','qol','lab'].indexOf(ex.type)>=0)return openMeasureLog(ex.type,id);
+  if(ex&&ex.type==='med'){var mp=S.pets.filter(function(x){return x.id===ex.petId})[0]||curPet(),mm=petMeds(mp).filter(function(x){return x.id===ex.medId})[0]||{id:ex.medId,name:ex.name,dose:ex.dose,unit:ex.unit,kind:ex.kind};return openDoseSheet(mp,mm,ex.slot,ex.id)}
   var p=ex?(S.pets.filter(function(x){return x.id===ex.petId})[0]||curPet()):curPet();if(!p)return;
   var l=ex?JSON.parse(JSON.stringify(ex)):{id:uid(),petId:p.id,type:presetType||'vomit',custom:'',ts:Date.now(),note:'',photos:[]};
   var lastW=weightPoints(p.id).slice(-1)[0];
   var hf=petFeed(p).on||l.type==='food',hw=petWater(p).on||l.type==='water',he=petEx(p).on||l.type==='exercise',acts=exActs(p);
   if(l.type==='exercise'&&l.act&&acts.indexOf(l.act)<0)acts.push(l.act);
-  var tg=TYPES.filter(function(t){return (t.id!=='food'||hf)&&(t.id!=='water'||hw)&&(t.id!=='exercise'||he)}).map(function(t){return '<button type="button" data-v="'+t.id+'" class="'+(l.type===t.id?'on':'')+'" style="--h:'+t.h+'">'+t.name+'</button>'}).join('');
+  var tg=TYPES.filter(function(t){return !t.hide&&(t.id!=='food'||hf)&&(t.id!=='water'||hw)&&(t.id!=='exercise'||he)}).map(function(t){return '<button type="button" data-v="'+t.id+'" class="'+(l.type===t.id?'on':'')+'" style="--h:'+t.h+'">'+t.name+'</button>'}).join('');
   var body='<div class="field"><span class="lbl">狀況類型</span><div class="typegrid" id="lf-type">'+tg+'</div></div>'+
     '<div class="field" id="lf-customwrap" '+(l.type==='other'?'':'hidden')+'><label for="lf-custom">自訂名稱（選填）</label><input id="lf-custom" type="text" maxlength="12" placeholder="例如：打噴嚏、跛腳" value="'+esc(l.custom)+'"></div>'+
     '<div class="field" id="lf-wwrap" '+(l.type==='weight'?'':'hidden')+'><label for="lf-weight">體重（公斤）</label><input id="lf-weight" type="text" inputmode="decimal" autocomplete="off" placeholder="'+(lastW?'上次 '+fmtKg(lastW.kg):'例如 4.25')+'" value="'+(l.weight?fmtKg(l.weight):'')+'"><div class="hint">會自動更新到首頁的體重，並加入體重變化表。</div></div>'+
@@ -2730,6 +2806,550 @@ function openWormBackfill(){
   }});
 }
 
+/* ================= 照護：美容清潔、高齡／特殊照護 =================
+   資料都存成 logs（同步、備份、時間線自動支援）：
+   groom 美容清潔、med 用藥、srr 睡眠呼吸、glucose 血糖、seizure 異常事件、lab 檢驗、qol 生活品質
+   設定存在寵物身上：groomItems / groomRemind、care{on,conds,...}、meds[] */
+var CARE_TYPES=[{id:'groom',name:'美容清潔',h:325,hide:true},{id:'med',name:'用藥',h:268,hide:true},{id:'srr',name:'睡眠呼吸',h:190,hide:true},
+  {id:'glucose',name:'血糖',h:8,hide:true},{id:'seizure',name:'異常事件',h:355,hide:true},{id:'lab',name:'檢驗數值',h:230,hide:true},{id:'qol',name:'生活品質',h:120,hide:true}];
+TYPES.push.apply(TYPES,CARE_TYPES);
+Object.assign(IC,{
+  comb:'<path d="M4 8h16v3H4z"/><path d="M6 11v7M9 11v7M12 11v7M15 11v7M18 11v7"/>',
+  pill:'<g transform="rotate(-45 12 12)"><rect x="3.5" y="8.3" width="17" height="7.4" rx="3.7"/><path d="M12 8.3H7.2a3.7 3.7 0 0 0 0 7.4H12z" fill="currentColor"/></g>',
+  heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  pulse:'<path d="M3 12h4l2-5 4 10 2-5h6"/>',
+  flask:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3"/><path d="M7.5 15h9"/>',
+  doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  alert:'<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.3"/>',
+  card:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 10h4M7 14h7"/><circle cx="16.5" cy="10.5" r="1.8"/>',
+  share:'<path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 13v6h14v-6"/>'
+});
+function careLabel(l){if(l.type==='groom')return l.item||'美容清潔';if(l.type==='med')return l.name||'用藥';return null}
+function isoLocal(ts){var d=new Date(ts);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
+function readTs(el,id){var v=$('#'+id,el).value;var t=v?new Date(v).getTime():Date.now();return isNaN(t)?Date.now():t}
+function numVal(el,id,dec){var v=($('#'+id,el).value||'').replace(/,/g,'.').replace(dec?/[^0-9.]/g:/[^0-9]/g,'');var n=dec?parseFloat(v):parseInt(v,10);return isNaN(n)?null:n}
+function medTabVisible(p){return careOn(p)}
+function careSeg(){var v=lsGet('petnote.careSeg');if(v==='med'&&!medTabVisible(curPet()))return 'worm';return v==='groom'||v==='med'?v:'worm'}
+
+/* ---------- 美容清潔 ---------- */
+var GROOM_PRESET=[['洗澡',30],['剪指甲',14],['清耳朵',14],['刷牙',1],['梳毛',7],['美容院',60],['剃腳底毛',30],['擠肛門腺',30]];
+var GROOM_EVERY=[[1,'每天'],[3,'每 3 天'],[7,'每週'],[14,'每 2 週'],[21,'每 3 週'],[30,'每月'],[45,'每 45 天'],[60,'每 2 個月'],[90,'每 3 個月']];
+function groomEveryLabel(n){var f=GROOM_EVERY.filter(function(x){return x[0]===n})[0];return f?f[1]:'每 '+n+' 天'}
+function petGroom(p){
+  if(Array.isArray(p.groomItems))return p.groomItems;
+  return p.species==='狗'?[{name:'洗澡',every:14},{name:'剪指甲',every:21}]:(p.species==='貓'?[{name:'剪指甲',every:14},{name:'洗澡',every:30}]:[]);
+}
+function groomRemindOn(p){return p.groomRemind!==false}
+function groomLogs(p,name){return S.logs.filter(function(l){return l.petId===p.id&&l.type==='groom'&&(name==null||l.item===name)}).sort(function(a,b){return b.ts-a.ts})}
+function groomStatus(p,it,now){
+  var ls=groomLogs(p,it.name);if(!ls.length)return {state:'none',count:0};
+  var ld=new Date(ls[0].ts);ld=new Date(ld.getFullYear(),ld.getMonth(),ld.getDate());
+  var due=addDays(ld,it.every),days=dayDiff(due,now);
+  return {state:days<0?'overdue':(days===0?'today':(days<=Math.max(1,Math.floor(it.every/5))?'soon':'ok')),last:ls[0],due:due,days:days,count:ls.length};
+}
+function groomChip(s){
+  if(s.state==='none')return '<span class="pill mute">還沒有紀錄</span>';
+  if(s.state==='overdue')return '<span class="pill warn">超過 '+(-s.days)+' 天</span>';
+  if(s.state==='today')return '<span class="pill warn">今天該做了</span>';
+  return '<span class="pill'+(s.state==='soon'?' warn':'')+'">'+s.days+' 天後</span>';
+}
+function viewGroom(p){
+  var now=today(),Y=S.year,items=petGroom(p),cm=ym(now);
+  var sts=items.map(function(it){return {it:it,s:groomStatus(p,it,now)}}),due=sts.filter(function(x){return x.s.state==='overdue'||x.s.state==='today'});
+  var nx=sts.filter(function(x){return x.s.due}).sort(function(a,b){return a.s.due-b.s.due})[0];
+  var body=items.length?'<div class="pbrow"><div class="pbcount '+(due.length?'warn':'')+'"><b>'+due.length+'</b><small>項待做</small></div><div class="grow"><b class="pbbig">'+(due.length?due.map(function(x){return esc(x.it.name)}).join('、')+' 該做了':(nx?'下一項：'+esc(nx.it.name):'都還沒有紀錄'))+'</b><small>'+(nx&&!due.length?fmtD(ymd(nx.s.due))+'・':'')+(groomRemindOn(p)?'到期當天早上提醒':'提醒已關閉')+'</small></div><button class="pbbtn" data-act="groomset" aria-label="美容清潔設定">'+ico('gear',20)+'</button></div>':'';
+  var h=pbanner({icon:'comb',title:'美容清潔',sub:esc(p.name),right:'<div class="yearnav"><button data-act="year" data-d="-1" aria-label="前一年">'+ico('cl',18)+'</button><b>'+Y+'</b><button data-act="year" data-d="1" aria-label="後一年">'+ico('cr',18)+'</button></div>',body:body});
+  if(!items.length)return h+'<div class="empty"><h3>還沒有美容清潔項目</h3><p>新增洗澡、剪指甲、清耳朵、美容院等項目，設定多久一次，之後蓋章打卡、到期提醒。</p><button class="btn primary" data-act="groomset">設定項目</button></div>';
+  h+='<div class="stack">';
+  sts.forEach(function(x){
+    var it=x.it,s=x.s,ls=groomLogs(p,it.name),st='',pm=s.due?ym(s.due):cm;
+    for(var m=1;m<=12;m++){
+      var mk=Y+'-'+pad(m),inM=ls.filter(function(l){return ym(new Date(l.ts))===mk}),cls='stamp',inner='<span>'+m+'月</span>';
+      if(inM.length){var rot=((hueOf(inM[0].id)%9)-4),dd=new Date(inM[0].ts);inner=PAW_SVG('currentColor',18)+'<small>'+(inM.length>1?inM.length+' 次':m+'/'+dd.getDate())+'</small>';
+        st+='<button class="stamp done" style="--rot:'+rot+'deg" data-act="groommonth" data-item="'+esc(it.name)+'" data-month="'+mk+'" aria-label="'+m+'月做了 '+inM.length+' 次，點擊查看">'+inner+'</button>';continue}
+      if(mk===cm)cls+=' now';else if(mk===pm&&mk>cm)cls+=' plan';else if(mk>cm)cls+=' future';
+      st+='<button class="'+cls+'" data-act="groommonth" data-item="'+esc(it.name)+'" data-month="'+mk+'" aria-label="'+m+'月，點擊記錄">'+inner+'</button>';
+    }
+    h+='<section class="card stampcard"><div class="cardhead"><h2>'+esc(it.name)+'<small>'+groomEveryLabel(it.every)+'</small></h2>'+groomChip(s)+'</div>'+
+      '<div class="wrow" style="border-top:0;padding-top:0"><div class="nm"><small>'+(s.last?'上次 '+fmtD(ymd(new Date(s.last.ts)))+'・下次 '+fmtD(ymd(s.due)):'還沒有紀錄，做完點右邊記錄')+'</small></div><button class="mini" data-act="groomadd" data-item="'+esc(it.name)+'">記錄</button></div>'+
+      '<div class="stamps">'+st+'</div></section>';
+  });
+  var yr=groomLogs(p).filter(function(l){return new Date(l.ts).getFullYear()===Y});
+  h+='<section class="card"><div class="cardhead"><h2>'+Y+' 年紀錄<small>'+(yr.length?'共 '+yr.length+' 筆':'')+'</small></h2><button class="linkbtn" data-act="groomadd">'+ico('plus',16)+'補登</button></div>';
+  if(!yr.length)h+='<small>'+Y+' 年還沒有紀錄。</small>';
+  else{var lm=-1;yr.slice(0,60).forEach(function(l){var d=new Date(l.ts),m=d.getMonth()+1;if(m!==lm){h+='<div class="yrh">'+m+' 月</div>';lm=m}
+    h+='<button class="hrow" data-act="editlog" data-id="'+l.id+'"><span class="d">'+pad(m)+'/'+pad(d.getDate())+'</span><span class="grow"><b>'+esc(l.item)+'</b>'+(l.note?'<small style="display:block">'+esc(l.note)+'</small>':'')+'</span>'+ico('cr',16)+'</button>'})}
+  h+='</section><small style="padding:0 4px">實線圈為本月，橘色虛線圈為下一次預計月份。同一個月做了好幾次，圈圈裡會顯示次數。</small></div>';
+  return h;
+}
+function openGroomMonth(name,month){
+  var p=curPet();if(!p)return;
+  var ls=groomLogs(p,name).filter(function(l){return ym(new Date(l.ts))===month});
+  var a=month.split('-').map(Number),now=today();
+  var def=month===ym(now)?Date.now():new Date(a[0],a[1]-1,15,10,0).getTime();
+  if(!ls.length){if(month>ym(now)){toast('還沒到這個月');return}return openGroomLog(null,name,def)}
+  var body='<div class="list">'+ls.map(function(l){var d=new Date(l.ts);return '<button class="hrow" data-glog="'+l.id+'"><span class="d">'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+'</span><span class="grow"><b>'+hhmm(l.ts)+'</b>'+(l.note?'<small style="display:block">'+esc(l.note)+'</small>':'')+'</span>'+ico('cr',16)+'</button>'}).join('')+'</div>';
+  openSheet({title:name+'・'+a[0]+'年'+a[1]+'月',body:body,footer:month<=ym(now)?'<button class="btn primary" id="gm-add">'+ico('plus',18)+'再記錄一次</button>':'',onMount:function(el){
+    el.addEventListener('click',function(e){var b=e.target.closest('[data-glog]');if(b){var id=b.dataset.glog;closeTop();setTimeout(function(){openGroomLog(id)},300)}});
+    var ad=$('#gm-add',el);if(ad)ad.onclick=function(){closeTop();setTimeout(function(){openGroomLog(null,name,def)},300)};
+  }});
+}
+function openGroomLog(id,name,ts){
+  var p=curPet();if(!p)return;
+  var ex=id&&S.logs.filter(function(l){return l.id===id})[0];if(ex)p=S.pets.filter(function(x){return x.id===ex.petId})[0]||p;
+  var items=petGroom(p).map(function(x){return x.name});
+  var l=ex?JSON.parse(JSON.stringify(ex)):{id:uid(),petId:p.id,type:'groom',item:name||items[0]||'',ts:ts||Date.now(),note:'',photos:[],custom:''};
+  if(l.item&&items.indexOf(l.item)<0)items.push(l.item);
+  var body='<div class="field"><span class="lbl">項目</span><div class="typegrid" id="gl-item">'+items.map(function(n){return '<button type="button" data-v="'+esc(n)+'" class="'+(l.item===n?'on':'')+'" style="--h:325">'+esc(n)+'</button>'}).join('')+'</div>'+
+    (items.length?'':'<small>還沒有項目，請先到「照護 → 美容」設定。</small>')+'</div>'+
+    '<div class="field"><label for="gl-time">時間</label><input id="gl-time" type="datetime-local" value="'+isoLocal(l.ts)+'"></div>'+
+    '<div class="field"><label for="gl-note">用品／備註（選填）</label><textarea id="gl-note" placeholder="例如：用了哪款洗毛精、有沒有過敏或皮膚反應、美容院名稱">'+esc(l.note)+'</textarea></div>';
+  var footer=(ex?'<button class="btn danger" id="gl-del">刪除</button>':'')+'<button class="btn primary" id="gl-save">'+(ex?'儲存':'完成記錄')+'</button>';
+  openSheet({title:(ex?'編輯':'記錄')+'美容清潔・'+p.name,body:body,footer:footer,onMount:function(el){
+    bindSeg($('#gl-item',el));
+    $('#gl-save',el).onclick=async function(){
+      var it=segVal($('#gl-item',el));if(!it){toast('請選擇項目');return}
+      l.item=it;l.ts=readTs(el,'gl-time');l.note=$('#gl-note',el).value.trim();
+      await saveLog(l);closeTop();render();if(!ex)stamp();Notif.sync();toast(ex?'已儲存':'已記錄'+it);
+    };
+    var del=$('#gl-del',el);if(del)del.onclick=async function(){if(!await confirmDlg('刪除這筆'+l.item+'紀錄？','刪除',true))return;await removeLog(l.id);closeTop();render();Notif.sync();toast('已刪除')};
+  }});
+}
+function openGroomSettings(){
+  var p=curPet();if(!p)return;
+  var items=JSON.parse(JSON.stringify(petGroom(p))),remind=groomRemindOn(p);
+  var every=function(v){var l=GROOM_EVERY.slice();if(!l.some(function(x){return x[0]===v}))l.push([v,'每 '+v+' 天']);return l.map(function(x){return '<option value="'+x[0]+'" '+(x[0]===v?'selected':'')+'>'+x[1]+'</option>'}).join('')};
+  var body='<div class="swrow" style="border-top:0"><span><b>到期提醒</b><small>到期當天早上提醒，首頁也會顯示待做</small></span><span class="sw"><input type="checkbox" id="gs-on" '+(remind?'checked':'')+' aria-label="到期提醒"><i></i></span></div>'+
+    '<span class="lbl">項目</span><div id="gs-items"></div>'+
+    '<span class="lbl" style="margin-top:12px">常用項目（點一下加入）</span><div class="chipwrap" id="gs-pre"></div>'+
+    '<div class="itemrow" style="margin-top:10px"><input id="gs-new" type="text" maxlength="14" placeholder="自訂項目名稱"><select id="gs-newev" aria-label="頻率">'+every(30)+'</select><button class="iconbtn" id="gs-add" aria-label="新增項目" style="background:var(--primary);color:var(--on-primary)">'+ico('plus')+'</button></div>'+
+    '<div class="hint">移除項目不會刪除已記錄的紀錄。</div>';
+  openSheet({title:'美容清潔設定',body:body,footer:'<button class="btn primary" id="gs-save">儲存設定</button>',onMount:function(el){
+    var box=$('#gs-items',el),pre=$('#gs-pre',el);
+    function paint(){
+      box.innerHTML=items.map(function(it,i){return '<div class="itemrow"><span class="nm">'+esc(it.name)+'</span><select data-ev="'+i+'" aria-label="'+esc(it.name)+' 頻率">'+every(it.every)+'</select><button class="iconbtn" data-rm="'+i+'" aria-label="移除 '+esc(it.name)+'">'+ico('x',18)+'</button></div>'}).join('')||'<small>目前沒有項目</small>';
+      pre.innerHTML=GROOM_PRESET.filter(function(g){return !items.some(function(x){return x.name===g[0]})}).map(function(g){return '<button type="button" class="fchip" data-pre="'+esc(g[0])+'" data-ev="'+g[1]+'">'+ico('plus',14)+esc(g[0])+'</button>'}).join('')||'<small>常用項目都加入了</small>';
+    }
+    paint();
+    box.addEventListener('change',function(e){var s=e.target.closest('select[data-ev]');if(s)items[+s.dataset.ev].every=+s.value});
+    box.addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(b){items.splice(+b.dataset.rm,1);paint()}});
+    pre.addEventListener('click',function(e){var b=e.target.closest('[data-pre]');if(b){items.push({name:b.dataset.pre,every:+b.dataset.ev});paint()}});
+    $('#gs-add',el).onclick=function(){
+      var inp=$('#gs-new',el),nm=inp.value.trim();
+      if(!nm){toast('請輸入項目名稱');return}
+      if(items.some(function(x){return x.name===nm})){toast('已經有這個項目');return}
+      items.push({name:nm,every:+$('#gs-newev',el).value});inp.value='';paint();
+    };
+    $('#gs-save',el).onclick=async function(){p.groomItems=items;p.groomRemind=$('#gs-on',el).checked;await savePet(p);closeTop();render();toast('已儲存設定');Notif.ensure()};
+  }});
+}
+
+/* ---------- 高齡／特殊照護 ---------- */
+var CONDS=['慢性腎病','糖尿病','心臟病','甲狀腺亢進','甲狀腺低下','癲癇','關節炎','腫瘤','肝病','胰臟炎','腸胃病／IBD','皮膚病／過敏','FIV／FeLV','高血壓','認知障礙（失智）','視力／聽力退化','氣喘／呼吸道'];
+function petCare(p){return Object.assign({on:false,conds:[],allergy:'',blood:'',vet:'',vetTel:'',notes:'',qs:''},p.care||{})}
+function careOn(p){return !!(p&&p.care&&p.care.on)}
+var MED_KINDS=[['oral','口服'],['subq','皮下輸液'],['insulin','胰島素'],['inject','注射'],['topical','外用'],['eye','眼／耳藥'],['other','其他']];
+var MED_UNITS=['顆','錠','ml','mg','U','滴','包','次'];
+function medKindName(k){var f=MED_KINDS.filter(function(x){return x[0]===k})[0];return f?f[1]:'其他'}
+function medNeedsSite(m){return m.kind==='subq'||m.kind==='insulin'||m.kind==='inject'}
+function petMeds(p){return Array.isArray(p.meds)?p.meds:[]}
+function medActive(m,d){if(m.off)return false;var k=ymd(d);if(m.start&&k<m.start)return false;if(m.end&&k>m.end)return false;return true}
+function medSlots(m,d){
+  if(m.freq==='prn'||!medActive(m,d))return [];
+  if(m.freq==='every'){var s=m.start?parseD(m.start):d,n=Math.max(1,+m.every||1),df=dayDiff(d,s);if(df<0||df%n)return []}
+  return (m.times&&m.times.length?m.times:['09:00']).slice().sort();
+}
+function slotKey(d,t){return ymd(d)+' '+t}
+function medLogFor(p,m,key){return S.logs.filter(function(l){return l.type==='med'&&l.petId===p.id&&l.medId===m.id&&l.slot===key})[0]}
+function dosesOn(p,d){var out=[];petMeds(p).forEach(function(m){medSlots(m,d).forEach(function(t){var key=slotKey(d,t);out.push({m:m,t:t,key:key,log:medLogFor(p,m,key)})})});return out.sort(function(a,b){return a.t<b.t?-1:(a.t>b.t?1:0)})}
+function slotTs(key){var a=key.split(' '),d=parseD(a[0]),hm=a[1].split(':');return new Date(d.getFullYear(),d.getMonth(),d.getDate(),+hm[0]||0,+hm[1]||0).getTime()}
+function adherence(p,days){var tot=0,ok=0;for(var i=0;i<days;i++){var d=addDays(today(),-i);dosesOn(p,d).forEach(function(x){if(i===0&&slotTs(x.key)>Date.now())return;tot++;if(x.log&&x.log.status==='given')ok++})}return tot?{tot:tot,ok:ok,pct:Math.round(ok/tot*100)}:null}
+function doseText(m,l){var d=l&&l.dose!=null?l.dose:m.dose;return (d!=null&&d!==''?d+' ':'')+(l&&l.unit||m.unit||'')}
+function dosesHtml(p,compact){
+  var ds=dosesOn(p,today()),now=Date.now(),prn=petMeds(p).filter(function(m){return m.freq==='prn'&&medActive(m,today())});
+  if(!ds.length&&!prn.length)return '<small>'+(petMeds(p).length?'今天沒有要給的藥。':'還沒有設定用藥。點「用藥清單」新增，時間到會提醒。')+'</small>';
+  var h=ds.map(function(x){
+    var l=x.log,late=!l&&slotTs(x.key)<now-30*6e4,right;
+    if(l&&l.status==='given')right='<span class="pill ok">'+ico('check',14)+hhmm(l.ts)+' 已給</span>';
+    else if(l)right='<span class="pill mute">略過</span>';
+    else right='<button class="dosechk" data-act="medgive" data-mid="'+x.m.id+'" data-key="'+x.key+'" aria-label="'+esc(x.m.name)+' 已給藥">'+ico('check',20)+'</button>';
+    return '<div class="dose'+(late?' late':'')+(l?' did':'')+'" role="button" tabindex="0" data-act="meddose" data-mid="'+x.m.id+'" data-key="'+x.key+'"><span class="dt">'+x.t+'</span><span class="grow"><b>'+esc(x.m.name)+'</b><small>'+esc(doseText(x.m,l))+'・'+medKindName(x.m.kind)+(late?'・<b class="lt">還沒給</b>':'')+'</small></span>'+right+'</div>';
+  }).join('');
+  if(prn.length&&!compact)h+='<div class="yrh">需要時使用</div>'+prn.map(function(m){var ls=S.logs.filter(function(l){return l.type==='med'&&l.medId===m.id&&l.petId===p.id}).sort(function(a,b){return b.ts-a.ts});
+    return '<div class="dose"><span class="dt">'+ico('pill',18)+'</span><span class="grow"><b>'+esc(m.name)+'</b><small>'+esc(doseText(m))+(ls[0]?'・上次 '+fmtD(ymd(new Date(ls[0].ts)))+' '+hhmm(ls[0].ts):'')+'</small></span><button class="mini" data-act="medprn" data-mid="'+m.id+'">記錄一次</button></div>'}).join('');
+  return h;
+}
+async function medGive(pid,mid,key){
+  var p=S.pets.filter(function(x){return x.id===pid})[0]||curPet(),m=petMeds(p).filter(function(x){return x.id===mid})[0];if(!m)return;
+  if(medNeedsSite(m))return openDoseSheet(p,m,key);
+  await saveLog({id:'med_'+m.id+'_'+key.replace(/[^0-9]/g,''),petId:p.id,type:'med',medId:m.id,name:m.name,dose:m.dose,unit:m.unit,kind:m.kind,slot:key,status:'given',ts:Date.now(),note:'',photos:[],custom:''});
+  render();Notif.sync();toast('已記錄 '+m.name);
+}
+function openDoseSheet(p,m,key,logId){
+  var ex=logId?S.logs.filter(function(l){return l.id===logId})[0]:(key?medLogFor(p,m,key):null);
+  var l=ex?JSON.parse(JSON.stringify(ex)):{id:key?'med_'+m.id+'_'+key.replace(/[^0-9]/g,''):uid(),petId:p.id,type:'med',medId:m.id,name:m.name,dose:m.dose,unit:m.unit,kind:m.kind,slot:key||null,status:'given',ts:Date.now(),note:'',photos:[],custom:''};
+  var lastSite=(S.logs.filter(function(x){return x.type==='med'&&x.medId===m.id&&x.site}).sort(function(a,b){return b.ts-a.ts})[0]||{}).site;
+  var site=l.site||'';
+  var body=(key?'<p class="about" style="margin:0 0 10px">預定時間 '+key.replace('-','/').replace('-','/')+'</p>':'')+
+    '<div class="row2"><div class="field"><label for="ds-dose">實際劑量</label><input id="ds-dose" type="text" inputmode="decimal" maxlength="7" value="'+esc(l.dose!=null?l.dose:'')+'"></div><div class="field"><label for="ds-unit">單位</label><select id="ds-unit">'+MED_UNITS.map(function(u){return '<option '+(u===(l.unit||m.unit)?'selected':'')+'>'+u+'</option>'}).join('')+'</select></div></div>'+
+    (medNeedsSite(m)?'<div class="field"><span class="lbl">注射／輸液部位'+(lastSite&&!ex?'<small>（上次：'+siteLabel(lastSite)+'，記得輪替）</small>':'')+'</span><div class="sitebox" id="ds-site">'+siteSvg(site)+'<div class="info"><small>部位</small><b id="ds-sitetx">'+(site?siteLabel(site):'點圖選擇')+'</b></div></div></div>':'')+
+    '<div class="field"><label for="ds-time">給藥時間</label><input id="ds-time" type="datetime-local" value="'+isoLocal(l.ts)+'"></div>'+
+    '<div class="field"><label for="ds-note">反應／備註（選填）</label><textarea id="ds-note" placeholder="例如：吃完有點想吐、精神變好、拒吃改混在罐頭裡">'+esc(l.note)+'</textarea></div>';
+  var footer=(ex?'<button class="btn danger" id="ds-del">刪除</button>':'')+(key?'<button class="btn" id="ds-skip">略過這次</button>':'')+'<button class="btn primary" id="ds-save">已給藥</button>';
+  openSheet({title:m.name+'・'+p.name,body:body,footer:footer,onMount:function(el){
+    var sb=$('#ds-site',el);
+    if(sb)sb.addEventListener('click',function(e){var z=e.target.closest('[data-z]');if(!z)return;site=z.dataset.z;sb.innerHTML=siteSvg(site)+'<div class="info"><small>部位</small><b>'+siteLabel(site)+'</b></div>'});
+    async function save(status){
+      l.dose=numVal(el,'ds-dose',true);l.unit=$('#ds-unit',el).value;l.ts=readTs(el,'ds-time');l.note=$('#ds-note',el).value.trim();l.status=status;l.name=m.name;l.kind=m.kind;
+      if(site)l.site=site;else delete l.site;
+      await saveLog(l);closeTop();render();Notif.sync();toast(status==='given'?'已記錄 '+m.name:'已略過這次');
+    }
+    $('#ds-save',el).onclick=function(){save('given')};
+    var sk=$('#ds-skip',el);if(sk)sk.onclick=function(){save('skipped')};
+    var del=$('#ds-del',el);if(del)del.onclick=async function(){await removeLog(l.id);closeTop();render();Notif.sync();toast('已刪除紀錄')};
+  }});
+}
+function openMedList(){
+  var p=curPet();if(!p)return;
+  function body(){var ms=petMeds(p);return (ms.length?'<div class="list">'+ms.map(function(m){
+    var fq=m.freq==='prn'?'需要時使用':(m.freq==='every'?'每 '+m.every+' 天・':'每天・')+(m.freq==='prn'?'':(m.times||[]).join('、'));
+    return '<button class="lrow" data-med="'+m.id+'"><span class="av" style="--s:40px;--h:268">'+ico('pill',20)+'</span><span class="grow"><b>'+esc(m.name)+(m.off?' <span class="pill mute">已停用</span>':(m.end&&m.end<ymd(today())?' <span class="pill mute">療程結束</span>':''))+'</b><small style="display:block">'+esc(doseText(m))+'・'+medKindName(m.kind)+'・'+fq+'</small></span>'+ico('cr',18)+'</button>'}).join('')+'</div>':'<small>還沒有用藥。新增藥名、劑量和時間，時間到會提醒，首頁可以直接打勾。</small>')}
+  openSheet({title:'用藥清單・'+p.name,body:'<div id="ml-body">'+body()+'</div>',footer:'<button class="btn primary" id="ml-add">'+ico('plus',18)+'新增用藥</button>',onMount:function(el){
+    el.addEventListener('click',function(e){var b=e.target.closest('[data-med]');if(b){openMedEdit(b.dataset.med,function(){$('#ml-body',el).innerHTML=body()})}});
+    $('#ml-add',el).onclick=function(){openMedEdit(null,function(){$('#ml-body',el).innerHTML=body()})};
+  }});
+}
+function openMedEdit(id,after){
+  var p=curPet();if(!p)return;
+  var ex=id&&petMeds(p).filter(function(m){return m.id===id})[0];
+  var m=ex?JSON.parse(JSON.stringify(ex)):{id:uid(),name:'',kind:'oral',dose:1,unit:'顆',freq:'daily',times:['08:00'],every:2,start:ymd(today()),end:'',remind:true,note:''};
+  var body='<div class="field"><label for="me-name">藥名／治療名稱</label><input id="me-name" type="text" maxlength="24" placeholder="例如：腎臟處方藥、皮下輸液、胰島素" value="'+esc(m.name)+'"></div>'+
+    '<div class="field"><span class="lbl">類型</span><div class="seg" id="me-kind">'+MED_KINDS.map(function(k){return '<button type="button" data-v="'+k[0]+'" class="'+(m.kind===k[0]?'on':'')+'">'+k[1]+'</button>'}).join('')+'</div></div>'+
+    '<div class="row2"><div class="field"><label for="me-dose">每次劑量</label><input id="me-dose" type="text" inputmode="decimal" maxlength="7" value="'+esc(m.dose!=null?m.dose:'')+'"></div><div class="field"><label for="me-unit">單位</label><select id="me-unit">'+MED_UNITS.map(function(u){return '<option '+(u===m.unit?'selected':'')+'>'+u+'</option>'}).join('')+'</select></div></div>'+
+    '<div class="field"><span class="lbl">頻率</span><div class="seg" id="me-freq"><button type="button" data-v="daily" class="'+(m.freq==='daily'?'on':'')+'">每天</button><button type="button" data-v="every" class="'+(m.freq==='every'?'on':'')+'">每隔幾天</button><button type="button" data-v="prn" class="'+(m.freq==='prn'?'on':'')+'">需要時</button></div></div>'+
+    '<div class="field" id="me-everyw"><label for="me-every">每幾天一次</label><input id="me-every" type="text" inputmode="numeric" maxlength="2" value="'+(m.every||2)+'"><div class="hint">從開始日期算起，例如每 2 天＝隔天一次。</div></div>'+
+    '<div class="field" id="me-timesw"><span class="lbl">時間</span><div id="me-times"></div><button type="button" class="linkbtn" id="me-tadd">'+ico('plus',16)+'加一個時間</button></div>'+
+    '<div class="row2"><div class="field"><label for="me-start">開始日期</label><input id="me-start" type="date" value="'+esc(m.start||'')+'"></div><div class="field"><label for="me-end">結束日期（選填）</label><input id="me-end" type="date" value="'+esc(m.end||'')+'"></div></div>'+
+    '<div class="swrow"><span><b>時間到提醒</b><small>Android 會跳通知；網頁版需開啟網頁通知</small></span><span class="sw"><input type="checkbox" id="me-rem" '+(m.remind!==false?'checked':'')+' aria-label="時間到提醒"><i></i></span></div>'+
+    (ex?'<div class="swrow"><span><b>暫停使用</b><small>停藥時打開，紀錄會保留</small></span><span class="sw"><input type="checkbox" id="me-off" '+(m.off?'checked':'')+' aria-label="暫停使用"><i></i></span></div>':'')+
+    '<div class="field" style="margin-top:8px"><label for="me-note">備註（選填）</label><input id="me-note" type="text" maxlength="60" placeholder="例如：飯後給、混在罐頭裡" value="'+esc(m.note||'')+'"></div>';
+  var footer=(ex?'<button class="btn danger" id="me-del">刪除</button>':'')+'<button class="btn primary" id="me-save">'+(ex?'儲存':'新增')+'</button>';
+  openSheet({title:ex?'編輯用藥':'新增用藥',body:body,footer:footer,onMount:function(el){
+    var times=(m.times||[]).slice();
+    function paintT(){$('#me-times',el).innerHTML=times.map(function(t,i){return '<div class="itemrow"><input type="time" data-ti="'+i+'" value="'+t+'"><button type="button" class="iconbtn" data-trm="'+i+'" aria-label="移除時間">'+ico('x',18)+'</button></div>'}).join('')||'<small>還沒有時間</small>'}
+    function paintF(){var f=segVal($('#me-freq',el));$('#me-everyw',el).hidden=f!=='every';$('#me-timesw',el).hidden=f==='prn'}
+    paintT();paintF();bindSeg($('#me-freq',el),paintF);
+    bindSeg($('#me-kind',el),function(v){var u=$('#me-unit',el);if(v==='subq')u.value='ml';else if(v==='insulin')u.value='U';else if(v==='eye')u.value='滴'});
+    $('#me-times',el).addEventListener('input',function(e){var i=e.target.dataset.ti;if(i!=null)times[+i]=e.target.value});
+    $('#me-times',el).addEventListener('click',function(e){var b=e.target.closest('[data-trm]');if(b){times.splice(+b.dataset.trm,1);paintT()}});
+    $('#me-tadd',el).onclick=function(){if(times.length>=8){toast('最多 8 個時間');return}times.push(times.length?'20:00':'08:00');paintT()};
+    $('#me-save',el).onclick=async function(){
+      var nm=$('#me-name',el).value.trim();if(!nm){toast('請輸入藥名');$('#me-name',el).focus();return}
+      var f=segVal($('#me-freq',el))||'daily',ts=times.filter(Boolean).sort();
+      if(f!=='prn'&&!ts.length){toast('請至少設定一個時間');return}
+      var st=$('#me-start',el).value,en=$('#me-end',el).value;if(en&&st&&en<st){toast('結束日期不能早於開始日期');return}
+      Object.assign(m,{name:nm,kind:segVal($('#me-kind',el))||'oral',dose:numVal(el,'me-dose',true),unit:$('#me-unit',el).value,freq:f,times:uniq(ts),every:Math.max(1,numVal(el,'me-every')||2),start:st||ymd(today()),end:en,remind:$('#me-rem',el).checked,note:$('#me-note',el).value.trim()});
+      var off=$('#me-off',el);if(off)m.off=off.checked;
+      var list=petMeds(p).slice(),i=list.findIndex(function(x){return x.id===m.id});if(i<0)list.push(m);else list[i]=m;p.meds=list;
+      await savePet(p);closeTop();render();Notif.ensure();Notif.sync();if(after)setTimeout(after,50);toast(ex?'已儲存':'已新增 '+nm);
+    };
+    var del=$('#me-del',el);if(del)del.onclick=async function(){if(!await confirmDlg('刪除「'+m.name+'」？已經記錄的給藥紀錄會保留在時間線。','刪除',true))return;p.meds=petMeds(p).filter(function(x){return x.id!==m.id});await savePet(p);closeTop();render();Notif.sync();if(after)setTimeout(after,50);toast('已刪除')};
+  }});
+}
+
+/* ---------- 居家測量 ---------- */
+var LAB_KEYS=[['BUN','mg/dL','尿素氮'],['CREA','mg/dL','肌酸酐'],['SDMA','µg/dL','對稱性二甲基精胺酸'],['PHOS','mg/dL','磷'],['K','mmol/L','鉀'],['ALT','U/L','肝指數'],['ALKP','U/L','鹼性磷酸酶'],['GLU','mg/dL','血糖'],['FRU','µmol/L','果糖胺'],['T4','µg/dL','甲狀腺素'],['HCT','%','血容比'],['USG','','尿比重'],['UPC','','尿蛋白肌酸酐比']];
+var QOL_Q=[['疼痛','有沒有疼痛、呼吸是否順暢（10＝完全不痛）'],['食慾','吃得夠不夠、需不需要協助進食'],['水分','喝水足夠嗎、需不需要補充輸液'],['清潔','能自己清潔、身上乾淨嗎'],['快樂','對家人有反應、有興趣玩、不焦慮'],['行動','能自己走動、起身、上廁所'],['好日子','好日子比壞日子多嗎']];
+var EVENT_KINDS=['抽搐／發作','昏倒','呼吸困難','劇烈嘔吐','走路不穩','其他'];
+var SEV=[['1','輕微'],['2','中等'],['3','嚴重']];
+function mLogs(p,type){return S.logs.filter(function(l){return l.petId===p.id&&l.type===type}).sort(function(a,b){return b.ts-a.ts})}
+function lineChart(pts,o){
+  o=o||{};var W=340,H=170,L=36,R=12,T=14,B=24;if(!pts.length)return '<small>還沒有資料</small>';
+  var t0=o.from||pts[0].t,t1=Math.max(Date.now(),pts[pts.length-1].t),vals=pts.map(function(x){return x.v}).concat(o.line!=null?[o.line]:[]);
+  var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals);if(o.zero)mn=0;if(mx===mn){mx+=1;mn=Math.max(0,mn-1)}
+  var st=niceStep(mx-mn,4);mn=Math.floor(mn/st)*st;mx=Math.ceil(mx/st)*st;
+  var X=function(t){return L+(W-L-R)*(t1===t0?0.5:(t-t0)/(t1-t0))},Y=function(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))},g='';
+  for(var k=mn;k<=mx+1e-9;k+=st){var y=Y(k).toFixed(1);g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)"/><text x="'+(L-5)+'" y="'+y+'" text-anchor="end" dominant-baseline="central" font-size="10.5" fill="var(--ink2)">'+(Math.round(k*10)/10)+'</text>'}
+  if(o.line!=null)g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(o.line).toFixed(1)+'" y2="'+Y(o.line).toFixed(1)+'" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5 4"/><text x="'+(W-R)+'" y="'+(Y(o.line)-5).toFixed(1)+'" text-anchor="end" font-size="10.5" fill="var(--accent)">'+esc(o.lineLabel||'')+'</text>';
+  var path=pts.map(function(x,i){return (i?'L':'M')+X(x.t).toFixed(1)+' '+Y(x.v).toFixed(1)}).join(' ');
+  g+='<path d="'+path+'" fill="none" stroke="'+(o.color||'var(--primary)')+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
+  g+=pts.map(function(x){var bad=o.line!=null&&(o.lineHigh===false?x.v<o.line:x.v>o.line);return '<circle cx="'+X(x.t).toFixed(1)+'" cy="'+Y(x.v).toFixed(1)+'" r="3.4" fill="'+(bad?'var(--accent)':(o.color||'var(--primary)'))+'"/>'}).join('');
+  var fd=function(t){var d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate()};
+  g+='<text x="'+L+'" y="'+(H-6)+'" font-size="10.5" fill="var(--ink2)">'+fd(t0)+'</text><text x="'+(W-R)+'" y="'+(H-6)+'" text-anchor="end" font-size="10.5" fill="var(--ink2)">今天</text>';
+  return '<div class="wchart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(o.label||'趨勢圖')+'">'+g+'</svg></div>';
+}
+function mSummary(p,kind){
+  var ls=mLogs(p,kind),l=ls[0];
+  if(kind==='srr'){if(!l)return ['睡眠呼吸','—','次/分','還沒有紀錄'];var w=ls.filter(function(x){return x.ts>Date.now()-7*864e5}),avg=w.length?Math.round(w.reduce(function(a,x){return a+(+x.bpm||0)},0)/w.length):null;return ['睡眠呼吸',l.bpm,'次/分',(avg!=null?'7 天平均 '+avg:'')+(l.bpm>30?'・偏高':'')]}
+  if(kind==='glucose'){if(!l)return ['血糖','—','mg/dL','還沒有紀錄'];return ['血糖',l.mgdl,'mg/dL',({fasting:'空腹',pre:'餐前',post:'餐後'}[l.when]||'')+' '+fmtD(ymd(new Date(l.ts))).slice(5)]}
+  if(kind==='seizure'){if(!l)return ['異常事件','—','','還沒有紀錄'];var n30=ls.filter(function(x){return x.ts>Date.now()-30*864e5}).length,dd=dayDiff(today(),new Date(new Date(l.ts).setHours(0,0,0,0)));return ['異常事件',dd===0?'今天':dd,dd===0?'':'天前','30 天內 '+n30+' 次']}
+  if(kind==='qol'){if(!l)return ['生活品質','—','/70','每週評一次'];return ['生活品質',l.total,'/70',l.total>=35?'可以接受':'偏低，和獸醫討論']}
+  return ['','','',''];
+}
+function careTiles(p){
+  return '<div class="mtiles">'+[['srr','pulse'],['glucose','drop'],['seizure','alert'],['qol','heart']].map(function(k){var s=mSummary(p,k[0]);
+    return '<div class="mtile" role="button" tabindex="0" data-act="mview" data-k="'+k[0]+'"><span class="mlb">'+ico(k[1],16)+s[0]+'</span><span class="mv"><b>'+s[1]+'</b><small>'+s[2]+'</small></span><span class="msub">'+esc(s[3])+'</span><button class="mtadd" data-act="madd" data-k="'+k[0]+'" aria-label="新增'+s[0]+'">'+ico('plus',16)+'</button></div>'}).join('')+'</div>';
+}
+function openMeasure(kind){
+  var p=curPet();if(!p)return;
+  var title={srr:'睡眠呼吸次數',glucose:'血糖',seizure:'異常事件',qol:'生活品質',lab:'檢驗數值'}[kind];
+  function bodyHtml(){
+    var ls=mLogs(p,kind),from=Date.now()-90*864e5,pts=ls.filter(function(l){return l.ts>=from}).slice().reverse(),h='';
+    if(kind==='srr')h='<p class="about" style="margin:0 0 6px">在牠熟睡時數 30 秒的呼吸次數 ×2。一般建議睡眠時低於每分鐘 30 次，若持續偏高或比平常明顯增加，請和獸醫討論。</p>'+lineChart(pts.map(function(l){return {t:l.ts,v:+l.bpm}}),{line:30,lineLabel:'30',label:'睡眠呼吸次數趨勢',from:from});
+    else if(kind==='glucose')h=lineChart(pts.map(function(l){return {t:l.ts,v:+l.mgdl}}),{label:'血糖趨勢',from:from});
+    else if(kind==='qol')h='<p class="about" style="margin:0 0 6px">參考 HHHHHMM 生活品質量表，7 項各 0–10 分，總分 35 分以上通常代表生活品質可以接受。只是輔助觀察，請和獸醫一起判斷。</p>'+lineChart(pts.map(function(l){return {t:l.ts,v:+l.total}}),{line:35,lineHigh:false,lineLabel:'35',label:'生活品質趨勢',from:from,zero:true});
+    else if(kind==='seizure'){var n30=ls.filter(function(x){return x.ts>Date.now()-30*864e5}).length;h='<div class="pbrow" style="margin:0 0 10px"><div class="pbcount"><b>'+n30+'</b><small>30 天內</small></div><div class="grow"><b class="pbbig">'+(ls[0]?'上次在 '+fmtD(ymd(new Date(ls[0].ts))):'還沒有紀錄')+'</b><small>發生時先顧好安全，用計時器記錄持續多久，事後補寫經過。</small></div></div>'}
+    else if(kind==='lab')h=labTable(p);
+    h+='<div class="list" style="margin-top:8px">'+(ls.length?ls.slice(0,60).map(function(l){var d=new Date(l.ts);return '<button class="hrow" data-mlog="'+l.id+'"><span class="d">'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+'</span><span class="grow"><b>'+esc(mLine(l))+'</b>'+(l.note?'<small style="display:block">'+esc(l.note)+'</small>':'')+'</span>'+ico('cr',16)+'</button>'}).join(''):'<small>還沒有紀錄</small>')+'</div>';
+    return h;
+  }
+  openSheet({title:title+'・'+p.name,body:'<div id="mv-body">'+bodyHtml()+'</div>',footer:'<button class="btn primary" id="mv-add">'+ico('plus',18)+'新增'+title+'</button>',onMount:function(el){
+    var refresh=function(){var b=$('#mv-body',el);if(b)b.innerHTML=bodyHtml()};
+    el.addEventListener('click',function(e){var b=e.target.closest('[data-mlog]');if(b)openMeasureLog(kind,b.dataset.mlog,refresh)});
+    $('#mv-add',el).onclick=function(){openMeasureLog(kind,null,refresh)};
+  }});
+}
+function mLine(l){
+  if(l.type==='srr')return l.bpm+' 次/分'+(l.ctx==='rest'?'（休息）':'（睡眠）');
+  if(l.type==='glucose')return l.mgdl+' mg/dL'+({fasting:'・空腹',pre:'・餐前',post:'・餐後'}[l.when]||'');
+  if(l.type==='seizure')return (l.kind||'異常事件')+'・'+fmtDur(l.dur)+'・'+(({'1':'輕微','2':'中等','3':'嚴重'})[l.sev]||'');
+  if(l.type==='qol')return l.total+' / 70 分';
+  if(l.type==='lab')return Object.keys(l.vals||{}).map(function(k){return k+' '+l.vals[k]}).join('・')||'檢驗結果';
+  return '';
+}
+function fmtDur(s){s=+s||0;if(!s)return '時間未記錄';var m=Math.floor(s/60),r=s%60;return (m?m+' 分 ':'')+(r?r+' 秒':(m?'':'0 秒'))}
+function labTable(p){
+  var ls=mLogs(p,'lab');if(!ls.length)return '<small>還沒有檢驗紀錄。看診拿到報告後，把重要數值記下來，就能看到變化趨勢。</small>';
+  var keys=[];ls.forEach(function(l){Object.keys(l.vals||{}).forEach(function(k){if(keys.indexOf(k)<0)keys.push(k)})});
+  return '<div class="labs">'+keys.map(function(k){var pts=ls.filter(function(l){return l.vals&&l.vals[k]!=null&&l.vals[k]!==''}).map(function(l){return {t:l.ts,v:+l.vals[k]}}),cur=pts[0],prev=pts[1];
+    var kd=LAB_KEYS.filter(function(x){return x[0]===k})[0],unit=(cur&&ls[0].units&&ls[0].units[k])||(kd?kd[1]:'');
+    var arrow=prev&&!isNaN(cur.v)&&!isNaN(prev.v)?(cur.v>prev.v?'<span class="up">▲ '+(Math.round((cur.v-prev.v)*100)/100)+'</span>':(cur.v<prev.v?'<span class="dn">▼ '+(Math.round((prev.v-cur.v)*100)/100)+'</span>':'<span>持平</span>')):'';
+    return '<div class="labrow"><span class="grow"><b>'+esc(k)+'</b><small>'+(kd?esc(kd[2]):'')+(cur?'・'+fmtD(ymd(new Date(cur.t))).slice(2):'')+'</small></span><span class="lv"><b>'+(cur?cur.v:'—')+'</b> <small>'+esc(unit)+'</small>'+arrow+'</span>'+(pts.length>1?'<span class="lspark">'+sparkSvg(pts.slice().reverse().map(function(x){return {t:x.t,kg:x.v}}),70,22)+'</span>':'<span class="lspark"></span>')+'</div>'}).join('')+'</div><small>箭頭是和上一次比較。參考範圍每家檢驗機器不同，請以報告和獸醫說明為準。</small>';
+}
+function openMeasureLog(kind,id,after){
+  var p=curPet();if(!p)return;
+  var ex=id&&S.logs.filter(function(l){return l.id===id})[0];
+  var l=ex?JSON.parse(JSON.stringify(ex)):{id:uid(),petId:p.id,type:kind,ts:Date.now(),note:'',photos:[],custom:''};
+  var title={srr:'睡眠呼吸次數',glucose:'血糖',seizure:'異常事件',qol:'生活品質',lab:'檢驗結果'}[kind],body='';
+  if(kind==='srr')body='<div class="counter" id="sr-ctr"><button type="button" class="ctrbtn" id="sr-tap"><b id="sr-n">開始</b><small id="sr-tx">牠熟睡時，每吸一口氣點一下</small></button></div>'+
+    '<div class="row2"><div class="field"><label for="sr-bpm">每分鐘呼吸次數</label><input id="sr-bpm" type="text" inputmode="numeric" maxlength="3" value="'+(l.bpm||'')+'"></div><div class="field"><span class="lbl">狀態</span><div class="seg" id="sr-ctx"><button type="button" data-v="sleep" class="'+(l.ctx!=='rest'?'on':'')+'">睡眠</button><button type="button" data-v="rest" class="'+(l.ctx==='rest'?'on':'')+'">休息</button></div></div></div>';
+  else if(kind==='glucose')body='<div class="field"><label for="gl-v">血糖（mg/dL）</label><input id="gl-v" type="text" inputmode="decimal" maxlength="5" value="'+(l.mgdl||'')+'"></div><div class="field"><span class="lbl">時機</span><div class="seg" id="gl-w">'+[['fasting','空腹'],['pre','餐前'],['post','餐後'],['other','其他']].map(function(x){return '<button type="button" data-v="'+x[0]+'" class="'+((l.when||'fasting')===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div></div>';
+  else if(kind==='seizure')body=(ex?'':'<div class="counter"><button type="button" class="ctrbtn sw" id="sz-sw"><b id="sz-t">開始計時</b><small id="sz-tx">先顧好牠的安全，再按這裡</small></button></div>')+
+    '<div class="field"><span class="lbl">狀況</span><div class="typegrid" id="sz-k">'+EVENT_KINDS.map(function(k){return '<button type="button" data-v="'+k+'" class="'+((l.kind||EVENT_KINDS[0])===k?'on':'')+'" style="--h:355">'+k+'</button>'}).join('')+'</div></div>'+
+    '<div class="row2"><div class="field"><label for="sz-m">持續（分）</label><input id="sz-m" type="text" inputmode="numeric" maxlength="3" value="'+(l.dur?Math.floor(l.dur/60):'')+'"></div><div class="field"><label for="sz-s">（秒）</label><input id="sz-s" type="text" inputmode="numeric" maxlength="2" value="'+(l.dur?l.dur%60:'')+'"></div></div>'+
+    '<div class="field"><span class="lbl">嚴重程度</span><div class="seg" id="sz-sev">'+SEV.map(function(x){return '<button type="button" data-v="'+x[0]+'" class="'+((l.sev||'1')===x[0]?'on':'')+'">'+x[1]+'</button>'}).join('')+'</div></div>';
+  else if(kind==='qol')body='<div class="qol">'+QOL_Q.map(function(q,i){var v=l.s?l.s[i]:5;return '<div class="qrow"><div class="qh"><b>'+q[0]+'</b><span class="qv" id="q-v'+i+'">'+v+'</span></div><small>'+q[1]+'</small><input type="range" min="0" max="10" step="1" value="'+v+'" data-q="'+i+'" aria-label="'+q[0]+'"></div>'}).join('')+'</div><div class="qtot">總分 <b id="q-tot"></b> / 70</div>';
+  else if(kind==='lab'){var vals=l.vals||{},units=l.units||{},extra=Object.keys(vals).filter(function(k){return !LAB_KEYS.some(function(x){return x[0]===k})});
+    body='<p class="about" style="margin:0 0 8px">只要填有做的項目，其他留空。</p><div class="labin">'+LAB_KEYS.map(function(k){return '<label class="labi"><span><b>'+k[0]+'</b><small>'+k[2]+(k[1]?'・'+k[1]:'')+'</small></span><input type="text" inputmode="decimal" maxlength="7" data-lab="'+k[0]+'" value="'+esc(vals[k[0]]!=null?vals[k[0]]:'')+'"></label>'}).join('')+
+      extra.map(function(k){return '<label class="labi"><span><b>'+esc(k)+'</b><small>'+esc(units[k]||'')+'</small></span><input type="text" inputmode="decimal" maxlength="7" data-lab="'+esc(k)+'" value="'+esc(vals[k])+'"></label>'}).join('')+'</div>'+
+      '<div class="itemrow" style="margin-top:8px"><input id="lb-nk" type="text" maxlength="12" placeholder="其他項目名稱"><input id="lb-nu" type="text" maxlength="10" placeholder="單位" style="max-width:90px"><button type="button" class="iconbtn" id="lb-add" aria-label="新增項目" style="background:var(--primary);color:var(--on-primary)">'+ico('plus')+'</button></div>';}
+  body+='<div class="field" style="margin-top:6px"><label for="ml-time">'+(kind==='lab'?'檢驗日期':'時間')+'</label><input id="ml-time" type="datetime-local" value="'+isoLocal(l.ts)+'"></div>'+
+    '<div class="field"><label for="ml-note">'+(kind==='seizure'?'經過（發生前在做什麼、發作時的樣子、之後的狀態）':(kind==='lab'?'醫院／備註（選填）':'備註（選填）'))+'</label><textarea id="ml-note">'+esc(l.note)+'</textarea></div>';
+  var footer=(ex?'<button class="btn danger" id="ml-del">刪除</button>':'')+'<button class="btn primary" id="ml-save">'+(ex?'儲存':'儲存紀錄')+'</button>';
+  var timers=[];
+  openSheet({title:title+'・'+p.name,body:body,footer:footer,onClose:function(){timers.forEach(clearInterval)},onMount:function(el){
+    if(kind==='srr'){
+      bindSeg($('#sr-ctx',el));var n=0,start=0,tap=$('#sr-tap',el);
+      tap.onclick=function(){
+        if(!start){start=Date.now();n=0;$('#sr-n',el).textContent='0';var iv=setInterval(function(){var left=30-Math.floor((Date.now()-start)/1000);
+          if(left<=0){clearInterval(iv);tap.disabled=true;$('#sr-tx',el).textContent='時間到！30 秒 '+n+' 次';$('#sr-bpm',el).value=n*2;$('#sr-n',el).textContent=(n*2)+' 次/分';setTimeout(function(){tap.disabled=false;start=0;$('#sr-tx',el).textContent='再點一次可以重新計數'},1500);return}
+          $('#sr-tx',el).textContent='還剩 '+left+' 秒，每吸一口氣點一下'},250);timers.push(iv);return}
+        n++;$('#sr-n',el).textContent=n;try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}
+      };
+    }
+    if(kind==='glucose')bindSeg($('#gl-w',el));
+    if(kind==='seizure'){bindSeg($('#sz-k',el));bindSeg($('#sz-sev',el));var sw=$('#sz-sw',el),t0=0;
+      if(sw)sw.onclick=function(){
+        if(!t0){t0=Date.now();l.ts=t0;$('#ml-time',el).value=isoLocal(t0);sw.classList.add('run');$('#sz-tx',el).textContent='結束時再按一次';var iv=setInterval(function(){var s=Math.floor((Date.now()-t0)/1000);$('#sz-t',el).textContent=Math.floor(s/60)+':'+pad(s%60)},250);timers.push(iv);return}
+        var s=Math.round((Date.now()-t0)/1000);timers.forEach(clearInterval);t0=0;sw.classList.remove('run');$('#sz-m',el).value=Math.floor(s/60);$('#sz-s',el).value=s%60;$('#sz-t',el).textContent='共 '+fmtDur(s);$('#sz-tx',el).textContent='已記下時間，補寫經過後儲存';
+      }}
+    if(kind==='qol'){var tot=function(){var t=0;$$('input[data-q]',el).forEach(function(r){t+=+r.value;$('#q-v'+r.dataset.q,el).textContent=r.value});$('#q-tot',el).textContent=t};tot();el.addEventListener('input',function(e){if(e.target.dataset.q!=null)tot()})}
+    if(kind==='lab'){var units2=Object.assign({},l.units||{});$('#lb-add',el).onclick=function(){var k=$('#lb-nk',el).value.trim(),u=$('#lb-nu',el).value.trim();if(!k){toast('請輸入項目名稱');return}if($('[data-lab="'+k.replace(/"/g,'')+'"]',el)){toast('已經有這個項目');return}units2[k]=u;$('.labin',el).insertAdjacentHTML('beforeend','<label class="labi"><span><b>'+esc(k)+'</b><small>'+esc(u)+'</small></span><input type="text" inputmode="decimal" maxlength="7" data-lab="'+esc(k)+'"></label>');$('#lb-nk',el).value='';$('#lb-nu',el).value=''};l._units=units2}
+    $('#ml-save',el).onclick=async function(){
+      if(kind==='srr'){var b=numVal(el,'sr-bpm');if(!b||b>200){toast('請輸入每分鐘呼吸次數');return}l.bpm=b;l.ctx=segVal($('#sr-ctx',el))||'sleep'}
+      if(kind==='glucose'){var g=numVal(el,'gl-v',true);if(!g||g>1000){toast('請輸入血糖數值');return}l.mgdl=g;l.when=segVal($('#gl-w',el))||'other'}
+      if(kind==='seizure'){l.kind=segVal($('#sz-k',el))||'其他';l.sev=segVal($('#sz-sev',el))||'1';l.dur=(numVal(el,'sz-m')||0)*60+(numVal(el,'sz-s')||0)}
+      if(kind==='qol'){l.s=$$('input[data-q]',el).map(function(r){return +r.value});l.total=l.s.reduce(function(a,b){return a+b},0)}
+      if(kind==='lab'){var v={};$$('input[data-lab]',el).forEach(function(i){var x=i.value.replace(/,/g,'.').trim();if(x!=='')v[i.dataset.lab]=isNaN(+x)?x:+x});if(!Object.keys(v).length){toast('至少填一個數值');return}l.vals=v;var us={};Object.keys(v).forEach(function(k){var u=(l._units||{})[k];if(u)us[k]=u});l.units=us;delete l._units}
+      l.ts=readTs(el,'ml-time');l.note=$('#ml-note',el).value.trim();
+      timers.forEach(clearInterval);await saveLog(l);closeTop();render();if(after)setTimeout(after,50);toast(ex?'已儲存':'已記錄'+title);
+    };
+    var del=$('#ml-del',el);if(del)del.onclick=async function(){if(!await confirmDlg('刪除這筆'+title+'？','刪除',true))return;await removeLog(l.id);closeTop();render();if(after)setTimeout(after,50);toast('已刪除')};
+  }});
+}
+
+/* ---------- 病史、緊急資訊、體重警示 ---------- */
+function weightAlert(p){
+  var pts=weightPoints(p.id);if(pts.length<2)return null;
+  var last=pts[pts.length-1],base=null;
+  for(var i=pts.length-2;i>=0;i--){var age=(last.t-pts[i].t)/864e5;if(age>=14&&age<=45){base=pts[i];break}if(age>45)break}
+  if(!base||Date.now()-last.t>45*864e5)return null;
+  var ch=(last.kg-base.kg)/base.kg;if(Math.abs(ch)<0.05)return null;
+  return {pct:Math.round(Math.abs(ch)*100),down:ch<0,from:base.kg,to:last.kg,days:Math.round((last.t-base.t)/864e5)};
+}
+function openCareEdit(){
+  var p=curPet();if(!p)return;var c=petCare(p),conds=c.conds.slice();
+  var body='<div class="field"><span class="lbl">慢性病史（可複選）</span><div class="chipwrap" id="ce-c">'+CONDS.concat(conds.filter(function(x){return CONDS.indexOf(x)<0})).map(function(n){return '<button type="button" class="fchip '+(conds.indexOf(n)>=0?'on':'')+'" data-c="'+esc(n)+'">'+esc(n)+'</button>'}).join('')+'</div><div class="itemrow" style="margin-top:8px"><input id="ce-new" type="text" maxlength="16" placeholder="其他病況"><button type="button" class="iconbtn" id="ce-add" aria-label="新增病況" style="background:var(--primary);color:var(--on-primary)">'+ico('plus')+'</button></div></div>'+
+    '<div class="field"><label for="ce-al">過敏（藥物、食物）</label><input id="ce-al" type="text" maxlength="60" placeholder="例如：盤尼西林、雞肉" value="'+esc(c.allergy)+'"></div>'+
+    '<div class="field"><label for="ce-bl">血型（選填）</label><input id="ce-bl" type="text" maxlength="12" placeholder="例如：A 型、DEA 1.1+" value="'+esc(c.blood)+'"></div>'+
+    '<div class="row2"><div class="field"><label for="ce-vet">常去的醫院／獸醫</label><input id="ce-vet" type="text" maxlength="30" value="'+esc(c.vet)+'"></div><div class="field"><label for="ce-tel">電話</label><input id="ce-tel" type="tel" maxlength="20" value="'+esc(c.vetTel)+'"></div></div>'+
+    '<div class="field"><label for="ce-notes">照護重點（選填）</label><textarea id="ce-notes" placeholder="例如：每天晚上皮下輸液 100 ml、不能吃高磷食物">'+esc(c.notes)+'</textarea></div>';
+  openSheet({title:'病史與緊急資訊・'+p.name,body:body,footer:'<button class="btn primary" id="ce-save">儲存</button>',onMount:function(el){
+    var box=$('#ce-c',el);
+    box.addEventListener('click',function(e){var b=e.target.closest('[data-c]');if(!b)return;var n=b.dataset.c,i=conds.indexOf(n);if(i<0)conds.push(n);else conds.splice(i,1);b.classList.toggle('on',i<0)});
+    $('#ce-add',el).onclick=function(){var v=$('#ce-new',el).value.trim();if(!v)return;if(conds.indexOf(v)<0){conds.push(v);box.insertAdjacentHTML('beforeend','<button type="button" class="fchip on" data-c="'+esc(v)+'">'+esc(v)+'</button>')}$('#ce-new',el).value=''};
+    $('#ce-save',el).onclick=async function(){p.care=Object.assign(petCare(p),{conds:conds,allergy:$('#ce-al',el).value.trim(),blood:$('#ce-bl',el).value.trim(),vet:$('#ce-vet',el).value.trim(),vetTel:$('#ce-tel',el).value.trim(),notes:$('#ce-notes',el).value.trim()});await savePet(p);closeTop();render();toast('已儲存')};
+  }});
+}
+function petAgeText(p){if(!p.birthday)return '';var a=ageParts(parseD(p.birthday),today());return a?(a.y?a.y+' 歲':'')+(a.m?a.m+' 個月':(a.y?'':a.d+' 天')):''}
+function lastWeight(p){var pts=weightPoints(p.id);return pts.length?pts[pts.length-1]:null}
+function activeMeds(p){var d=today();return petMeds(p).filter(function(m){return medActive(m,d)})}
+function medFreqText(m){return m.freq==='prn'?'需要時':((m.freq==='every'?'每 '+m.every+' 天 ':'每天 ')+(m.times||[]).join('、'))}
+function ecardText(p){
+  var c=petCare(p),w=lastWeight(p),lines=['【'+p.name+' 緊急醫療資訊】',[p.species,p.breed,p.gender!=='未知'?p.gender:'',petAgeText(p),w?fmtKg(w.kg)+' kg':''].filter(Boolean).join('・')];
+  if(c.conds.length)lines.push('病史：'+c.conds.join('、'));
+  lines.push('過敏：'+(c.allergy||'無已知過敏'));
+  if(c.blood)lines.push('血型：'+c.blood);
+  var ms=activeMeds(p);if(ms.length)lines.push('目前用藥：'+ms.map(function(m){return m.name+' '+doseText(m)+'（'+medFreqText(m)+'）'}).join('；'));
+  if(c.notes)lines.push('照護重點：'+c.notes);
+  if(c.vet||c.vetTel)lines.push('醫院：'+[c.vet,c.vetTel].filter(Boolean).join(' '));
+  return lines.join('\n');
+}
+function openECard(){
+  var p=curPet();if(!p)return;var c=petCare(p),w=lastWeight(p),ms=activeMeds(p);
+  var row=function(k,v){return v?'<div class="ecr"><small>'+k+'</small><b>'+v+'</b></div>':''};
+  var body='<div class="ecard"><div class="ech">'+avatar(p,56)+'<div><b>'+esc(p.name)+'</b><small>'+esc([p.species,p.breed,petAgeText(p),w?fmtKg(w.kg)+' kg':''].filter(Boolean).join('・'))+'</small></div></div>'+
+    row('病史',esc(c.conds.join('、')))+row('過敏',esc(c.allergy||'無已知過敏'))+row('血型',esc(c.blood))+
+    row('目前用藥',ms.map(function(m){return esc(m.name)+' <small>'+esc(doseText(m))+'・'+esc(medFreqText(m))+'</small>'}).join('<br>'))+
+    row('照護重點',esc(c.notes))+row('醫院',esc([c.vet,c.vetTel].filter(Boolean).join(' ')))+'</div>'+
+    '<small>緊急時可以直接出示這個畫面，或分享給保母、家人。</small>';
+  openSheet({title:'緊急資訊卡',body:body,footer:'<button class="btn" data-act="careedit">'+ico('edit',18)+'編輯</button><button class="btn primary" id="ec-share">'+ico('share',18)+'分享</button>',onMount:function(el){
+    $('#ec-share',el).onclick=function(){shareText(p.name+' 緊急醫療資訊',ecardText(p))};
+  }});
+}
+async function shareText(title,text){
+  try{var cap=window.Capacitor,P=cap&&cap.Plugins;if(isNative()&&P&&P.Share){await P.Share.share({title:title,text:text,dialogTitle:title});return}}catch(e){if(e&&/cancel/i.test(String(e.message||e)))return}
+  try{if(navigator.share){await navigator.share({title:title,text:text});return}}catch(e){if(e&&e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(text);toast('已複製，可以貼到 LINE 或訊息')}catch(e){toast('無法分享，請截圖')}
+}
+
+/* ---------- 看診報告 ---------- */
+function reportData(p,days){
+  var from=Date.now()-days*864e5,c=petCare(p),pts=weightPoints(p.id),inR=pts.filter(function(x){return x.t>=from});
+  var syms=S.logs.filter(function(l){return l.petId===p.id&&l.ts>=from&&['vomit','stool','appetite','energy','cough','skin','injury','vet','other'].indexOf(l.type)>=0}).sort(function(a,b){return b.ts-a.ts});
+  var by=function(t){return S.logs.filter(function(l){return l.petId===p.id&&l.type===t&&l.ts>=from}).sort(function(a,b){return b.ts-a.ts})};
+  return {c:c,from:from,days:days,w:inR,wAll:pts,syms:syms,srr:by('srr'),glu:by('glucose'),sz:by('seizure'),qol:by('qol'),labs:mLogs(p,'lab').slice(0,3),meds:activeMeds(p),adh:adherence(p,Math.min(days,30)),medLogs:by('med'),alert:weightAlert(p)};
+}
+function reportHtml(p,days,forPrint){
+  var D=reportData(p,days),c=D.c,h='',sec=function(t,b){return b?'<section class="rps"><h4>'+t+'</h4>'+b+'</section>':''};
+  var w=lastWeight(p);
+  h+='<div class="rph"><div><b>'+esc(p.name)+'</b> 看診摘要</div><small>'+esc([p.species,p.breed,p.gender!=='未知'?p.gender:'',petAgeText(p),{yes:'已結紮',no:'未結紮'}[petNeut(p)]||''].filter(Boolean).join('・'))+'<br>期間：最近 '+days+' 天（'+fmtD(ymd(new Date(D.from)))+'–'+fmtD(ymd(today()))+'）</small></div>';
+  h+=sec('病史與過敏',(c.conds.length?'<p>病史：'+esc(c.conds.join('、'))+'</p>':'')+'<p>過敏：'+esc(c.allergy||'無已知過敏')+'</p>'+(c.notes?'<p>照護重點：'+esc(c.notes)+'</p>':''));
+  if(D.wAll.length){var f=D.w[0]||D.wAll[D.wAll.length-1],l=D.wAll[D.wAll.length-1];h+=sec('體重',(D.w.length>1?'<p>'+fmtKg(f.kg)+' → <b>'+fmtKg(l.kg)+' kg</b>（'+(l.kg>=f.kg?'+':'−')+fmtKg(Math.abs(l.kg-f.kg))+' kg，'+(Math.round((l.kg-f.kg)/f.kg*1000)/10)+'%）</p>':'<p>最近一次 <b>'+fmtKg(l.kg)+' kg</b>（'+fmtD(ymd(new Date(l.t)))+'）</p>')+(D.w.length>1&&!forPrint?'<div class="rpspark">'+sparkSvg(D.w,280,46)+'</div>':'')+(D.alert?'<p class="rpw">⚠ '+D.alert.days+' 天內'+(D.alert.down?'下降':'增加')+' '+D.alert.pct+'%</p>':''))}
+  if(D.meds.length)h+=sec('目前用藥'+(D.adh?'（最近 '+Math.min(days,30)+' 天按時給藥 '+D.adh.pct+'%，'+D.adh.ok+'/'+D.adh.tot+' 次）':''),'<ul>'+D.meds.map(function(m){return '<li><b>'+esc(m.name)+'</b> '+esc(doseText(m))+'・'+medKindName(m.kind)+'・'+esc(medFreqText(m))+(m.start?'・自 '+fmtD(m.start)+' 開始':'')+'</li>'}).join('')+'</ul>'+(function(){var rx=D.medLogs.filter(function(l){return l.note});return rx.length?'<p>給藥後反應：</p><ul>'+rx.slice(0,8).map(function(l){return '<li>'+fmtD(ymd(new Date(l.ts))).slice(5)+' '+esc(l.name)+'：'+esc(l.note)+'</li>'}).join('')+'</ul>':''})());
+  var ms=[];
+  if(D.srr.length){var v=D.srr.map(function(x){return +x.bpm});ms.push('<li>睡眠呼吸：平均 <b>'+Math.round(v.reduce(function(a,b){return a+b},0)/v.length)+'</b> 次/分，最高 '+Math.max.apply(null,v)+'（'+v.length+' 次測量）</li>')}
+  if(D.glu.length){var g=D.glu.map(function(x){return +x.mgdl});ms.push('<li>血糖：'+Math.min.apply(null,g)+'–'+Math.max.apply(null,g)+' mg/dL（'+g.length+' 次），最近 '+g[0]+'</li>')}
+  if(D.qol.length)ms.push('<li>生活品質：最近 <b>'+D.qol[0].total+'</b>/70'+(D.qol.length>1?'（期間最低 '+Math.min.apply(null,D.qol.map(function(x){return x.total}))+'）':'')+'</li>');
+  h+=sec('居家測量',ms.length?'<ul>'+ms.join('')+'</ul>':'');
+  h+=sec('異常事件（'+D.sz.length+' 次）',D.sz.length?'<ul>'+D.sz.slice(0,12).map(function(l){var d=new Date(l.ts);return '<li>'+fmtD(ymd(d)).slice(5)+' '+hhmm(l.ts)+' '+esc(l.kind||'')+'・'+fmtDur(l.dur)+'・'+(({'1':'輕微','2':'中等','3':'嚴重'})[l.sev]||'')+(l.note?'：'+esc(l.note):'')+'</li>'}).join('')+'</ul>':'');
+  h+=sec('檢驗數值',D.labs.length?'<ul>'+D.labs.map(function(l){return '<li>'+fmtD(ymd(new Date(l.ts)))+'：'+esc(mLine(l))+'</li>'}).join('')+'</ul>':'');
+  h+=sec('身體狀況紀錄（'+D.syms.length+' 筆）',D.syms.length?'<ul>'+D.syms.slice(0,15).map(function(l){return '<li>'+fmtD(ymd(new Date(l.ts))).slice(5)+' '+esc(logLabel(l))+(l.note?'：'+esc(l.note):'')+'</li>'}).join('')+'</ul>':'');
+  if(c.qs)h+=sec('想問獸醫的問題','<p style="white-space:pre-line">'+esc(c.qs)+'</p>');
+  h+='<p class="rpf">由伴獸筆記產生・'+fmtD(ymd(today()))+'。內容為飼主在家的紀錄，僅供看診參考。</p>';
+  return h;
+}
+function reportText(p,days){var div=document.createElement('div');div.innerHTML=reportHtml(p,days,true);$$('section,p,li,.rph div,.rph small',div).forEach(function(n){n.insertAdjacentText('beforebegin','\n')});$$('h4',div).forEach(function(n){n.insertAdjacentText('beforebegin','\n【');n.insertAdjacentText('afterend','】')});$$('li',div).forEach(function(n){n.insertAdjacentText('afterbegin','・')});return div.textContent.replace(/\n{3,}/g,'\n\n').trim()}
+var REPORT_CSS='body{font:15px/1.6 -apple-system,"Noto Sans TC","PingFang TC",sans-serif;color:#1C2724;margin:24px;max-width:760px}.rph{border-bottom:3px solid #1F6F5C;padding-bottom:10px;margin-bottom:6px}.rph b{font-size:22px}.rph div{font-size:18px}.rph small{color:#5A6762}.rps{border-bottom:1px solid #E7DFD3;padding:6px 0}.rps h4{margin:6px 0;color:#1F6F5C;font-size:16px}.rps p{margin:4px 0}.rps ul{margin:4px 0;padding-left:1.2em}.rpw{color:#B5531A;font-weight:700}.rpf{color:#888;font-size:12px;margin-top:14px}';
+function openReport(){
+  var p=curPet();if(!p)return;var days=30,c=petCare(p);
+  var body='<div class="seg" id="rp-d"><button type="button" data-v="30" class="on">最近 30 天</button><button type="button" data-v="90">最近 90 天</button></div>'+
+    '<div class="field" style="margin-top:12px"><label for="rp-q">想問獸醫的問題（會放進報告）</label><textarea id="rp-q" placeholder="例如：最近喝水變多正常嗎？藥要吃到什麼時候？">'+esc(c.qs)+'</textarea></div>'+
+    '<div class="report" id="rp-body">'+reportHtml(p,days)+'</div>';
+  openSheet({title:'看診報告・'+p.name,body:body,footer:'<button class="btn" id="rp-share">'+ico('share',18)+'分享文字</button><button class="btn primary" id="rp-print">'+ico('doc',18)+(isNative()?'存成檔案':'列印／存 PDF')+'</button>',onMount:function(el){
+    var paint=function(){$('#rp-body',el).innerHTML=reportHtml(p,days)};
+    bindSeg($('#rp-d',el),function(v){days=+v;paint()});
+    var q=$('#rp-q',el),qt=null;q.addEventListener('input',function(){clearTimeout(qt);qt=setTimeout(async function(){p.care=Object.assign(petCare(p),{qs:q.value.trim()});await savePet(p);paint()},600)});
+    $('#rp-share',el).onclick=function(){shareText(p.name+' 看診摘要',reportText(p,days))};
+    $('#rp-print',el).onclick=async function(){
+      var doc='<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(p.name)+' 看診摘要</title><style>'+REPORT_CSS+'</style></head><body>'+reportHtml(p,days,true)+'</body></html>';
+      if(isNative()){try{var P=window.Capacitor.Plugins,name=p.name+'-看診摘要-'+ymd(today())+'.html';await P.Filesystem.writeFile({path:name,data:doc,directory:'CACHE',encoding:'utf8'});var u=await P.Filesystem.getUri({path:name,directory:'CACHE'});await P.Share.share({title:name,url:u.uri,dialogTitle:'分享看診報告'})}catch(e){}return}
+      var f=document.createElement('iframe');f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.appendChild(f);
+      f.contentDocument.open();f.contentDocument.write(doc);f.contentDocument.close();
+      setTimeout(function(){try{f.contentWindow.focus();f.contentWindow.print()}catch(e){toast('無法列印，請改用分享文字')}setTimeout(function(){f.remove()},60000)},300);
+    };
+  }});
+}
+
+/* ---------- 照護分頁：醫療 ---------- */
+function viewMedCare(p){
+  if(!careOn(p))return pbanner({icon:'heart',title:'醫療照護',sub:esc(p.name)})+'<div class="empty"><h3>給高齡或需要長期照護的毛孩</h3><p>開啟後可以設定用藥與治療提醒、記錄睡眠呼吸、血糖、異常事件、檢驗數值、生活品質，並產生看診報告給獸醫。</p><button class="btn primary" data-act="careon">開啟高齡／特殊照護</button></div>';
+  var c=petCare(p),ds=dosesOn(p,today()),dn=ds.filter(function(x){return x.log}).length,adh=adherence(p,30);
+  var body='<div class="pbrow">'+(ds.length?'<div class="pbring">'+ringSvg(dn/ds.length,64,'var(--primary)','color-mix(in srgb,var(--primary) 18%,transparent)')+'<span><b>'+dn+'</b>/'+ds.length+'</span></div>':'')+'<div class="grow"><b class="pbbig">'+(ds.length?(dn>=ds.length?'今天的藥都給完了':'今天還有 '+(ds.length-dn)+' 次要給'):'今天沒有排定的藥')+'</b><small>'+(adh?'最近 30 天按時給藥 '+adh.pct+'%':(c.conds.length?esc(c.conds.join('、')):'點右上角的卡片編輯病史'))+'</small></div><button class="pbbtn" data-act="ecard" aria-label="緊急資訊卡">'+ico('card',20)+'</button></div>';
+  var h=pbanner({icon:'heart',title:'醫療照護',sub:esc(p.name)+(c.conds.length?'・'+esc(c.conds.slice(0,2).join('、'))+(c.conds.length>2?'…':''):''),body:body});
+  h+='<div class="stack">';
+  var wa=weightAlert(p);if(wa)h+='<div class="alerts"><button class="alert warn" data-act="weights">'+ico('alert',20)+'<span>體重 '+wa.days+' 天內'+(wa.down?'下降':'增加')+' '+wa.pct+'%（'+fmtKg(wa.from)+' → '+fmtKg(wa.to)+' kg），建議告訴獸醫</span>'+ico('cr',16)+'</button></div>';
+  h+='<section class="card"><div class="cardhead"><h2>今日用藥</h2><button class="linkbtn" data-act="medlist">用藥清單'+ico('cr',16)+'</button></div>'+dosesHtml(p)+'</section>';
+  h+='<section class="card"><div class="cardhead"><h2>居家測量</h2></div>'+careTiles(p)+'</section>';
+  h+='<section class="card"><div class="cardhead"><h2>檢驗數值</h2><button class="linkbtn" data-act="madd" data-k="lab">'+ico('plus',16)+'新增</button></div><div role="button" tabindex="0" data-act="mview" data-k="lab">'+labTable(p)+'</div></section>';
+  h+='<section class="card"><div class="cardhead"><h2>病史與緊急資訊</h2><button class="linkbtn" data-act="careedit">編輯'+ico('cr',16)+'</button></div>'+
+    (c.conds.length?'<div class="chipwrap">'+c.conds.map(function(x){return '<span class="pill cnt">'+esc(x)+'</span>'}).join('')+'</div>':'<small>還沒有填病史。</small>')+
+    '<p class="about" style="margin:8px 0 0">過敏：'+esc(c.allergy||'無已知過敏')+(c.vet?'<br>醫院：'+esc(c.vet)+(c.vetTel?' '+esc(c.vetTel):''):'')+'</p>'+
+    '<div class="actions" style="margin-top:12px"><button class="btn" data-act="ecard">'+ico('card',18)+'緊急資訊卡</button><button class="btn primary" data-act="report">'+ico('doc',18)+'看診報告</button></div></section>';
+  h+='<small style="padding:0 4px">這裡的紀錄只是協助觀察與溝通，不能取代獸醫診斷。數值異常或狀況變差，請盡快就醫。</small></div>';
+  return h;
+}
+function careHomeCard(p){
+  if(!careOn(p))return '';
+  var ds=dosesOn(p,today());
+  return '<section class="card carecard"><div class="cardhead"><h2>今日照護</h2><button class="linkbtn" data-act="caretab">醫療照護'+ico('cr',16)+'</button></div>'+(ds.length||petMeds(p).length?dosesHtml(p,true):'')+
+    '<div class="qchips">'+[['srr','pulse','測呼吸'],['glucose','drop','記血糖'],['seizure','alert','異常事件'],['qol','heart','生活品質']].map(function(k){return '<button class="fchip" data-act="madd" data-k="'+k[0]+'">'+ico(k[1],15)+k[2]+'</button>'}).join('')+'</div></section>';
+}
+function viewCare(){
+  var p=curPet(),seg=careSeg();
+  var segs=[['worm','驅蟲'],['groom','美容清潔']];if(medTabVisible(p))segs.push(['med','醫療照護']);
+  var tabs='<div class="caretop"><div class="seg caretabs" role="tablist" style="grid-template-columns:repeat('+segs.length+',minmax(0,1fr))">'+segs.map(function(x){return '<button type="button" data-act="careseg" data-v="'+x[0]+'" class="'+(seg===x[0]?'on':'')+'" role="tab" aria-selected="'+(seg===x[0])+'">'+x[1]+'</button>'}).join('')+'</div><button class="caregear" data-act="careopts" aria-label="'+esc(p.name)+'的照護設定">'+ico('gear',20)+'</button></div>';
+  return tabs+(seg==='groom'?viewGroom(p):(seg==='med'?viewMedCare(p):viewDeworm()));
+}
+function openCareOpts(){
+  var p=curPet();if(!p)return;
+  var body='<div class="swrow" style="border-top:0;padding-top:0"><span><b>醫療照護</b><small>給高齡或需要長期照護的毛孩<br>開啟後可以設定用藥與治療提醒等設定</small></span><span class="sw"><input type="checkbox" id="co-med" '+(careOn(p)?'checked':'')+' aria-label="醫療照護"><i></i></span></div>'+
+    '<div class="swrow"><span><b>美容清潔到期提醒</b><small>到期當天早上提醒，首頁也會顯示</small></span><span class="sw"><input type="checkbox" id="co-groom" '+(groomRemindOn(p)?'checked':'')+' aria-label="美容清潔到期提醒"><i></i></span></div>'+
+    '<div class="hint">每隻寵物分開設定。關閉醫療照護只會隱藏分頁和提醒，已記錄的資料都會保留。</div>';
+  openSheet({title:p.name+'的照護設定',body:body,footer:'<button class="btn primary" id="co-save">完成</button>',onMount:function(el){
+    $('#co-save',el).onclick=async function(){
+      var on=$('#co-med',el).checked,was=careOn(p);
+      p.care=Object.assign(petCare(p),{on:on});p.groomRemind=$('#co-groom',el).checked;
+      await savePet(p);if(on&&!was)lsSet('petnote.careSeg','med');closeTop();render();Notif.sync();
+      toast(on===was?'已儲存':(on?'已開啟醫療照護':'已關閉醫療照護'));
+    };
+  }});
+}
+function careAlerts(p,now,out){
+  if(groomRemindOn(p))petGroom(p).forEach(function(it){var s=groomStatus(p,it,now);if(s.state==='overdue'||s.state==='today')out.push({tone:'warn',pid:p.id,tab:'deworm',seg:'groom',text:p.name+'・'+it.name+(s.state==='today'?' 今天該做了':' 已經超過 '+(-s.days)+' 天')})});
+  if(careOn(p)){
+    var late=dosesOn(p,now).filter(function(x){return !x.log&&slotTs(x.key)<Date.now()-60*6e4});
+    if(late.length)out.push({kind:'medlate',tone:'bad',pid:p.id,tab:'deworm',seg:'med',text:p.name+'・'+late.map(function(x){return x.t+' '+x.m.name}).slice(0,2).join('、')+(late.length>2?' 等 '+late.length+' 次':'')+' 還沒給藥'});
+    var wa=weightAlert(p);if(wa)out.push({kind:'weight',tone:'warn',pid:p.id,tab:'deworm',seg:'med',text:p.name+'・體重 '+wa.days+' 天內'+(wa.down?'下降':'增加')+' '+wa.pct+'%，建議告訴獸醫'});
+  }
+}
+function careNotifs(p,now,at,out){
+  if(groomRemindOn(p))petGroom(p).forEach(function(it){var s=groomStatus(p,it,today());if(!s.due)return;var t=at(s.due);if(t>now)out.push({t:t,title:p.name+'的美容清潔提醒',body:'今天該'+(/^[洗剪清刷梳剃擠]/.test(it.name)?'':'做')+it.name+'了'})});
+  if(careOn(p))for(var k=0;k<3;k++){var d=addDays(today(),k);dosesOn(p,d).forEach(function(x){if(x.log||x.m.remind===false)return;var t=new Date(slotTs(x.key));if(t>now)out.push({t:t,title:p.name+'的用藥提醒',body:x.t+' '+x.m.name+' '+doseText(x.m),pri:1})})}
+}
+function careHay(l){
+  if(l.type==='groom')return '\n美容\n清潔\n'+(l.item||'');
+  if(l.type==='med')return '\n用藥\n吃藥\n'+(l.name||'')+'\n'+medKindName(l.kind)+(l.status==='skipped'?'\n略過':'');
+  if(['srr','glucose','seizure','qol','lab'].indexOf(l.type)>=0)return '\n'+mLine(l);
+  return '';
+}
+function careMetricHtml(l,terms){
+  if(l.type==='med')return '<p class="note"><span class="wkg" style="font-size:18px">'+hl(doseText({},l)||'',terms)+'</span>'+(l.status==='skipped'?'<span class="delta">略過</span>':'')+(l.site?'<span class="delta">'+siteLabel(l.site)+'</span>':'')+'</p>';
+  if(['srr','glucose','seizure','qol','lab'].indexOf(l.type)>=0)return '<p class="note"><b>'+hl(mLine(l),terms)+'</b></p>';
+  return '';
+}
+
 /* ================= 備份 ================= */
 async function buildBackupBlob(progress){
   var ids=[];S.logs.forEach(function(l){(l.photos||[]).forEach(function(p){if(Photos.isId(p))ids.push(p)})});
@@ -3040,7 +3660,7 @@ async function paintCloud(){
   }
   var on=s.sync!==false;
   box.innerHTML='<div class="swrow" style="border-top:0;padding-top:0"><span><b>'+esc(s.email)+'</b><small>'+(on?(s.synced?'上次同步：'+fmtWhen(s.synced):'還沒同步過'):'自動同步已關閉')+'</small></span></div>'+
-    '<div class="actions" style="margin-top:4px"><button class="btn primary" data-act="gdsync">立即同步</button><button class="btn" data-act="gdrestore">從備份還原</button></div>'+
+    '<div class="actions" style="margin-top:12px"><button class="btn primary" data-act="gdsync">立即同步</button><button class="btn" data-act="gdrestore">從備份還原</button></div>'+
     '<div class="swrow"><span><b>自動同步</b><small>'+(isNative()?'打開 App、修改資料後會自動和其他裝置同步':'登入有效時（約 1 小時）會自動同步；過期後首頁會提示，點一下就能繼續')+'</small></span><span class="sw"><input type="checkbox" id="gdAuto" '+(on?'checked':'')+' aria-label="自動同步"><i></i></span></div>'+
     '<div class="swrow"><span><b>完整備份</b><small>'+(s.last?'上次：'+fmtWhen(s.last)+(s.remoteSize?'・'+fmtSize(s.remoteSize):''):'還沒有完整備份')+'。'+(on?'另外每 3 天自動存一份（含照片），萬一同步出錯可以還原。':'')+'</small></span><button class="btn" data-act="gdbackup" style="min-height:40px;flex:none">立即備份</button></div>'+
     '<button class="btn block" data-act="gdunlink" style="margin-top:6px">取消連結</button>';
@@ -3094,7 +3714,7 @@ var Notif=(function(){
   function plug(){try{var c=window.Capacitor;if(c&&c.isNativePlatform&&c.isNativePlatform()&&c.Plugins&&c.Plugins.LocalNotifications)return c.Plugins.LocalNotifications}catch(e){}return null}
   async function status(){var P=plug();if(!P)return 'web';try{var r=await P.checkPermissions();return r.display||'prompt'}catch(e){return 'error'}}
   async function ask(){var P=plug();if(!P)return 'web';try{var r=await P.requestPermissions();return r.display||'denied'}catch(e){return 'error'}}
-  function anyReminder(){return !!S.backup.every||S.pets.some(function(p){return p.wormRemind||vItems(p).some(function(i){return i.remind>=0})})}
+  function anyReminder(){return !!S.backup.every||S.pets.some(function(p){return p.wormRemind||careOn(p)||(groomRemindOn(p)&&petGroom(p).length)||vItems(p).some(function(i){return i.remind>=0})})}
   function build(){
     var out=[],now=new Date(),td=today();
     var at=function(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate(),9,0,0)};
@@ -3114,6 +3734,7 @@ var Notif=(function(){
           if(names.length)out.push({t:t,title:p.name+'的驅蟲提醒',body:'今天該驅蟲了：'+names.join('、')});
         }
       }
+      careNotifs(p,now,at,out);
     });
     if(S.pets.length&&S.backup.every){
       var bd=backupDue(),bt=bd?at(bd):null;
@@ -3121,7 +3742,7 @@ var Notif=(function(){
       if(bt)out.push({t:bt,title:'伴獸筆記：該備份資料了',body:'已經一段時間沒匯出備份，打開 App 到「設定 → 匯出備份」存一份到雲端硬碟。'});
     }
     out.sort(function(a,b){return a.t-b.t});
-    return out.slice(0,60).map(function(o,i){return {id:i+1,title:o.title,body:o.body,schedule:{at:o.t,allowWhileIdle:true}}});
+    return out.slice(0,120).map(function(o,i){return {id:i+1,title:o.title,body:o.body,schedule:{at:o.t,allowWhileIdle:true}}});
   }
   async function run(){
     var P=plug();if(!P)return;
@@ -3296,6 +3917,21 @@ document.addEventListener('click',function(e){
   else if(a==='year'){S.year+=+t.dataset.d;renderMain()}
   else if(a==='wormdone')openWormSheet(t.dataset.item,t.dataset.month);
   else if(a==='wormset')openWormSettings();
+  else if(a==='careopts')openCareOpts();
+  else if(a==='careseg'){lsSet('petnote.careSeg',t.dataset.v);render();animEnter()}
+  else if(a==='caretab'){lsSet('petnote.careSeg','med');S.tab='deworm';$('#main').scrollTop=0;render();animEnter()}
+  else if(a==='groomset')openGroomSettings();
+  else if(a==='groommonth')openGroomMonth(t.dataset.item,t.dataset.month);
+  else if(a==='groomadd')openGroomLog(null,t.dataset.item||null);
+  else if(a==='medgive')medGive(S.sel,t.dataset.mid,t.dataset.key);
+  else if(a==='meddose'||a==='medprn'){var cp=curPet(),cm2=petMeds(cp).filter(function(x){return x.id===t.dataset.mid})[0];if(cm2)openDoseSheet(cp,cm2,t.dataset.key||null)}
+  else if(a==='medlist')openMedList();
+  else if(a==='mview')openMeasure(t.dataset.k);
+  else if(a==='madd')openMeasureLog(t.dataset.k,null);
+  else if(a==='careon'){var cp2=curPet();cp2.care=Object.assign(petCare(cp2),{on:true});savePet(cp2).then(function(){render();toast('已開啟高齡／特殊照護');setTimeout(openCareEdit,400)})}
+  else if(a==='careedit'){if(Layers.length)closeTop();setTimeout(openCareEdit,Layers.length?300:0)}
+  else if(a==='ecard')openECard();
+  else if(a==='report')openReport();
   else if(a==='sample')loadSample();
   else if(a==='export')exportData();
   else if(a==='gdlink')gdAction('link');
@@ -3311,7 +3947,7 @@ document.addEventListener('click',function(e){
   else if(a==='libedit')openLibItem(t.dataset.name||null);
   else if(a==='grpedit')openGroup(t.dataset.id||null);
   else if(a==='wormadd')openWormBackfill();
-  else if(a==='alertgo'){S.sel=t.dataset.pid;lsSet('petnote.sel',S.sel);S.tab=t.dataset.tab;$('#main').scrollTop=0;render()}
+  else if(a==='alertgo'){if(t.dataset.seg)lsSet('petnote.careSeg',t.dataset.seg);S.sel=t.dataset.pid;lsSet('petnote.sel',S.sel);S.tab=t.dataset.tab;$('#main').scrollTop=0;render()}
   else if(a==='wpushon'){t.disabled=true;WebPush.enable().then(function(r){toast(r==='granted'?'已開啟通知':'沒有允許通知');updateNotifCard()}).catch(function(){t.disabled=false;toast('開啟失敗，請確認網路後再試一次')})}
   else if(a==='wpushoff'){WebPush.disable().then(function(){toast('已關閉通知');updateNotifCard()})}
   else if(a==='wpushtest'){t.disabled=true;WebPush.test().then(function(r){t.disabled=false;var m;if(r&&r.ok)m='測試通知已送出，幾秒內會收到';else if(r&&r.why==='perm')m='通知權限沒有開啟';else if(r&&r.why==='sub')m='無法建立推播訂閱（'+(r.detail||'')+'）';else m='推播服務拒絕（代碼 '+((r&&r.status)||'?')+'）';toast(m);var d=$('#wpushDiag');if(d)d.textContent=r&&r.ok?'':'診斷：'+m+(r&&r.detail&&r.why!=='sub'?'｜'+String(r.detail).slice(0,160):'');if(r&&r.why==='perm'){var rb=$('#wpushReperm');if(rb)rb.hidden=false}}).catch(function(e){t.disabled=false;toast('連不到通知伺服器，請確認網路');var d=$('#wpushDiag');if(d)d.textContent='診斷：連不到通知伺服器（'+String(e&&e.message||e)+'）'})}
@@ -3395,7 +4031,7 @@ function applyTheme(){
   else{setTimeout(function(){GDrive.quiet()},1500);setTimeout(function(){GDrive.autoTick()},6000)}
   setInterval(function(){if(!document.hidden)GDrive.quiet()},10000);
   window.addEventListener('focus',function(){GDrive.quiet()});window.addEventListener('online',function(){GDrive.quiet()});
-  if(/[?&]pntest=1/.test(location.search))window.__pn={S:S,saveFoods:saveFoods,saveLib:saveLib,saveLog:saveLog,removeLog:removeLog,savePet:savePet,removePet:removePet,saveWorm:saveWorm,Photos:Photos,GDrive:GDrive,uid:uid,render:render};
+  if(/[?&]pntest=1/.test(location.search))window.__pn={Notif:Notif,S:S,saveFoods:saveFoods,saveLib:saveLib,saveLog:saveLog,removeLog:removeLog,savePet:savePet,removePet:removePet,saveWorm:saveWorm,Photos:Photos,GDrive:GDrive,uid:uid,render:render};
   setTimeout(function(){Updater.check(false)},2500);
   if(!DB.ok)toast('目前無法永久儲存資料');
   else{var lv=lsGet('petnote.ver');if(lv&&lv!==APP_VERSION)toast('已更新到 '+APP_VERSION+' 版，資料都還在');lsSet('petnote.ver',APP_VERSION)}
