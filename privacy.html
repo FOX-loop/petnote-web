@@ -32,7 +32,7 @@ a{color:var(--primary)}
 <body>
 <main>
 <header><img src="icons/icon-192.png" alt=""><h1>伴獸筆記 隱私權政策</h1></header>
-<p class="meta">生效日期：2026 年 10 月 29 日　｜　開發者：FOX loop</p>
+<p class="meta">生效日期：2026 年 11 月 2 日　｜　開發者：FOX loop</p>
 
 <div class="sum"><b>重點摘要</b>
 <ul>
@@ -85,11 +85,25 @@ a{color:var(--primary)}
 </section>
 
 <section>
+<h2>5-1. 一起養（選用）</h2>
+<p>你可以在「設定 → 一起養」建立共養群組，或掃描夥伴的 QR code 加入，和夥伴一起記錄選定的毛孩。使用時，App 會請你登入 Google 帳號並要求以下權限：</p>
+<ul>
+<li><b>伴獸筆記自己建立的檔案</b>（drive.file）：只能讀寫伴獸筆記建立的「一起養」檔案，<b>看不到、也不會讀取你雲端硬碟裡的其他檔案</b>。</li>
+<li><b>你的名字與 Email 地址</b>：名字用來在紀錄旁顯示「誰記的」，讓夥伴知道誰餵過；Email 不會傳給其他人。</li>
+</ul>
+<p><b>資料存放與加密：</b>每位夥伴在自己的 Google 雲端硬碟有一個共用檔案，只包含建立者選定共用的毛孩資料（含大頭照）與紀錄（不含紀錄附加的照片）。檔案內容在你的裝置上用共養群組專屬的金鑰加密後才上傳，並設定成「知道連結的人可以檢視」，讓夥伴的 App 讀取；沒有金鑰的人即使拿到檔案也只看得到亂碼。金鑰只存在夥伴的裝置與邀請 QR code 裡，請不要把 QR code 分享給夥伴以外的人。</p>
+<p><b>加入共養群組的通知：</b>夥伴加入或離開時，App 會把「這位夥伴的共用檔案位置、名字與加密用的公開金鑰」<b>加密後</b>暫存在開發者的通知伺服器（Cloudflare），讓建立者的 App 取走，取走後立即刪除，30 天沒人取走也會自動刪除。伺服器無法解讀內容，也不會保存你的紀錄。</p>
+<p><b>離開與刪除：</b>你可以隨時離開共養群組（建立者可以解散共養群組或移出成員），離開時 App 會刪除你雲端硬碟裡的共用檔案；建立者解散時，共用檔案會清空成只剩「已解散」的標記（檔名會標示可以刪除），讓夥伴的 App 知道要停止同步。被移出或離開後，共養群組會更換金鑰，之後的新紀錄就無法讀取。已經同步到夥伴裝置上的紀錄，會留在他們的裝置上。</p>
+<p>伴獸筆記對 Google API 資料的使用同樣遵守 <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API 服務使用者資料政策</a>（包括「有限使用」要求），只用來提供一起養功能。</p>
+</section>
+
+<section>
 <h2>6. 網路連線</h2>
 <ul>
-<li><b>Google Play 版：</b>App 不會主動連線到開發者的伺服器，更新由 Google Play 處理。</li>
+<li><b>Google Play 版：</b>App 不會主動連線到開發者的伺服器，更新由 Google Play 處理；只有使用「一起養」加入或離開共養群組時，會依第 5-1 點傳送一則加密的通知。</li>
 <li><b>自行安裝的 Android 版（APK）：</b>開啟時會向 GitHub 查詢是否有新版本，只會取得版本資訊，不會傳送你的任何紀錄。</li>
 <li><b>Google 雲端硬碟同步與備份：</b>只有你連結 Google 帳號後，才會依第 5 點連線到 Google 的登入與雲端硬碟服務。</li>
+<li><b>一起養：</b>只有你建立或加入共養群組後，才會依第 5-1 點連線到 Google 雲端硬碟（讀取夥伴的共用檔案）與通知伺服器；邀請用的 QR code 產生與掃描程式會從 cdn.jsdelivr.net 下載，不包含你的資料。</li>
 <li><b>網頁版：</b>網頁由 GitHub Pages 提供，GitHub 可能依其政策記錄一般的連線資訊（例如 IP 位址）。你在網頁版輸入的資料一樣只存在瀏覽器裡；只有開啟通知時，會依第 3 點連線到通知伺服器（Cloudflare 也可能依其政策記錄一般的連線資訊）。</li>
 </ul>
 </section>
@@ -116,7 +130,7 @@ a{color:var(--primary)}
 
 <div class="en">
 <h2>Privacy Policy (English summary)</h2>
-<p>伴獸筆記 (Banshou Notes), developed by FOX loop, stores all pet profiles, records, photos and reminder settings only on your own device (app storage or the browser's local database). We do not collect, share or sell personal data. There are no accounts, ads, analytics or tracking. Photos are read only when you choose them. On Android, reminders are scheduled locally. On the web version, if you turn on notifications, your push subscription, a random device ID and the upcoming reminder titles and times are stored on our notification server (Cloudflare) solely to deliver them; reminders are deleted once sent and everything is deleted when you turn notifications off. Backups are created on your device and saved wherever you choose. If you link a Google account, your data is synced between your devices and backed up directly from each device to a hidden app-specific folder in your own Google Drive (drive.appdata scope, plus your email address to show which account is linked); the developer has no access to them, and use of Google API data complies with the Google API Services User Data Policy, including the Limited Use requirements. Contact: <a href="mailto:foxloop.apps@gmail.com">foxloop.apps@gmail.com</a>. Effective date: October 29, 2026.</p>
+<p>伴獸筆記 (Banshou Notes), developed by FOX loop, stores all pet profiles, records, photos and reminder settings only on your own device (app storage or the browser's local database). We do not collect, share or sell personal data. There are no accounts, ads, analytics or tracking. Photos are read only when you choose them. On Android, reminders are scheduled locally. On the web version, if you turn on notifications, your push subscription, a random device ID and the upcoming reminder titles and times are stored on our notification server (Cloudflare) solely to deliver them; reminders are deleted once sent and everything is deleted when you turn notifications off. Backups are created on your device and saved wherever you choose. If you link a Google account, your data is synced between your devices and backed up directly from each device to a hidden app-specific folder in your own Google Drive (drive.appdata scope, plus your email address to show which account is linked); the developer has no access to them, and use of Google API data complies with the Google API Services User Data Policy, including the Limited Use requirements. If you use Co-care ("一起養"), the shared pets' records (without photos) are encrypted on your device with a family key and stored in a file in your own Google Drive (drive.file scope, plus your name and email; your name is shown to your co-carers), shared by link so co-carers' apps can read it; when someone joins or leaves, an encrypted note (their file location, name and public key) is briefly relayed through our notification server and deleted once picked up or after 30 days. The developer cannot read the shared data. Contact: <a href="mailto:foxloop.apps@gmail.com">foxloop.apps@gmail.com</a>. Effective date: November 2, 2026.</p>
 </div>
 </main>
 </body>
